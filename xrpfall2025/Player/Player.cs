@@ -8,32 +8,32 @@ public partial class Player : CharacterBody3D
 	// The downward acceleration when in the air, in meters per second squared.
 	[Export]
 	public int FallAcceleration { get; set; } = 75;
-
+	
 	private Vector3 _targetVelocity = Vector3.Zero;
 
 	public override void _PhysicsProcess(double delta)
 	{
 		var direction = Vector3.Zero;
-
+		
 		if (Input.IsActionPressed("right"))
 		{
 			direction.X += 1.0f;
-			GD.Print("Pressed D right");
+			//GD.Print("Pressed D right");
 		}
 		if (Input.IsActionPressed("left"))
 		{
 			direction.X -= 1.0f;
-			GD.Print("Pressed A left");
+			//GD.Print("Pressed A left");
 		}
 		if (Input.IsActionPressed("back"))
 		{
 			direction.Z += 1.0f;
-			GD.Print("Pressed S back");
+			//GD.Print("Pressed S back");
 		}
 		if (Input.IsActionPressed("forward"))
 		{
 			direction.Z -= 1.0f;
-			GD.Print("Pressed W forward");
+			//GD.Print("Pressed W forward");
 		}
 
 		if (direction != Vector3.Zero)
@@ -51,7 +51,7 @@ public partial class Player : CharacterBody3D
 		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
 		{
 			_targetVelocity.Y -= FallAcceleration * (float)delta;
-			GD.Print("I'm falling!");
+			//GD.Print("I'm falling!");
 		}
 
 		// Moving the character
