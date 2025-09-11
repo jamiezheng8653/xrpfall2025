@@ -1,3 +1,35 @@
-[gd_scene format=3 uid="uid://chl48ibp3ow2q"]
+[gd_scene load_steps=6 format=3 uid="uid://t6ina0qm5xao"]
+
+[ext_resource type="PackedScene" uid="uid://j2fwc787auoi" path="res://car.tscn" id="1_6p30n"]
+
+[sub_resource type="Environment" id="Environment_6p30n"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_6p30n"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wwp3m"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nhen0"]
+albedo_color = Color(0.431373, 0.270588, 1, 1)
 
 [node name="carMovement" type="Node3D"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.771314, -0.0711382, 0.632467, 0.623356, 0.11614, 0.773265, -0.128463, 0.990682, -0.0452359, 22.9486, 23.6745, 13.5026)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.0238537, 0.568117, -0.822602, 0.0164673, 0.822948, 0.567878, 0.99958, -9.31714e-10, -0.0289857, -83.5287, 61.8075, -6.46381)
+environment = SubResource("Environment_6p30n")
+
+[node name="Car" parent="." instance=ExtResource("1_6p30n")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 3.98096, 226.244, -5.39355)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_6p30n")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_wwp3m")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="StaticBody3D"]
+transform = Transform3D(100, 0, 0, 0, 1, 0, 0, 0, 96.55, 0, 0, 0)
+material = SubResource("StandardMaterial3D_nhen0")
