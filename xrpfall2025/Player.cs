@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class Car : CharacterBody3D
+public partial class Player : CharacterBody3D
 {
 	// How fast the player moves in meters per second.
 	[Export]
@@ -18,18 +18,22 @@ public partial class Car : CharacterBody3D
 		if (Input.IsActionPressed("right"))
 		{
 			direction.X += 1.0f;
+			GD.Print("Pressed D right");
 		}
 		if (Input.IsActionPressed("left"))
 		{
 			direction.X -= 1.0f;
+			GD.Print("Pressed A left");
 		}
 		if (Input.IsActionPressed("back"))
 		{
 			direction.Z += 1.0f;
+			GD.Print("Pressed S back");
 		}
 		if (Input.IsActionPressed("forward"))
 		{
 			direction.Z -= 1.0f;
+			GD.Print("Pressed W forward");
 		}
 
 		if (direction != Vector3.Zero)
@@ -43,12 +47,11 @@ public partial class Car : CharacterBody3D
 		_targetVelocity.X = direction.X * Speed;
 		_targetVelocity.Z = direction.Z * Speed;
 
-		GD.Print("IsOnFloor " + IsOnFloor());
-
 		// Vertical velocity
 		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
 		{
 			_targetVelocity.Y -= FallAcceleration * (float)delta;
+			GD.Print("I'm falling!");
 		}
 
 		// Moving the character

@@ -22,7 +22,7 @@ transform = Transform3D(-0.0238537, 0.568117, -0.822602, 0.0164673, 0.822948, 0.
 environment = SubResource("Environment_6p30n")
 
 [node name="Car" parent="." instance=ExtResource("1_6p30n")]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 3.98096, 226.244, -5.39355)
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 3.98096, 7.42, -5.39355)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 physics_material_override = SubResource("PhysicsMaterial_6p30n")
