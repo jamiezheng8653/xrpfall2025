@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://cbhuwjvyk2t2t"]
+[gd_scene load_steps=5 format=3 uid="uid://cbhuwjvyk2t2t"]
 
 [ext_resource type="Script" uid="uid://ckroufi0l422b" path="res://Player/Player.cs" id="1_4flbx"]
-[ext_resource type="Texture2D" uid="uid://ct5tj7qusd4kq" path="res://Assets/greenCircle.png" id="2_4ntmi"]
+[ext_resource type="Texture2D" uid="uid://crf26xahoogfh" path="res://Assets/greenTriangle.png" id="2_4ntmi"]
+[ext_resource type="Texture2D" uid="uid://ct5tj7qusd4kq" path="res://Assets/greenCircle.png" id="3_btcbx"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_onrkg"]
 
@@ -16,14 +17,19 @@ script = ExtResource("1_4flbx")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="Node3D/Player/Pivot"]
 
+[node name="triangle" type="Sprite3D" parent="Node3D/Player/Pivot/CSGBox3D"]
+transform = Transform3D(-0.75, -6.55671e-08, -2.86603e-15, 0, -3.27835e-08, 0.75, -6.55671e-08, 0.75, 3.27835e-08, 0, 1.8844, -2.56792)
+layers = 2
+texture = ExtResource("2_4ntmi")
+
 [node name="Camera3D" type="Camera3D" parent="Node3D/Player/Pivot/CSGBox3D"]
 transform = Transform3D(1, 0, 0, 0, 0.925739, 0.378164, 0, -0.378164, 0.925739, 0, 1.89331, 1.79712)
 cull_mask = 1047553
 
+[node name="circle" type="Sprite3D" parent="Node3D/Player/Pivot/CSGBox3D"]
+transform = Transform3D(0.25, 0, 0, 0, -1.09278e-08, 1, 0, -0.25, -4.37114e-08, 0, 1.35024, 0)
+layers = 2
+texture = ExtResource("3_btcbx")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/Player"]
 shape = SubResource("BoxShape3D_onrkg")
-
-[node name="Sprite3D" type="Sprite3D" parent="Node3D/Player"]
-transform = Transform3D(0.75, 0, 0, 0, -3.27835e-08, 0.75, 0, -0.75, -3.27835e-08, 0, 1.8844, 0)
-layers = 2
-texture = ExtResource("2_4ntmi")

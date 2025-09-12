@@ -43,8 +43,8 @@ cull_mask = 1047553
 [node name="MinimapSystem" type="Node" parent="."]
 
 [node name="MarginContainer" type="MarginContainer" parent="MinimapSystem"]
-offset_left = 938.0
-offset_top = 449.0
+offset_left = 913.0
+offset_top = 393.0
 offset_right = 1152.0
 offset_bottom = 646.0
 
@@ -54,7 +54,7 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="MinimapSystem/MarginContainer/SubViewportContainer"]
 handle_input_locally = false
-size = Vector2i(214, 197)
+size = Vector2i(239, 253)
 render_target_update_mode = 4
 
 [node name="minimapCamera" type="Camera3D" parent="MinimapSystem/MarginContainer/SubViewportContainer/SubViewport"]

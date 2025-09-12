@@ -17,26 +17,30 @@ public partial class Player : CharacterBody3D
 	//if the player gets a speedup or speed debuff, 
 	//multiply/divide _targetVelocity by cooresponding multiplier
 	//has to be int because Vectors are made up by ints
-	[Export]
-	private int slowMultiplier = 2;
+	[Export] private int slowMultiplier = 2;
 
-	[Export]
-	private int fastMultiplier = 2;
+	[Export] private int fastMultiplier = 2;
 
 	private Vector3 _targetVelocity = Vector3.Zero;
+	private Vector3 direction = Vector3.Forward;
+	private float maxSpeed = 30;
 
 	// How fast the player moves in meters per second.
-	[Export]
-	public int Speed { get; set; } = 14;
+	//[Export] public int Speed { get; set; } = 14;
+	private float speed = 0;
+	private float speedIncrement = 0.25f;
+
+	//Rotation speed
+	[Export] public float RotationSpeed { get; set; } = 1.5f;
+	private float rotationIncrement = Mathf.DegToRad(1); //per delta
+	private float _rotationDirection;
 
 	// The downward acceleration when in the air, in meters per second squared.
-	[Export]
-	public int FallAcceleration { get; set; } = 75;
+	[Export] public int FallAcceleration { get; set; } = 75;
 
-	[Export]
 	//change of state. may update this when we hash out 
 	// how we want to track player state upon item collision
-	public States Current
+	[Export] public States Current
 	{
 		get { return current; }
 		set { current = value; }
@@ -44,27 +48,40 @@ public partial class Player : CharacterBody3D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		Vector3 direction = Vector3.Zero;
+		//Vector3 direction = Vector3.Zero;
 
 		if (Input.IsActionPressed("right"))
 		{
-			direction.X += 1.0f;
+			direction.X += rotationIncrement;
 			//GD.Print("Pressed D right");
 		}
-		if (Input.IsActionPressed("left"))
+		else if (Input.IsActionPressed("left"))
 		{
-			direction.X -= 1.0f;
+			direction.X -= rotationIncrement;
 			//GD.Print("Pressed A left");
+		}
+		//want the car to go backwards without 
+		// changing its facing orientation
+		if (Input.IsActionJustPressed("back"))
+		{
+			//direction.Z += 1.0f;
+			speed *= -1;
+			//GD.Print("Pressed S back");
 		}
 		if (Input.IsActionPressed("back"))
 		{
-			direction.Z += 1.0f;
-			//GD.Print("Pressed S back");
+			if(speed > -maxSpeed) speed -= speedIncrement;
 		}
 		if (Input.IsActionPressed("forward"))
 		{
-			direction.Z -= 1.0f;
+			//direction.Z -= 1.0f;
+			if (speed < maxSpeed) speed += speedIncrement;
 			//GD.Print("Pressed W forward");
+		}
+		if (Input.IsActionJustReleased("forward") || Input.IsActionJustReleased("back"))
+		{
+			//will eventually add friction to come to a gradual stop
+			speed = 0;
 		}
 
 		if (direction != Vector3.Zero)
@@ -75,8 +92,8 @@ public partial class Player : CharacterBody3D
 		}
 
 		// Ground velocity
-		_targetVelocity.X = direction.X * Speed;
-		_targetVelocity.Z = direction.Z * Speed;
+		_targetVelocity.X = direction.X * speed;
+		_targetVelocity.Z = direction.Z * speed;
 
 		// Vertical velocity
 		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
@@ -104,7 +121,7 @@ public partial class Player : CharacterBody3D
 				_targetVelocity.Z *= -1;
 				break;
 
-			//regular has no change
+				//regular has no change
 		}
 
 		// Moving the character
