@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://crf26xahoogfh"
-path.s3tc="res://.godot/imported/greenTriangle.png-9b0ae3b7607b4f8442d7b656cc9256a5.s3tc.ctex"
+path.s3tc="res://.godot/imported/greenTriangle.png-25e71a233d47e9923d6b25113615deea.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/greenTriangle.png"
-dest_files=["res://.godot/imported/greenTriangle.png-9b0ae3b7607b4f8442d7b656cc9256a5.s3tc.ctex"]
+source_file="res://Assets/Images/greenTriangle.png"
+dest_files=["res://.godot/imported/greenTriangle.png-25e71a233d47e9923d6b25113615deea.s3tc.ctex"]
 
 [params]
 

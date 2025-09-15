@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://bd4sj4dkmbaqg"]
 
-[ext_resource type="PackedScene" uid="uid://cbhuwjvyk2t2t" path="res://Player/player.tscn" id="1_ojhd4"]
+[ext_resource type="PackedScene" uid="uid://cbhuwjvyk2t2t" path="res://Scenes/Prefabs/player.tscn" id="1_u1thq"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
 size = Vector3(60, 2, 60)
@@ -29,7 +29,7 @@ transform = Transform3D(0.35981, 0.0243341, 0.932709, -0.667748, -0.691474, 0.27
 layers = 3
 shadow_enabled = true
 
-[node name="Player" parent="." instance=ExtResource("1_ojhd4")]
+[node name="Player" parent="." instance=ExtResource("1_u1thq")]
 
 [node name="CameraPivot" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.30241, 0, 0)

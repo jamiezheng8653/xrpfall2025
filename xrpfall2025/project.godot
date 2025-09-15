@@ -13,7 +13,7 @@ config_version=5
 config/name="xrpFall2025"
 run/main_scene="uid://bd4sj4dkmbaqg"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://Assets/Images/icon.svg"
 
 [dotnet]
 
