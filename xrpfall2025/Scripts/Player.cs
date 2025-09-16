@@ -84,21 +84,11 @@ public partial class Player : CharacterBody3D
 		else
 		{
 			//will eventually add friction to come to a gradual stop
-			if (speed > 0)
-			{
-				speed += -acceleration * 2 * delta;
-				if (speed < 0) speed = 0;
-			}
-			else if (speed < 0)
-			{
-				speed -= -acceleration * 2 * delta;
-				if (speed > 0) speed = 0;
-			}
-			else speed = 0;
+			speed *= 0.9 * delta;
 		}
 
 		// Vertical velocity
-		//currently doesn't quite work
+		//TODO: currently doesn't quite work
 		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
 		{
 			Position -= GetTransform().Basis.Y * (float)(delta * fallAcceleration);
@@ -120,8 +110,9 @@ public partial class Player : CharacterBody3D
 			case States.Inverted:
 				speed *= -1;
 				break;
-
-				//regular has no change
+			//regular has no change
+			//case States.Regular:
+				//break;
 		}
 
 		// Moving the character
