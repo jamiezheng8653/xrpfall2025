@@ -14,7 +14,7 @@ albedo_color = Color(0.901961, 0.431373, 0.470588, 1)
 [node name="Node" type="Node"]
 
 [node name="ground" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.67339, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.50533, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
 shape = SubResource("BoxShape3D_7dm0k")

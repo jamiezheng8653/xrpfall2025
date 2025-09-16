@@ -23,7 +23,7 @@ layers = 2
 texture = ExtResource("2_4ntmi")
 
 [node name="Camera3D" type="Camera3D" parent="Node3D/Player/Pivot/CSGBox3D"]
-transform = Transform3D(1, 0, 0, 0, 0.925739, 0.378164, 0, -0.378164, 0.925739, 0, 1.89331, 1.79712)
+transform = Transform3D(1, 0, 0, 0, 0.925739, 0.378164, 0, -0.378164, 0.925739, 0, 1.89331, 1.59095)
 cull_mask = 1047553
 
 [node name="circle" type="Sprite3D" parent="Node3D/Player/Pivot/CSGBox3D"]

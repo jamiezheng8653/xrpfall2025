@@ -28,7 +28,7 @@ public partial class Player : CharacterBody3D
 
 	// How fast the player moves in meters per second.
 	private double speed = 0;
-	private double speedIncrement = 0.25f; //will be replaced when accel is implemented
+	private double acceleration = 10; 
 
 	//Rotation speed
 	//will be replaced upon adding angular velocity
@@ -36,7 +36,7 @@ public partial class Player : CharacterBody3D
 	private double rotationIncrement = Mathf.DegToRad(2); //per delta
 
 	// The downward acceleration when in the air, in meters per second squared.
-	[Export] private int fallAcceleration = 75;
+	[Export] private int fallAcceleration = 10;
 
 	/// <summary>
 	/// The current state of the player car. Get/Set
@@ -50,17 +50,11 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
-	/// 
+	/// Called every frame to process how this object will move by what
+	/// Will rotate this object left or right, move forwards or backwards locally
+	/// and fall if necessary
 	/// </summary>
-	public override void _Ready()
-	{
-		
-	}
-
-	/// <summary>
-	/// Called every frame on 
-	/// </summary>
-	/// <param name="delta"></param>
+	/// <param name="delta">delta time</param>
 	public override void _PhysicsProcess(double delta)
 	{
 		//GetInput(delta);
@@ -79,21 +73,32 @@ public partial class Player : CharacterBody3D
 		//TODO: Properly accelerate
 		if (Input.IsActionPressed("back"))
 		{
-			if (speed > -maxSpeed) speed -= speedIncrement;
+			if (speed > -maxSpeed) speed -= acceleration * delta;
 		}
-		if (Input.IsActionPressed("forward"))
+		else if (Input.IsActionPressed("forward"))
 		{
 			//direction.Z -= 1.0f;
-			if (speed < maxSpeed) speed += speedIncrement;
+			if (speed < maxSpeed) speed += acceleration * delta;
 			//GD.Print("Pressed W forward");
 		}
-		if (Input.IsActionJustReleased("forward") || Input.IsActionJustReleased("back"))
+		else
 		{
 			//will eventually add friction to come to a gradual stop
-			speed = 0;
+			if (speed > 0)
+			{
+				speed += -acceleration * 2 * delta;
+				if (speed < 0) speed = 0;
+			}
+			else if (speed < 0)
+			{
+				speed -= -acceleration * 2 * delta;
+				if (speed > 0) speed = 0;
+			}
+			else speed = 0;
 		}
 
 		// Vertical velocity
+		//currently doesn't quite work
 		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
 		{
 			Position -= GetTransform().Basis.Y * (float)(delta * fallAcceleration);
@@ -116,12 +121,14 @@ public partial class Player : CharacterBody3D
 				speed *= -1;
 				break;
 
-			//regular has no change
+				//regular has no change
 		}
 
 		// Moving the character
 		Position += GetTransform().Basis.Z * (float)(delta * speed) * -1;
 		MoveAndSlide();
+		GD.Print("speed: " + speed);
+
 	}
 
 }
