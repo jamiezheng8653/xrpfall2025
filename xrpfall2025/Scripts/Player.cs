@@ -118,8 +118,7 @@ public partial class Player : CharacterBody3D
 		// Moving the character
 		Position += GetTransform().Basis.Z * (float)(delta * speed) * -1;
 		MoveAndSlide();
-		GD.Print("speed: " + speed);
-
+		//GD.Print("speed: " + speed);
 	}
 
 }
