@@ -19,24 +19,21 @@ public partial class Player : CharacterBody3D
 	//current state
 	private States current = States.Regular;
 	//if the player gets a speedup or speed debuff, 
-	//multiply/divide _targetVelocity by cooresponding multiplier
+	//multiply/divide speed by cooresponding multiplier
 	//has to be int because Vectors are made up by ints
 	[Export] private int slowMultiplier = 2;
-
 	[Export] private int fastMultiplier = 2;
 
-	private Vector3 _targetVelocity = Vector3.Zero;
-	private Vector3 direction = Vector3.Forward;
-	private float maxSpeed = 30;
+	private double maxSpeed = 30;
 
 	// How fast the player moves in meters per second.
-	private float speed = 0;
-	private float speedIncrement = 0.25f;
+	private double speed = 0;
+	private double speedIncrement = 0.25f; //will be replaced when accel is implemented
 
 	//Rotation speed
-	[Export] private float rotationSpeed = 1.5f;
-	private float rotationIncrement = Mathf.DegToRad(1); //per delta
-	private float _rotationDirection;
+	//will be replaced upon adding angular velocity
+	[Export] private double rotationSpeed = 1.5f; 
+	private double rotationIncrement = Mathf.DegToRad(2); //per delta
 
 	// The downward acceleration when in the air, in meters per second squared.
 	[Export] private int fallAcceleration = 75;
@@ -53,84 +50,31 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
+	/// 
+	/// </summary>
+	public override void _Ready()
+	{
+		
+	}
+
+	/// <summary>
 	/// Called every frame on 
 	/// </summary>
 	/// <param name="delta"></param>
 	public override void _PhysicsProcess(double delta)
 	{
-		GetInput();
-		CalcSteeringForces(delta);
-
-		// Vertical velocity
-		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
-		{
-			_targetVelocity.Y -= fallAcceleration * (float)delta;
-			//GD.Print("I'm falling!");
-		}
-
-		//check states
-		switch (current)
-		{
-			//multiply speed
-			case States.Fast:
-				_targetVelocity.X *= fastMultiplier;
-				_targetVelocity.Z *= fastMultiplier;
-				break;
-			//divide speed
-			case States.Slow:
-				_targetVelocity.X /= slowMultiplier;
-				_targetVelocity.Z /= slowMultiplier;
-				break;
-			//flip flop controls
-			case States.Inverted:
-				_targetVelocity.X *= -1;
-				_targetVelocity.Z *= -1;
-				break;
-
-				//regular has no change
-		}
-
-		// Moving the character
-		Velocity = _targetVelocity;
-		MoveAndSlide();
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	private void ApplyFriction()
-	{
-
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	private void GetInput()
-	{
+		//GetInput(delta);
 		//Adjust left and right steering 
-		//TODO: allow for one direction to turn full circle, 
-		// currently only turns 90 degrees before not allowing more
 		if (Input.IsActionPressed("right"))
 		{
-			direction.X += rotationIncrement;
-			direction.Z -= rotationIncrement;
+			RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
 			//GD.Print("Pressed D right");
 		}
 		else if (Input.IsActionPressed("left"))
 		{
-			direction.X -= rotationIncrement;
-			direction.Z += rotationIncrement;
+			RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
 			//GD.Print("Pressed A left");
 		}
-		//want the car to go backwards without 
-		// changing its facing orientation
-		// if (Input.IsActionJustPressed("back"))
-		// {
-		// 	//direction.Z += 1.0f;
-		// 	speed *= -1;
-		// 	//GD.Print("Pressed S back");
-		// }
 
 		//TODO: Properly accelerate
 		if (Input.IsActionPressed("back"))
@@ -148,23 +92,36 @@ public partial class Player : CharacterBody3D
 			//will eventually add friction to come to a gradual stop
 			speed = 0;
 		}
-	}
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="delta"></param>
-	private void CalcSteeringForces(double delta)
-	{
-		if (direction != Vector3.Zero)
+		// Vertical velocity
+		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
 		{
-			direction = direction.Normalized();
-			// Setting the basis property will affect the rotation of the node.
-			GetNode<Node3D>("Pivot").Basis = Basis.LookingAt(direction);
+			Position -= GetTransform().Basis.Y * (float)(delta * fallAcceleration);
+			//GD.Print("I'm falling!");
 		}
 
-		// Ground velocity
-		_targetVelocity.X = direction.X * speed;
-		_targetVelocity.Z = direction.Z * speed;
+		//check states and adjust the targetVelocity accordingly
+		switch (current)
+		{
+			//multiply speed
+			case States.Fast:
+				speed *= fastMultiplier;
+				break;
+			//divide speed
+			case States.Slow:
+				speed /= slowMultiplier;
+				break;
+			//flip flop controls
+			case States.Inverted:
+				speed *= -1;
+				break;
+
+			//regular has no change
+		}
+
+		// Moving the character
+		Position += GetTransform().Basis.Z * (float)(delta * speed) * -1;
+		MoveAndSlide();
 	}
+
 }
