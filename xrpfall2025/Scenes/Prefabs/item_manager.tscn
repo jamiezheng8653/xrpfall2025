@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://sdm8yxrkofoh"]
+
+[ext_resource type="Script" uid="uid://clrhanome170o" path="res://Scripts/ItemManager.cs" id="1_mf4hd"]
+
+[node name="ItemManager" type="Node"]
+script = ExtResource("1_mf4hd")

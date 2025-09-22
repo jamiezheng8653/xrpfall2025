@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://do3gixifb6rtv"]
+
+[ext_resource type="Script" uid="uid://br51gwrotbasa" path="res://Scripts/Item.cs" id="1_8n5ru"]
+
+[node name="Item" type="Node"]
+script = ExtResource("1_8n5ru")
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="."]
