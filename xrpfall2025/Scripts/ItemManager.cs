@@ -10,7 +10,7 @@ public partial class ItemManager : Node
 	//grab a reference to the player
 	//Every item generated will get a reference to the player's bounds 
 	//Used in collision detection
-	[Export] private CharacterBody3D player = null;
+	[Export] private Node player = null;
 	private PackedScene itemPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/item.tscn");
 
 	//list of all items generated
@@ -23,14 +23,11 @@ public partial class ItemManager : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		Player p = (Player)player.GetNode<CharacterBody3D>("Node3D/Player");
 		//set up all the item nodes before the scene starts
 		items = new List<Node>();
-		for (int i = 0; i < maxItems; i++)
-		{
-			items.Add(itemPrefab.Instantiate()); //create the new item
-			AddChild(items[items.Count - 1]); //add to the scene tree
-			//might have to set up the individual components of the item node 
-		}
+
+		GenerateItems(p);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -38,9 +35,17 @@ public partial class ItemManager : Node
 	{
 	}
 
-	public Item GenerateItem()
+	public void GenerateItems(Player player)
 	{
-		return null;
+		for (int i = 0; i < maxItems; i++)
+		{
+			Item temp;
+			items.Add(itemPrefab.Instantiate()); //create the new item
+			AddChild(items[^1]); //add to the scene tree
+								 //might have to set up the individual components of the item node 
+			temp = items[i].GetNode<Item>(".");
+			temp.CustomInit(player);
+		}
 	}
 
 }

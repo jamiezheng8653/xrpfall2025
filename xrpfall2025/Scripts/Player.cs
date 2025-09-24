@@ -1,6 +1,7 @@
 //Code from https://docs.godotengine.org/en/4.4/getting_started/first_3d_game/03.player_movement_code.html
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design.Serialization;
+using System.Diagnostics;
 using System.Numerics;
 using Godot;
 using Vector3 = Godot.Vector3;
@@ -73,7 +74,8 @@ public partial class Player : CharacterBody3D
 	public override void _Process(double delta)
 	{
 		//draw gizmos
-		DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
+		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
+		//DebugDraw3D.DrawAabb(AABB, color);
 	}
 
 	/// <summary>

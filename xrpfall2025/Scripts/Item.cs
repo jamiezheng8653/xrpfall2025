@@ -8,8 +8,8 @@ using System;
 /// </summary>
 public partial class Item : Node
 {
-	//Upon player collision, the item will disappear and a random
-	//  number generator will run to select which item the player will get. 
+	// Upon player collision, the item will disappear and a random
+	// number generator will run to select which item the player will get. 
 	// The numbers for the random number generator will coorespond with an enum
 	// listing the various items the player can interact with. 
 	// Upon selection, the item will be used immediately and disappear before 
@@ -31,9 +31,13 @@ public partial class Item : Node
 		get { return area3d.Position; }
 		set { area3d.Position = value; }
 	}
-	public Item(Player player)
+
+	/// <summary>
+	/// Cannot call the constructor when trying to instantiate a 
+	/// </summary>
+	/// <param name="player"></param>
+	public Item(Player player = null)
 	{
-		this.player = player;
 		//Position = position;
 	}
 
@@ -70,7 +74,8 @@ public partial class Item : Node
 			//unsubscribe from OnItemCollision Event 
 		}
 
-		DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
+		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
+		//DebugDraw3D.DrawAabb(AABB, color);
 	}
 
 	/// <summary>
@@ -86,5 +91,10 @@ public partial class Item : Node
 		//currently no error checking of if the selected item is valid in the enum list
 		int result = rng.Next(0, 3);
 		player.Current = (States)result;
+	}
+
+	public void CustomInit(Player player)
+	{
+		this.player = player;
 	}
 }

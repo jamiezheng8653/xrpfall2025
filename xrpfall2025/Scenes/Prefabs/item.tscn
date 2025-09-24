@@ -13,3 +13,4 @@ script = ExtResource("1_8n5ru")
 shape = SubResource("CylinderShape3D_8n5ru")
 
 [node name="CSGCylinder3D" type="CSGCylinder3D" parent="Area3D/CollisionShape3D"]
+layers = 3
