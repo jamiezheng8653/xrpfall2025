@@ -8,10 +8,10 @@ using Vector3 = Godot.Vector3;
 //Enum States
 public enum States
 {
-	Regular,
 	Inverted,
 	Slow,
-	Fast
+	Fast,
+	Regular
 };
 
 public partial class Player : CharacterBody3D
@@ -47,6 +47,15 @@ public partial class Player : CharacterBody3D
 	{
 		get { return current; }
 		set { current = value; }
+	}
+
+	public override void _Ready()
+	{
+		
+	}
+
+	public override void _ExitTree()
+	{
 	}
 
 	/// <summary>
@@ -110,8 +119,8 @@ public partial class Player : CharacterBody3D
 			case States.Inverted:
 				speed *= -1;
 				break;
-			//regular has no change
-			//case States.Regular:
+				//regular has no change
+				//case States.Regular:
 				//break;
 		}
 
