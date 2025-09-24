@@ -38,6 +38,9 @@ public partial class Player : CharacterBody3D
 	// The downward acceleration when in the air, in meters per second squared.
 	[Export] private int fallAcceleration = 10;
 
+	//Gizmos for debugging
+	private Color color;
+
 	/// <summary>
 	/// The current state of the player car. Get/Set
 	/// Relevant when we eventually add items that modify
@@ -48,14 +51,29 @@ public partial class Player : CharacterBody3D
 		get { return current; }
 		set { current = value; }
 	}
+	
+	/// <summary>
+	/// Property to give the player's aabb, used for 
+	/// collision calculations happening in the collided item
+	/// </summary>
+	public Aabb AABB
+	{
+		get { return GetNode<CsgBox3D>("Node3D/Player/Pivot/CSGBox3D").GetAabb(); }
+	}
 
 	public override void _Ready()
 	{
-		
+		color = new Color("CYAN");
 	}
 
 	public override void _ExitTree()
 	{
+	}
+
+	public override void _Process(double delta)
+	{
+		//draw gizmos
+		DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
 	}
 
 	/// <summary>

@@ -2,16 +2,21 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+//delegate declaration
+public delegate void ItemCollisionDelegate();
+
 public partial class ItemManager : Node
 {
 	//grab a reference to the player
 	//Every item generated will get a reference to the player's bounds 
 	//Used in collision detection
-	[Export] private Player player = null;
+	[Export] private CharacterBody3D player = null;
 	private PackedScene itemPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/item.tscn");
 
 	//list of all items generated
 	private List<Node> items = null;
+	//list of locations where items will generate in a line
+	//[Export] private List<Node> locations = new List<Node>();
 
 	[Export] private int maxItems = 1;
 
@@ -37,4 +42,5 @@ public partial class ItemManager : Node
 	{
 		return null;
 	}
+
 }

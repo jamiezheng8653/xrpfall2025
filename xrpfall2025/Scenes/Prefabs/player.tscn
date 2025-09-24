@@ -6,7 +6,7 @@
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_onrkg"]
 
-[node name="Node" type="Node"]
+[node name="Player" type="Node"]
 
 [node name="Node3D" type="Node3D" parent="."]
 
