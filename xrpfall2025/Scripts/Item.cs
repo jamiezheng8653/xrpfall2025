@@ -20,8 +20,8 @@ public partial class Item : Node
 	private Player player; //Item manager will pass in this information
 
 	//references necessary for collision bounds
-	private CsgCylinder3D cylinder;
-	private Area3D area3d;
+	[Export] private CsgCylinder3D cylinder = null;
+	[Export] private Area3D area3d = null;
 
 	//for gizmos debugging
 	private Color color;
@@ -33,17 +33,21 @@ public partial class Item : Node
 	}
 
 	/// <summary>
-	/// Cannot call the constructor when trying to instantiate a 
+	/// Returns the Axis Aligned Bounding Box centered on this Item
 	/// </summary>
-	/// <param name="player"></param>
-	public Item(Player player = null)
-	{
-		//Position = position;
-	}
-
 	public Aabb AABB
 	{
-		get { return cylinder.GetAabb(); }
+		get
+		{
+			Aabb temp = cylinder.GetAabb();
+			temp.Position = area3d.GlobalPosition - temp.Size/2;
+			return temp;
+		}
+	}
+
+	public Item()
+	{
+		player = null;
 	}
 
 	// Called when the node enters the scene tree for the first time.
@@ -53,16 +57,15 @@ public partial class Item : Node
 
 		OnItemCollision += SelectItem;
 		//node path will need to be updated when we get a formal player car model
-		area3d = GetNode<Area3D>("Area3D");
-		Position = new Vector3(2, 3, 1);
-		cylinder = GetNode<CsgCylinder3D>("Area3D/CollisionShape3D/CSGCylinder3D");
+		//area3d = GetNode<Area3D>("Area3D");
+		Position = new Vector3(2, 0, 1);
+		//cylinder = GetNode<CsgCylinder3D>("Area3D/CollisionShape3D/CSGCylinder3D");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
 		//check for if this item has overlapped with the player.
-
 		if (AABB.Intersects(player.AABB))
 		{
 			GD.Print("I'm Colliding!");
@@ -71,11 +74,12 @@ public partial class Item : Node
 			OnItemCollision?.Invoke(); //shorthand for above
 
 			//have the model be hidden from the scene 
+			OnItemCollision -= SelectItem;
 			//unsubscribe from OnItemCollision Event 
 		}
 
 		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
-		//DebugDraw3D.DrawAabb(AABB, color);
+		DebugDraw3D.DrawAabb(AABB, color);
 	}
 
 	/// <summary>
@@ -93,6 +97,12 @@ public partial class Item : Node
 		player.Current = (States)result;
 	}
 
+	/// <summary>
+	/// Since parameterized constructors are inacessible in Godot, 
+	/// this function will be called immediately after initializing 
+	/// this instance in a different scene
+	/// </summary>
+	/// <param name="player">Reference to the Player instance in scene</param>
 	public void CustomInit(Player player)
 	{
 		this.player = player;

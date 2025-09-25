@@ -4,8 +4,10 @@
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_8n5ru"]
 
-[node name="Item" type="Node"]
+[node name="Item" type="Node" node_paths=PackedStringArray("cylinder", "area3d")]
 script = ExtResource("1_8n5ru")
+cylinder = NodePath("Area3D/CollisionShape3D/CSGCylinder3D")
+area3d = NodePath("Area3D")
 
 [node name="Area3D" type="Area3D" parent="."]
 

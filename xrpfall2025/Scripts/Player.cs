@@ -18,7 +18,7 @@ public enum States
 public partial class Player : CharacterBody3D
 {
 	//current state
-	private States current = States.Regular;
+	private States current;
 	//if the player gets a speedup or speed debuff, 
 	//multiply/divide speed by cooresponding multiplier
 	//has to be int because Vectors are made up by ints
@@ -29,11 +29,11 @@ public partial class Player : CharacterBody3D
 
 	// How fast the player moves in meters per second.
 	private double speed = 0;
-	private double acceleration = 10; 
+	private double acceleration = 10;
 
 	//Rotation speed
 	//will be replaced upon adding angular velocity
-	[Export] private double rotationSpeed = 1.5f; 
+	[Export] private double rotationSpeed = 1.5f;
 	private double rotationIncrement = Mathf.DegToRad(2); //per delta
 
 	// The downward acceleration when in the air, in meters per second squared.
@@ -41,6 +41,7 @@ public partial class Player : CharacterBody3D
 
 	//Gizmos for debugging
 	private Color color;
+	[Export] private CsgBox3D csgBox3D = null;
 
 	/// <summary>
 	/// The current state of the player car. Get/Set
@@ -52,19 +53,27 @@ public partial class Player : CharacterBody3D
 		get { return current; }
 		set { current = value; }
 	}
-	
+
 	/// <summary>
-	/// Property to give the player's aabb, used for 
-	/// collision calculations happening in the collided item
+	/// Property to give the player's aabb centered on the player,
+	/// used for collision calculations happening in the collided item
 	/// </summary>
 	public Aabb AABB
 	{
-		get { return GetNode<CsgBox3D>("Node3D/Player/Pivot/CSGBox3D").GetAabb(); }
+		get
+		{
+			//move the aabb to the actual object's transform
+			//otherwise the aabb sits in the origin
+			Aabb temp = csgBox3D.GetAabb();
+			temp.Position = this.GlobalPosition - temp.Size / 2;
+			return temp;
+		}
 	}
 
 	public override void _Ready()
 	{
 		color = new Color("CYAN");
+		current = States.Regular;
 	}
 
 	public override void _ExitTree()
@@ -74,8 +83,9 @@ public partial class Player : CharacterBody3D
 	public override void _Process(double delta)
 	{
 		//draw gizmos
-		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
+		DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
 		//DebugDraw3D.DrawAabb(AABB, color);
+		GD.Print("State: " + Current);
 	}
 
 	/// <summary>
@@ -86,6 +96,9 @@ public partial class Player : CharacterBody3D
 	/// <param name="delta">delta time</param>
 	public override void _PhysicsProcess(double delta)
 	{
+		//reset state
+		//current = States.Regular;
+
 		//GetInput(delta);
 		//Adjust left and right steering 
 		if (Input.IsActionPressed("right"))
@@ -124,16 +137,47 @@ public partial class Player : CharacterBody3D
 			//GD.Print("I'm falling!");
 		}
 
+		UpdateState(current);
+
+		// Moving the character
+		Position += GetTransform().Basis.Z * (float)(delta * speed) * -1;
+		MoveAndSlide();
+		//GD.Print("speed: " + speed);
+	}
+
+	/// <summary>
+	/// Calculating the Axis Realigned Bounding Box (ARBB) of this object
+	/// </summary>
+	private void CalculateARBB()
+	{
+		//find 8 corners of oriented bounding box
+
+		//will need to globalize the vectors vector3(matrix4 * vector4(vector, 1))
+
+		//find min and max of the 8 corners
+
+		//find size of the box
+
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="state"></param>
+	private void UpdateState(States state)
+	{
 		//check states and adjust the targetVelocity accordingly
-		switch (current)
+		switch (state)
 		{
 			//multiply speed
 			case States.Fast:
 				speed *= fastMultiplier;
+				if (speed > maxSpeed * 1.5) speed = maxSpeed * 1.5;
 				break;
 			//divide speed
 			case States.Slow:
 				speed /= slowMultiplier;
+				current = States.Regular;
 				break;
 			//flip flop controls
 			case States.Inverted:
@@ -143,11 +187,14 @@ public partial class Player : CharacterBody3D
 				//case States.Regular:
 				//break;
 		}
-
-		// Moving the character
-		Position += GetTransform().Basis.Z * (float)(delta * speed) * -1;
-		MoveAndSlide();
-		//GD.Print("speed: " + speed);
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="prevState"></param>
+	private void RevertState(States prevState)
+	{
+		//according to what state was previous
+	}
 }
