@@ -17,6 +17,8 @@ public enum States
 
 public partial class Player : CharacterBody3D
 {
+
+
 	//current state
 	private States current = States.Regular;
 	//if the player gets a speedup or speed debuff, 
@@ -30,6 +32,18 @@ public partial class Player : CharacterBody3D
 	// How fast the player moves in meters per second.
 	private double speed = 0;
 	private double acceleration = 10; 
+	
+	// Temporary values
+	private int place = 3;
+	private int lap = 2;
+	
+	// Expose properties for HUD
+	public double Speed => speed;
+	public double Acceleration => acceleration;
+	public Vector3 CurrentPosition => Position;
+	public int Place => place;
+	public int Lap => lap;
+	
 
 	//Rotation speed
 	//will be replaced upon adding angular velocity
@@ -149,5 +163,8 @@ public partial class Player : CharacterBody3D
 		MoveAndSlide();
 		//GD.Print("speed: " + speed);
 	}
+	
+  	
+	
 
 }
