@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Diagnostics;
 
 /// <summary>
 /// What the player will collide with to change their state temporarily.
@@ -20,8 +21,10 @@ public partial class Item : Node
 	private Player player; //Item manager will pass in this information
 
 	//references necessary for collision bounds
-	private CsgCylinder3D cylinder;
-	private Area3D area3d;
+	[Export] private CsgCylinder3D cylinder = null;
+	[Export] private Area3D area3d = null;
+
+	private Stopwatch timer = null;
 
 	//for gizmos debugging
 	private Color color;
@@ -33,17 +36,21 @@ public partial class Item : Node
 	}
 
 	/// <summary>
-	/// Cannot call the constructor when trying to instantiate a 
+	/// Returns the Axis Aligned Bounding Box centered on this Item
 	/// </summary>
-	/// <param name="player"></param>
-	public Item(Player player = null)
-	{
-		//Position = position;
-	}
-
 	public Aabb AABB
 	{
-		get { return cylinder.GetAabb(); }
+		get
+		{
+			Aabb temp = cylinder.GetAabb();
+			temp.Position = area3d.GlobalPosition - temp.Size / 2;
+			return temp;
+		}
+	}
+
+	public Item()
+	{
+		player = null;
 	}
 
 	// Called when the node enters the scene tree for the first time.
@@ -52,30 +59,42 @@ public partial class Item : Node
 		color = new Color("YELLOW");
 
 		OnItemCollision += SelectItem;
+		OnItemCollision += StartTimer;
+		OnItemCollision += HideModel;
 		//node path will need to be updated when we get a formal player car model
-		area3d = GetNode<Area3D>("Area3D");
-		Position = new Vector3(2, 3, 1);
-		cylinder = GetNode<CsgCylinder3D>("Area3D/CollisionShape3D/CSGCylinder3D");
+		Position = new Vector3(2, 0, 1);
+		timer = new Stopwatch();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		//check for if this item has overlapped with the player.
-
-		if (AABB.Intersects(player.AABB))
+		//if a timer is going, then reset the item and the timer
+		if (timer.ElapsedMilliseconds > 10000)
 		{
-			GD.Print("I'm Colliding!");
-			//invoke event
-			//if (OnItemCollision != null) OnItemCollision();
-			OnItemCollision?.Invoke(); //shorthand for above
+			ClearTimer();
+			ShowModel();
+		}
+		//otherwise read for collisions with the player
+		else if (timer.ElapsedMilliseconds >= 0)
+		{
+			//check for if this item has overlapped with the player.
+			if (AABB.Intersects(player.AABB))
+			{
+				GD.Print("I'm Colliding!");
+				//invoke event
+				//if (OnItemCollision != null) OnItemCollision();
+				OnItemCollision?.Invoke(); //shorthand for above
 
-			//have the model be hidden from the scene 
-			//unsubscribe from OnItemCollision Event 
+				//have the model be hidden from the scene 
+				//unsubscribe from OnItemCollision Event 
+			}
 		}
 
+		GD.Print("Item timer: " + timer.ElapsedMilliseconds);
+
 		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
-		//DebugDraw3D.DrawAabb(AABB, color);
+		DebugDraw3D.DrawAabb(AABB, color);
 	}
 
 	/// <summary>
@@ -93,8 +112,42 @@ public partial class Item : Node
 		player.Current = (States)result;
 	}
 
+	/// <summary>
+	/// Since parameterized constructors are inacessible in Godot, 
+	/// this function will be called immediately after initializing 
+	/// this instance in a different scene
+	/// </summary>
+	/// <param name="player">Reference to the Player instance in scene</param>
 	public void CustomInit(Player player)
 	{
 		this.player = player;
+	}
+
+	private void StartTimer()
+	{
+		timer.Start();
+		//unsubscribe from event
+		OnItemCollision -= StartTimer;
+		OnItemCollision -= SelectItem;
+		OnItemCollision -= HideModel;
+	}
+
+	private void ClearTimer()
+	{
+		timer.Reset();
+		//resubscribe to event
+		OnItemCollision += StartTimer;
+		OnItemCollision += SelectItem;
+		OnItemCollision += HideModel;
+	}
+
+	private void HideModel()
+	{
+		cylinder.Hide();
+	}
+
+	private void ShowModel()
+	{
+		cylinder.Show();
 	}
 }

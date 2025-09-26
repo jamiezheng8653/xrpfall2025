@@ -17,10 +17,9 @@ public enum States
 
 public partial class Player : CharacterBody3D
 {
+	public event ItemCollisionDelegate OnItemCollision;
+	private States current; //current state
 
-
-	//current state
-	private States current = States.Regular;
 	//if the player gets a speedup or speed debuff, 
 	//multiply/divide speed by cooresponding multiplier
 	//has to be int because Vectors are made up by ints
@@ -47,7 +46,7 @@ public partial class Player : CharacterBody3D
 
 	//Rotation speed
 	//will be replaced upon adding angular velocity
-	[Export] private double rotationSpeed = 1.5f; 
+	[Export] private double rotationSpeed = 1.5f;
 	private double rotationIncrement = Mathf.DegToRad(2); //per delta
 
 	// The downward acceleration when in the air, in meters per second squared.
@@ -55,6 +54,10 @@ public partial class Player : CharacterBody3D
 
 	//Gizmos for debugging
 	private Color color;
+	[Export] private CsgBox3D csgBox3D = null;
+
+	//Timer for transitioning between states
+	private Stopwatch timer;
 
 	/// <summary>
 	/// The current state of the player car. Get/Set
@@ -66,30 +69,56 @@ public partial class Player : CharacterBody3D
 		get { return current; }
 		set { current = value; }
 	}
-	
+
 	/// <summary>
-	/// Property to give the player's aabb, used for 
-	/// collision calculations happening in the collided item
+	/// Property to give the player's aabb centered on the player,
+	/// used for collision calculations happening in the collided item
 	/// </summary>
 	public Aabb AABB
 	{
-		get { return GetNode<CsgBox3D>("Node3D/Player/Pivot/CSGBox3D").GetAabb(); }
+		get
+		{
+			//move the aabb to the actual object's transform
+			//otherwise the aabb sits in the origin
+			Aabb temp = csgBox3D.GetAabb();
+			temp.Position = this.GlobalPosition - temp.Size / 2;
+			return temp;
+		}
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public override void _Ready()
 	{
 		color = new Color("CYAN");
+		current = States.Regular;
+		timer = new Stopwatch();
+		OnItemCollision += StartTimer;
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public override void _ExitTree()
 	{
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="delta"></param>
 	public override void _Process(double delta)
 	{
 		//draw gizmos
-		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
-		//DebugDraw3D.DrawAabb(AABB, color);
+		DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
+		GD.Print("Player State: " + Current);
+
+		//check the timer
+		GD.Print("Player Timer: " + timer.ElapsedMilliseconds);
+
+		//when collision event, run rng and start stopwatch. unsubscribe collision event and start stopwatch event
+		//after certain time, resubscribe collision event, reset stop watch.
 	}
 
 	/// <summary>
@@ -100,20 +129,28 @@ public partial class Player : CharacterBody3D
 	/// <param name="delta">delta time</param>
 	public override void _PhysicsProcess(double delta)
 	{
-		//GetInput(delta);
-		//Adjust left and right steering 
+		//Adjust left and right steering
+		//TODO: update inverted state checking logic to be more elegant
 		if (Input.IsActionPressed("right"))
 		{
-			RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
+			if (current == States.Inverted)
+			{
+				RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
+			}
+			else RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
 			//GD.Print("Pressed D right");
 		}
 		else if (Input.IsActionPressed("left"))
 		{
-			RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
+			if (current == States.Inverted)
+			{
+				RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
+			}
+			else RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
 			//GD.Print("Pressed A left");
 		}
 
-		//TODO: Properly accelerate
+		//accelerate in forward or backward direction
 		if (Input.IsActionPressed("back"))
 		{
 			if (speed > -maxSpeed) speed -= acceleration * delta;
@@ -138,16 +175,62 @@ public partial class Player : CharacterBody3D
 			//GD.Print("I'm falling!");
 		}
 
+		if (timer.ElapsedMilliseconds > 0)
+		{
+			RevertState(current, speed, delta);
+		}
+
+		// Moving the character
+		Position += GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
+
+		MoveAndSlide();
+		GD.Print("Player speed: " + speed);
+	}
+
+	/// <summary>
+	/// Calculating the Axis Realigned Bounding Box (ARBB) of this object
+	/// </summary>
+	private void CalculateARBB()
+	{
+		//find 8 corners of oriented bounding box
+
+		//will need to globalize the vectors vector3(matrix4 * vector4(vector, 1))
+
+		//find min and max of the 8 corners
+
+		//find size of the box
+
+	}
+
+	/// <summary>
+	/// Calculates the speed value for the final position change 
+	/// without modifying the original speed value. 
+	/// </summary>
+	/// <param name="state">What state is the player in currently</param>
+	/// <param name="speed">How fast is the player supposedly going</param>
+	/// <returns></returns>
+	private double UpdateStateSpeed(States state, double speed)
+	{
 		//check states and adjust the targetVelocity accordingly
-		switch (current)
+		switch (state)
 		{
 			//multiply speed
+			//quickly accelerate to twice the current speed (like one to 1.5 seconds, whatever feels good)
 			case States.Fast:
-				speed *= fastMultiplier;
+				if (timer.ElapsedMilliseconds <= 0)
+				{
+					speed *= fastMultiplier;
+					if (speed > maxSpeed * 1.5) speed = maxSpeed * 1.5;
+				}
 				break;
 			//divide speed
+			//cut speed to 50% to 75% of the max speed
 			case States.Slow:
-				speed /= slowMultiplier;
+				if (timer.ElapsedMilliseconds <= 0)
+				{
+					speed /= slowMultiplier;
+					maxSpeed /= 2;
+				}
 				break;
 			//flip flop controls
 			case States.Inverted:
@@ -158,13 +241,80 @@ public partial class Player : CharacterBody3D
 				//break;
 		}
 
-		// Moving the character
-		Position += GetTransform().Basis.Z * (float)(delta * speed) * -1;
-		MoveAndSlide();
-		//GD.Print("speed: " + speed);
+		//start the timer if you have not already
+		if (current != States.Regular && timer.ElapsedMilliseconds <= 0) OnItemCollision?.Invoke();
+
+		return speed;
 	}
 	
   	
 	
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="prevState"></param>
+	private void RevertState(States prevState, double speed, double delta)
+	{
+		//according to what state was previously, the process to revert back to States.Regular will differ slightly
+		switch (prevState)
+		{
+			//Fast -> Regular
+			//slowly decelerate to the normal max speed (over the course of 5 seconds, whatever feels good)
+			//change state to Regular
+			case States.Fast:
+				if(timer.ElapsedMilliseconds <= 5000) speed -= acceleration * delta;
+				if (speed < maxSpeed)
+				{
+					current = States.Regular;
+					ClearTimer();
+				}
+				break;
+
+			//Slow -> Regular
+			//be slow for about 10s
+			//change state to Regular, acceleration should be as normal
+			case States.Slow:
+				//after 10s, revert the maxSpeed
+				if (timer.ElapsedMilliseconds >= 10000)
+				{
+					maxSpeed *= 2;
+					current = States.Regular;
+					ClearTimer();
+				}
+				
+				break;
+
+			//Inverted to Regular
+			//set timer of 15s, controls are inverted during this time
+			//after 15s, change state to Regular. 
+			case States.Inverted:
+				//after 10s, revert speed's sign to what it was before
+				//change state to Regular
+				if (timer.ElapsedMilliseconds >= 10000)
+				{
+					current = States.Regular;
+					ClearTimer();
+				}
+				break;
+		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	private void StartTimer()
+	{
+		timer.Start();
+		OnItemCollision -= StartTimer;
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	private void ClearTimer()
+	{
+		timer.Reset();
+		OnItemCollision += StartTimer;
+	}
 }

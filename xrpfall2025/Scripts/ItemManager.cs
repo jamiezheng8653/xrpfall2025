@@ -42,8 +42,7 @@ public partial class ItemManager : Node
 			Item temp;
 			items.Add(itemPrefab.Instantiate()); //create the new item
 			AddChild(items[^1]); //add to the scene tree
-								 //might have to set up the individual components of the item node 
-			temp = items[i].GetNode<Item>(".");
+			temp = (Item)items[i];
 			temp.CustomInit(player);
 		}
 	}
