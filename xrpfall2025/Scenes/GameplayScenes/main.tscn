@@ -1,13 +1,15 @@
-[gd_scene load_steps=6 format=3 uid="uid://bd4sj4dkmbaqg"]
+[gd_scene load_steps=7 format=3 uid="uid://bd4sj4dkmbaqg"]
 
 [ext_resource type="PackedScene" uid="uid://cbhuwjvyk2t2t" path="res://Scenes/Prefabs/player.tscn" id="1_u1thq"]
 [ext_resource type="PackedScene" uid="uid://sdm8yxrkofoh" path="res://Scenes/Prefabs/item_manager.tscn" id="2_pw4we"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_pw4we"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
 size = Vector3(60, 2, 60)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
-size = Vector3(60, 2, 60)
+size = Vector3(10, 2, 10)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
 albedo_color = Color(0.901961, 0.431373, 0.470588, 1)
@@ -17,10 +19,14 @@ albedo_color = Color(0.901961, 0.431373, 0.470588, 1)
 [node name="ItemManager" parent="." node_paths=PackedStringArray("player") instance=ExtResource("2_pw4we")]
 player = NodePath("../Player")
 
+[node name="Timer" type="Timer" parent="."]
+wait_time = 10.0
+
 [node name="Player" parent="." instance=ExtResource("1_u1thq")]
 
 [node name="ground" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.50533, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 0)
+physics_material_override = SubResource("PhysicsMaterial_pw4we")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
 shape = SubResource("BoxShape3D_7dm0k")
