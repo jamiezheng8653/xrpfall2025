@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://dry5xxoksd4yr"]
+
+[ext_resource type="Script" uid="uid://0s1ou10tryfl" path="res://Scripts/KillPlane.cs" id="1_xxqnq"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_wok52"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_toyea"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xxqnq"]
+albedo_color = Color(0.520673, 0.458974, 0.658289, 1)
+
+[node name="killPlane" type="Node" node_paths=PackedStringArray("planeBox")]
+script = ExtResource("1_xxqnq")
+planeBox = NodePath("ground/CollisionShape3D/CSGBox3D")
+
+[node name="ground" type="StaticBody3D" parent="."]
+disable_mode = 1
+collision_layer = 3
+collision_mask = 3
+physics_material_override = SubResource("PhysicsMaterial_wok52")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
+process_physics_priority = 1
+transform = Transform3D(1000, 0, 0, 0, 1, 0, 0, 0, 1000, 0, -2, 0)
+top_level = true
+shape = SubResource("BoxShape3D_toyea")
+debug_color = Color(0.946025, 0.188105, 0.356576, 0.42)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="ground/CollisionShape3D"]
+material = SubResource("StandardMaterial3D_xxqnq")

@@ -9,28 +9,29 @@
 [node name="Player" type="Node"]
 
 [node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 60)
 
 [node name="Player" type="CharacterBody3D" parent="Node3D" node_paths=PackedStringArray("csgBox3D")]
 script = ExtResource("1_4flbx")
-csgBox3D = NodePath("Pivot/CSGBox3D")
+csgBox3D = NodePath("CollisionShape3D/CSGBox3D")
 
 [node name="Pivot" type="Node3D" parent="Node3D/Player"]
 
-[node name="CSGBox3D" type="CSGBox3D" parent="Node3D/Player/Pivot"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/Player"]
+shape = SubResource("BoxShape3D_onrkg")
 
-[node name="triangle" type="Sprite3D" parent="Node3D/Player/Pivot/CSGBox3D"]
-transform = Transform3D(-0.75, -6.55671e-08, -2.86603e-15, 0, -3.27835e-08, 0.75, -6.55671e-08, 0.75, 3.27835e-08, 0, 1.8844, -2.56792)
+[node name="CSGBox3D" type="CSGBox3D" parent="Node3D/Player/CollisionShape3D"]
+
+[node name="triangle" type="Sprite3D" parent="Node3D/Player/CollisionShape3D/CSGBox3D"]
+transform = Transform3D(-0.75, -6.55671e-08, -2.86603e-15, 0, -3.27835e-08, 0.75, -6.55671e-08, 0.75, 3.27835e-08, 0, 2, -2.5)
 layers = 2
 texture = ExtResource("2_4ntmi")
 
-[node name="Camera3D" type="Camera3D" parent="Node3D/Player/Pivot/CSGBox3D"]
-transform = Transform3D(1, 0, 0, 0, 0.925739, 0.378164, 0, -0.378164, 0.925739, 0, 1.89331, 1.59095)
+[node name="Camera3D" type="Camera3D" parent="Node3D/Player/CollisionShape3D/CSGBox3D"]
+transform = Transform3D(1, 0, 0, 0, 0.927184, 0.374607, 0, -0.374607, 0.927184, 0, 2, 1.5)
 cull_mask = 1047553
 
-[node name="circle" type="Sprite3D" parent="Node3D/Player/Pivot/CSGBox3D"]
-transform = Transform3D(0.25, 0, 0, 0, -1.09278e-08, 1, 0, -0.25, -4.37114e-08, 0, 1.35024, 0)
+[node name="circle" type="Sprite3D" parent="Node3D/Player/CollisionShape3D/CSGBox3D"]
+transform = Transform3D(0.25, 0, 0, 0, -1.09278e-08, 1, 0, -0.25, -4.37114e-08, 0, 2, 0)
 layers = 2
 texture = ExtResource("3_btcbx")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/Player"]
-shape = SubResource("BoxShape3D_onrkg")

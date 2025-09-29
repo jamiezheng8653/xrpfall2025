@@ -17,7 +17,7 @@ public partial class Item : Node
 	// reloading on the screen after a set period of time. 
 	// The item will set off an event that will notify the player to change its state
 	// accordingly.
-	public event ItemCollisionDelegate OnItemCollision;
+	private event ItemCollisionDelegate OnItemCollision;
 	private Player player; //Item manager will pass in this information
 
 	//references necessary for collision bounds

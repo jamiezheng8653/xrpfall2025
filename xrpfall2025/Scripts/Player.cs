@@ -17,7 +17,8 @@ public enum States
 
 public partial class Player : CharacterBody3D
 {
-	public event ItemCollisionDelegate OnItemCollision;
+	private event OnKillPlane isCollidingKillPlane;
+	private event ItemCollisionDelegate OnItemCollision;
 	private States current; //current state
 
 	//if the player gets a speedup or speed debuff, 
@@ -30,19 +31,19 @@ public partial class Player : CharacterBody3D
 
 	// How fast the player moves in meters per second.
 	private double speed = 0;
-	private double acceleration = 10; 
-	
+	private double acceleration = 10;
+
 	// Temporary values
 	private int place = 3;
 	private int lap = 2;
-	
+
 	// Expose properties for HUD
 	public double Speed => speed;
 	public double Acceleration => acceleration;
 	public Vector3 CurrentPosition => Position;
 	public int Place => place;
 	public int Lap => lap;
-	
+
 
 	//Rotation speed
 	//will be replaced upon adding angular velocity
@@ -87,7 +88,10 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
-	/// 
+	/// Initialize any values upon load. If you're initializing this 
+	/// through another script, please utilize the Init() method.
+	/// Currently no Init() method is in place, if we choose to 
+	/// programmatically load all objects in, be sure to implement Init()
 	/// </summary>
 	public override void _Ready()
 	{
@@ -98,16 +102,19 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
-	/// 
+	/// Any logic to ensure no memory leaks (particularly with any events)
+	/// when this Player leaves the scene tree during runtime for whatever reason
 	/// </summary>
 	public override void _ExitTree()
 	{
 	}
 
 	/// <summary>
-	/// 
+	/// General game logic being run every frame.
+	/// If you're modifying anything relating to the Player's physics,
+	/// please use _PhysicsProcess()
 	/// </summary>
-	/// <param name="delta"></param>
+	/// <param name="delta">delta time</param>
 	public override void _Process(double delta)
 	{
 		//draw gizmos
@@ -130,23 +137,16 @@ public partial class Player : CharacterBody3D
 	public override void _PhysicsProcess(double delta)
 	{
 		//Adjust left and right steering
-		//TODO: update inverted state checking logic to be more elegant
-		if (Input.IsActionPressed("right"))
+		if (Input.IsActionPressed("right")
+			|| (Input.IsActionPressed("left") && current == States.Inverted))
 		{
-			if (current == States.Inverted)
-			{
-				RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
-			}
-			else RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
+			RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
 			//GD.Print("Pressed D right");
 		}
-		else if (Input.IsActionPressed("left"))
+		else if (Input.IsActionPressed("left")
+			|| (Input.IsActionPressed("right") && current == States.Inverted))
 		{
-			if (current == States.Inverted)
-			{
-				RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
-			}
-			else RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
+			RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
 			//GD.Print("Pressed A left");
 		}
 
@@ -208,7 +208,7 @@ public partial class Player : CharacterBody3D
 	/// </summary>
 	/// <param name="state">What state is the player in currently</param>
 	/// <param name="speed">How fast is the player supposedly going</param>
-	/// <returns></returns>
+	/// <returns>The final speed value to be fed to the player</returns>
 	private double UpdateStateSpeed(States state, double speed)
 	{
 		//check states and adjust the targetVelocity accordingly
@@ -246,14 +246,19 @@ public partial class Player : CharacterBody3D
 
 		return speed;
 	}
-	
-  	
-	
+
+
+
 
 	/// <summary>
-	/// 
+	/// Transition logic that should happen after the player 
+	/// transitions from States.Regular to any other state.
+	/// After a clear condition is met, the player's current 
+	/// state will revert back to States.Regular.
 	/// </summary>
-	/// <param name="prevState"></param>
+	/// <param name="prevState">The player's current state that is not States.Regular</param>
+	/// <param name="speed">How fast is the player moving right now</param>
+	/// <param name="delta">deltatime</param>
 	private void RevertState(States prevState, double speed, double delta)
 	{
 		//according to what state was previously, the process to revert back to States.Regular will differ slightly
@@ -263,7 +268,7 @@ public partial class Player : CharacterBody3D
 			//slowly decelerate to the normal max speed (over the course of 5 seconds, whatever feels good)
 			//change state to Regular
 			case States.Fast:
-				if(timer.ElapsedMilliseconds <= 5000) speed -= acceleration * delta;
+				if (timer.ElapsedMilliseconds <= 5000) speed -= acceleration * delta;
 				if (speed < maxSpeed)
 				{
 					current = States.Regular;
@@ -282,7 +287,7 @@ public partial class Player : CharacterBody3D
 					current = States.Regular;
 					ClearTimer();
 				}
-				
+
 				break;
 
 			//Inverted to Regular
@@ -301,7 +306,8 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
-	/// 
+	/// Starts the timer associated with the state transition logic
+	/// Unsubscribes this method from the OnItemCollision event once called
 	/// </summary>
 	private void StartTimer()
 	{
@@ -310,11 +316,17 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
-	/// 
+	/// Resets the timer associated with the state transition logic
+	/// Resubscribes StartTimer method to OnItemCollision event
 	/// </summary>
 	private void ClearTimer()
 	{
 		timer.Reset();
 		OnItemCollision += StartTimer;
+	}
+
+	private void ReturnToTrack(Vector3 prevPosition)
+	{
+		
 	}
 }

@@ -1,39 +1,22 @@
-[gd_scene load_steps=8 format=3 uid="uid://bd4sj4dkmbaqg"]
+[gd_scene load_steps=6 format=3 uid="uid://bd4sj4dkmbaqg"]
 
 [ext_resource type="PackedScene" uid="uid://sdm8yxrkofoh" path="res://Scenes/Prefabs/item_manager.tscn" id="1_evp6a"]
 [ext_resource type="PackedScene" uid="uid://cbhuwjvyk2t2t" path="res://Scenes/Prefabs/player.tscn" id="1_u1thq"]
+[ext_resource type="PackedScene" uid="uid://305jauwsothn" path="res://Scenes/Prefabs/track_1.tscn" id="2_4aluh"]
 [ext_resource type="PackedScene" uid="uid://drsnmi4pkc6t5" path="res://Scenes/Prefabs/hud.tscn" id="2_pw4we"]
-
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_pw4we"]
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
-size = Vector3(60, 2, 60)
-
-[sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
-size = Vector3(10, 2, 10)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
-albedo_color = Color(0.901961, 0.431373, 0.470588, 1)
+[ext_resource type="PackedScene" uid="uid://dry5xxoksd4yr" path="res://Scenes/Prefabs/kill_plane.tscn" id="3_33oou"]
 
 [node name="Node" type="Node"]
 
 [node name="ItemManager" parent="." node_paths=PackedStringArray("player") instance=ExtResource("1_evp6a")]
 player = NodePath("../Player")
 
+[node name="Track1" parent="." instance=ExtResource("2_4aluh")]
+
 [node name="Player" parent="." instance=ExtResource("1_u1thq")]
 
-[node name="ground" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 0)
-physics_material_override = SubResource("PhysicsMaterial_pw4we")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
-shape = SubResource("BoxShape3D_7dm0k")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="ground"]
-transform = Transform3D(6.00174, 0, 0, 0, 1, 0, 0, 0, 6.00206, 0, 0, 0)
-layers = 3
-mesh = SubResource("BoxMesh_ig7tw")
-surface_material_override/0 = SubResource("StandardMaterial3D_ig7tw")
+[node name="killPlane" parent="." node_paths=PackedStringArray("playerNode") instance=ExtResource("3_33oou")]
+playerNode = NodePath("../Player")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.35981, 0.0243341, 0.932709, -0.667748, -0.691474, 0.275637, 0.65165, -0.721991, -0.23255, 0, 18, 0)
