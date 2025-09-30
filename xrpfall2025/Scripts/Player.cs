@@ -1,4 +1,5 @@
 //Code from https://docs.godotengine.org/en/4.4/getting_started/first_3d_game/03.player_movement_code.html
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
@@ -17,7 +18,7 @@ public enum States
 
 public partial class Player : CharacterBody3D
 {
-	private event OnKillPlane isCollidingKillPlane;
+	private event OnKillPlaneDelegate IsCollidingKillPlane;
 	private event ItemCollisionDelegate OnItemCollision;
 	private States current; //current state
 
@@ -46,12 +47,13 @@ public partial class Player : CharacterBody3D
 
 
 	//Rotation speed
-	//will be replaced upon adding angular velocity
 	[Export] private double rotationSpeed = 1.5f;
 	private double rotationIncrement = Mathf.DegToRad(2); //per delta
 
 	// The downward acceleration when in the air, in meters per second squared.
 	[Export] private int fallAcceleration = 10;
+	private Vector3 prevPosition; //tracked just before an object starts falling
+	private List<Vector3> pathOfFalling;
 
 	//Gizmos for debugging
 	private Color color;
@@ -98,7 +100,10 @@ public partial class Player : CharacterBody3D
 		color = new Color("CYAN");
 		current = States.Regular;
 		timer = new Stopwatch();
+		prevPosition = new Vector3();
+		pathOfFalling = new List<Vector3>();
 		OnItemCollision += StartTimer;
+		IsCollidingKillPlane += ReturnToTrack;
 	}
 
 	/// <summary>
@@ -119,10 +124,10 @@ public partial class Player : CharacterBody3D
 	{
 		//draw gizmos
 		DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
-		GD.Print("Player State: " + Current);
+		//GD.Print("Player State: " + Current);
 
 		//check the timer
-		GD.Print("Player Timer: " + timer.ElapsedMilliseconds);
+		//GD.Print("Player Timer: " + timer.ElapsedMilliseconds);
 
 		//when collision event, run rng and start stopwatch. unsubscribe collision event and start stopwatch event
 		//after certain time, resubscribe collision event, reset stop watch.
@@ -137,13 +142,13 @@ public partial class Player : CharacterBody3D
 	public override void _PhysicsProcess(double delta)
 	{
 		//Adjust left and right steering
-		if (Input.IsActionPressed("right")
+		if ((Input.IsActionPressed("right") && current != States.Inverted)
 			|| (Input.IsActionPressed("left") && current == States.Inverted))
 		{
 			RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
 			//GD.Print("Pressed D right");
 		}
-		else if (Input.IsActionPressed("left")
+		else if ((Input.IsActionPressed("left") && current != States.Inverted)
 			|| (Input.IsActionPressed("right") && current == States.Inverted))
 		{
 			RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
@@ -168,10 +173,12 @@ public partial class Player : CharacterBody3D
 		}
 
 		// Vertical velocity
-		//TODO: currently doesn't quite work
 		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
 		{
+			//keep adding position before gravity is implemented until impact with kill plane
+			pathOfFalling.Add(Position); 
 			Position -= GetTransform().Basis.Y * (float)(delta * fallAcceleration);
+			//how to check when player just starts falling and not more 
 			//GD.Print("I'm falling!");
 		}
 
@@ -184,7 +191,7 @@ public partial class Player : CharacterBody3D
 		Position += GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
 
 		MoveAndSlide();
-		GD.Print("Player speed: " + speed);
+		//GD.Print("Player speed: " + speed);
 	}
 
 	/// <summary>
@@ -325,8 +332,22 @@ public partial class Player : CharacterBody3D
 		OnItemCollision += StartTimer;
 	}
 
-	private void ReturnToTrack(Vector3 prevPosition)
+	/// <summary>
+	/// Logic that happens whenever the player falls off the track and hits the kill plane
+	/// </summary>
+	/// <param name="prevPosition">the position of the player just before falling</param>
+	/// <param name="currentPosition">the position of the player upon impact with the kill plane</param>
+	private bool ReturnToTrack()
 	{
-		
+		//calculate the point which the player is closests to the line. 
+		//return the player back to the calculated point
+		GlobalPosition = pathOfFalling[0] + Vector3.One;
+		pathOfFalling.Clear(); //empty the list for the next fall
+
+		//calculate the projection of the vector between prv and current onto the kill plane
+		//take the magnitude of that vector and add it to the prevPos. 
+		//set the player's global position to the new pt. 
+		//point the player towards the track direction of flow. 
+		return true;
 	}
 }

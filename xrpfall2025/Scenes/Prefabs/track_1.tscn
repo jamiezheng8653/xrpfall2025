@@ -14,6 +14,7 @@
 
 [node name="finishPost" type="CSGCylinder3D" parent="track"]
 transform = Transform3D(15, 0, 0, 0, 50, 0, 0, 0, 15, 0, 50, 80)
+layers = 3
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="track"]
 transform = Transform3D(70.7107, 0, -14.1421, 0, 1, 0, 70.7107, 0, 14.1421, -100, 0, -28)
@@ -22,6 +23,7 @@ debug_color = Color(0.844489, 0.353483, 0.36834, 0.42)
 
 [node name="topmeshR" type="MeshInstance3D" parent="track/CollisionShape3D3"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+layers = 3
 mesh = SubResource("BoxMesh_0ue6f")
 skeleton = NodePath("../../CollisionShape3D6/straightmeshR")
 
@@ -32,6 +34,7 @@ debug_color = Color(0.844489, 0.353483, 0.36834, 0.42)
 
 [node name="topmeshL" type="MeshInstance3D" parent="track/CollisionShape3D"]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0, 0)
+layers = 3
 mesh = SubResource("BoxMesh_0ue6f")
 skeleton = NodePath("../../CollisionShape3D6/straightmeshR")
 
@@ -42,6 +45,7 @@ debug_color = Color(0.844489, 0.353483, 0.36834, 0.42)
 
 [node name="bottommeshR" type="MeshInstance3D" parent="track/CollisionShape3D2"]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0, 0)
+layers = 3
 mesh = SubResource("BoxMesh_0ue6f")
 skeleton = NodePath("../../CollisionShape3D6/straightmeshR")
 
@@ -52,6 +56,7 @@ debug_color = Color(0.844489, 0.353483, 0.36834, 0.42)
 
 [node name="bottommeshL" type="MeshInstance3D" parent="track/CollisionShape3D4"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+layers = 3
 mesh = SubResource("BoxMesh_0ue6f")
 skeleton = NodePath("../../CollisionShape3D6/straightmeshR")
 
@@ -61,7 +66,7 @@ shape = SubResource("BoxShape3D_0ue6f")
 debug_color = Color(0.951543, 0.190632, 0.292418, 0.42)
 
 [node name="straightmeshL" type="MeshInstance3D" parent="track/CollisionShape3D5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+layers = 3
 mesh = SubResource("BoxMesh_avj5e")
 skeleton = NodePath("../../CollisionShape3D")
 
@@ -71,6 +76,6 @@ shape = SubResource("BoxShape3D_0ue6f")
 debug_color = Color(0.951543, 0.190632, 0.292418, 0.42)
 
 [node name="straightmeshR" type="MeshInstance3D" parent="track/CollisionShape3D6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+layers = 3
 mesh = SubResource("BoxMesh_avj5e")
 skeleton = NodePath("../../CollisionShape3D")
