@@ -17,7 +17,7 @@ public partial class Item : Node
 	// reloading on the screen after a set period of time. 
 	// The item will set off an event that will notify the player to change its state
 	// accordingly.
-	private event ItemCollisionDelegate OnItemCollision;
+	public event ItemCollisionDelegate OnItemCollision;
 	private Player player; //Item manager will pass in this information
 
 	//references necessary for collision bounds
@@ -91,7 +91,7 @@ public partial class Item : Node
 			}
 		}
 
-		GD.Print("Item timer: " + timer.ElapsedMilliseconds);
+		//GD.Print("Item timer: " + timer.ElapsedMilliseconds);
 
 		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
 		DebugDraw3D.DrawAabb(AABB, color);
@@ -118,9 +118,10 @@ public partial class Item : Node
 	/// this instance in a different scene
 	/// </summary>
 	/// <param name="player">Reference to the Player instance in scene</param>
-	public void CustomInit(Player player)
+	public void CustomInit(Player player, Vector3 position)
 	{
 		this.player = player;
+		Position = position;
 	}
 
 	private void StartTimer()

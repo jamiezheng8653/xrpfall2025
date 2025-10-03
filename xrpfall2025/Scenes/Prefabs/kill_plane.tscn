@@ -25,6 +25,7 @@ process_physics_priority = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 top_level = true
 shape = SubResource("BoxShape3D_toyea")
+disabled = true
 debug_color = Color(0.946025, 0.188105, 0.356576, 0.42)
 
 [node name="CSGBox3D" type="CSGBox3D" parent="ground/CollisionShape3D"]

@@ -11,6 +11,7 @@
 [node name="Track1" type="Node"]
 
 [node name="track" type="StaticBody3D" parent="."]
+visible = false
 
 [node name="finishPost" type="CSGCylinder3D" parent="track"]
 transform = Transform3D(15, 0, 0, 0, 50, 0, 0, 0, 15, 0, 50, 80)

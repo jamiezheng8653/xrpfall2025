@@ -1,21 +1,30 @@
 using Godot;
 using System;
 
-public delegate bool OnKillPlaneDelegate();
+public delegate void OnKillPlaneDelegate();
 public partial class KillPlane : Node
 {
-	private event OnKillPlaneDelegate IsCollidingKillPlane;
-	[Export] private Node playerNode = null;
+	public event OnKillPlaneDelegate IsCollidingKillPlane;
 	private Player playerP = null;
 	[Export] private CsgBox3D planeBox = null;
 	private Color color;
+
+	public Aabb AABB
+	{
+		get
+		{
+			//move the aabb to the actual object's transform
+			//otherwise the aabb sits in the origin
+			Aabb temp = planeBox.GlobalTransform * planeBox.GetAabb();
+			temp.Size = planeBox.GlobalTransform.Basis.Scale;
+			return temp;
+		}
+	}
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		color = new Color("RED");
-		playerP = (Player)playerNode.GetNode<CharacterBody3D>("Node3D/Player");
-		IsCollidingKillPlane += IsColliding;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -23,19 +32,25 @@ public partial class KillPlane : Node
 	{
 		if (IsColliding())
 		{
+			GD.Print("I'm colliding!");
 			//fire event
 			IsCollidingKillPlane?.Invoke();
 		}
 
 		//draw aabb 
-		DebugDraw3D.DrawAabb(planeBox.GetAabb(), color);
+		DebugDraw3D.DrawAabb(AABB, color);
 
+	}
+
+	public void Init(Player player)
+	{
+		playerP = player;
 	}
 
 	private bool IsColliding()
 	{
 		// we don't need to adjust the position of the kill plane's aabb 
 		// because the kill plane is never going to move while the game is running
-		return playerP.AABB.Intersects(planeBox.GetAabb());
+		return playerP.AABB.Intersects(AABB);
 	}
 }
