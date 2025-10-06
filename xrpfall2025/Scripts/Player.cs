@@ -1,4 +1,3 @@
-//Code from https://docs.godotengine.org/en/4.4/getting_started/first_3d_game/03.player_movement_code.html
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design.Serialization;
@@ -54,7 +53,7 @@ public partial class Player : CharacterBody3D
 	private List<Vector3> pathOfFalling;
 	private bool kpImpact = false;
 
-	private Curve3D track;
+	private Path3D track;
 
 	//Gizmos for debugging
 	private Color color;
@@ -96,7 +95,7 @@ public partial class Player : CharacterBody3D
 	/// </summary>
 	/// <param name="startingPosition"></param>
 	/// <param name="facingDirection"></param>
-	public void Init(Vector3 startingPosition, Curve3D track/*, Vector3 facingDirection*/)
+	public void Init(Vector3 startingPosition, Path3D track/*, Vector3 facingDirection*/)
 	{
 		GlobalPosition = startingPosition + new Vector3(0, 5, 0);
 		this.track = track;
@@ -137,6 +136,14 @@ public partial class Player : CharacterBody3D
 		DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
 		//GD.Print("Player State: " + Current);
 
+		//closest point
+		/*DebugDraw3D.DrawBox(
+			GetClosestAbsolutePosition(track, GlobalPosition),
+			Godot.Quaternion.Identity,
+			Vector3.One,
+			color
+			);*/
+
 		//check the timer
 		//GD.Print("Player Timer: " + timer.ElapsedMilliseconds);
 
@@ -153,25 +160,25 @@ public partial class Player : CharacterBody3D
 	public override void _PhysicsProcess(double delta)
 	{
 		//Adjust left and right steering
-		if ((Input.IsActionPressed("right") && current != States.Inverted)
-			|| (Input.IsActionPressed("left") && current == States.Inverted))
+		if (((Input.IsActionPressed("right") && current != States.Inverted)
+			|| (Input.IsActionPressed("left") && current == States.Inverted)) && IsOnFloor())
 		{
 			RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
 			//GD.Print("Pressed D right");
 		}
-		else if ((Input.IsActionPressed("left") && current != States.Inverted)
-			|| (Input.IsActionPressed("right") && current == States.Inverted))
+		else if (((Input.IsActionPressed("left") && current != States.Inverted)
+			|| (Input.IsActionPressed("right") && current == States.Inverted)) && IsOnFloor())
 		{
 			RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
 			//GD.Print("Pressed A left");
 		}
 
 		//accelerate in forward or backward direction
-		if (Input.IsActionPressed("back"))
+		if (Input.IsActionPressed("back") && IsOnFloor())
 		{
 			if (speed > -maxSpeed) speed -= acceleration * delta;
 		}
-		else if (Input.IsActionPressed("forward"))
+		else if (Input.IsActionPressed("forward") && IsOnFloor())
 		{
 			//direction.Z -= 1.0f;
 			if (speed < maxSpeed) speed += acceleration * delta;
@@ -193,7 +200,6 @@ public partial class Player : CharacterBody3D
 			//GD.Print("I'm falling!");
 			GD.Print(pathOfFalling[^1]);
 		}
-		//else if (!pathOfFalling.Any() && IsOnFloor())
 		else
 		{
 			pathOfFalling.Clear();
@@ -265,9 +271,6 @@ public partial class Player : CharacterBody3D
 				//case States.Regular:
 				//break;
 		}
-
-		//start the timer if you have not already
-		//if (current != States.Regular && timer.ElapsedMilliseconds <= 0) OnItemCollision?.Invoke();
 
 		return speed;
 	}
@@ -360,21 +363,41 @@ public partial class Player : CharacterBody3D
 
 			//calculate the projection of the vector between prv and current onto the kill plane
 			Vector3 u = pathOfFalling[^1] - pathOfFalling[0];
-			//eventually this point will be a point on the bezier curve when track generation gets implemented
-			//Vector3 v = pathOfFalling[0] + u; 
-			Vector3 v = track.GetClosestPoint(Position);
-			//point the player towards the track direction of flow. 
+			Vector3 v = new Vector3(pathOfFalling[0].X, pathOfFalling[^1].Y, pathOfFalling[0].Z);			
+
+			//get the direction that points towards the origin
+			Vector3 d = (Vector3.Zero - pathOfFalling[0]).Normalized();
 
 			pathOfFalling.Clear(); //empty the list for the next fall
 			//set the player's global position to the new pt
-			//if the orientation of the player is acute 
-			GlobalPosition = -(Utils.ProjUOntoV(u, v).Normalized() - new Vector3(10, 5, -10)) - v;
-			//if the orientation of the player is obtuse
-			//GlobalPosition = -(Utils.ProjUOntoV(u, v) + new Vector3(10, 5, -10)) + v;
-			//if the orientation of the player is orthogonal
-			//GlobalPosition = -(Utils.ProjUOntoV(u, v) - new Vector3(0, 5, 10)) + v;
+			GlobalPosition = -(Utils.ProjUOntoV(u, v).Normalized() - new Vector3(d.X, 5, d.Z))
+				+ Utils.GetClosestAbsolutePosition(track, GlobalPosition);
+
+			//point the player towards the track direction of flow.
+			Vector3 direction = (
+				Utils.GetClosestAbsolutePosition(track, GlobalPosition) -
+				Utils.GetClosestAbsolutePosition(track, GlobalPosition + new Vector3(0.001f, 0, 0.001f))
+				).Normalized();
+			//only consistent if we are driving in the general south direction. Otherwise the direction given is backwards. 
+			LookAt(GlobalTransform.Origin + direction, Vector3.Up); 
+
 			GD.Print("Projection vector: " + Utils.ProjUOntoV(u, v));
 		}
 
+	}
+
+	public void ToPreviousCheckpoint()
+	{
+		//this method will be called when the player falls off the map
+		//the slice will be simplified into a isosceles triangle with 
+		// the long sides being as long as the length of the longer two magnitudes.
+		//generate a slice of angle 360/numOfPts and check for if the player is in the slice. 
+		//If true, teleport the player to the point that is behind the front most one (i - 1)
+
+		for (int i = 0; i < track.Curve.PointCount; i++)
+		{
+			//Triangle points: p[i], p[i+1], origin
+			
+		}
 	}
 }

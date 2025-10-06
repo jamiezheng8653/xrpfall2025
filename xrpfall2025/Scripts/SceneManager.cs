@@ -3,6 +3,7 @@ using System;
 
 public partial class SceneManager : Node
 {
+	//parts involved in the scene.
 	[Export] private Node player;
 	[Export] private Node track;
 	[Export] private Node itemManager;
@@ -20,7 +21,7 @@ public partial class SceneManager : Node
 		killPlaneKP.Init(playerP);
 		trackT.Init();
 		itemManagerIM.Init(playerP, trackT);
-		playerP.Init(trackT.StartingPoint, trackT.Curve);
+		playerP.Init(trackT.StartingPoint, trackT.Path3D);
 
 		//subscribe Player and Killplane Events
 		killPlaneKP.IsCollidingKillPlane += playerP.ReturnToTrack;

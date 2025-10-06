@@ -8,14 +8,14 @@ using System.Collections.Generic;
 /// </summary>
 public partial class Track : Node
 {
-	[Export] private Path3D path = null;
+	[Export] private Path3D innerPath = null;
 	[Export] private int scale = 1;
 	[Export] private int numOfPts = 0;
 	private Vector3 startPoint;
 
-	public Curve3D Curve
+	public Path3D Path3D
 	{
-		get{ return path.Curve; }
+		get { return innerPath; }
 	}
 
 	public Vector3 StartingPoint
@@ -32,7 +32,6 @@ public partial class Track : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -45,10 +44,11 @@ public partial class Track : Node
 		//list of points that will generate track loop
 		List<Vector3> pts = new List<Vector3>();
 		Random rng = new Random();
+		//Path3D outerPath = new Path3D();
 
 		//change in angle
-		double deltaTheta = Mathf.DegToRad(360 / numOfPts);		
-		
+		double deltaTheta = Mathf.DegToRad(360 / numOfPts);
+
 		//with the origin being the center of generation, we generate numOfPts random lengths. 
 		// then calculate the point from there
 		for (int i = 0; i < numOfPts; i++)
@@ -60,14 +60,22 @@ public partial class Track : Node
 			//GD.Print(pts[i]);
 		}
 
-		startPoint = pts[0]; //get the starting point saved
-		path.Curve.Closed = true; //ensure the loop is closed 
-		//start generating the loop
-		for (int i = 0; i < pts.Count; i++)
+		//get the starting point saved
+		startPoint = pts[0]; 
+		//ensure the loop is closed
+		innerPath.Curve.Closed = true;
+		//start generating the track loo. 
+		//the first one will be inner track, second loop will be the outer track. 
+		// Since the mesh generates towards the origin rather than centered on the 
+		// bezier curve, we will treat the inner track as the track's midpoint line overall
+		for (int i = 0; i < pts.Count; i++) //first; inner
 		{
 			//GD.Print(pts[i]);
-			path.Curve.AddPoint(pts[i], null, null, i);
+			innerPath.Curve.AddPoint(pts[i], null, null, i);
+			//outerPath.Curve.AddPoint(pts[i] * 2, null, null, i);
 		}
+		
+		
 
 	}
 }
