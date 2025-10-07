@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using Godot;
 using Vector3 = Godot.Vector3;
+using Vector2 = Godot.Vector2;
 
 //Enum States
 public enum States
@@ -133,7 +134,7 @@ public partial class Player : CharacterBody3D
 	public override void _Process(double delta)
 	{
 		//draw gizmos
-		DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
+		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
 		//GD.Print("Player State: " + Current);
 
 		//closest point
@@ -397,7 +398,20 @@ public partial class Player : CharacterBody3D
 		for (int i = 0; i < track.Curve.PointCount; i++)
 		{
 			//Triangle points: p[i], p[i+1], origin
-			
+			ConvexPolygonShape3D triangle = new ConvexPolygonShape3D();
+			triangle.Points = [
+				Vector3.Zero,
+				//extra margins in case the player car exceeds the slice area
+				2 * track.Curve.GetPointPosition(i),
+				2* track.Curve.GetPointPosition(i + 1)
+			];
+			//if SAT returns true, move the player to p[i] checkpoint
+			if (true)
+			{
+				GlobalPosition = track.Curve.GetPointPosition(i);
+				//kill the loop
+				return;
+			}
 		}
 	}
 }
