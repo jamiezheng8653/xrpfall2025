@@ -30,6 +30,26 @@ public static class Utils
 		else return u;
 	}
 
+	public static Vector3 Max(Vector3[] set)
+	{
+		Vector3 v = set[0];
+		for (int i = 1; i < set.Length; i++)
+		{
+			v = SortByMagnitude(v, set[i]);
+		}
+		return v;
+	}
+
+	public static Vector3 Min(Vector3[] set)
+	{
+		Vector3 v = set[0];
+		for (int i = 1; i < set.Length; i++)
+		{
+			if (v > SortByMagnitude(v, set[i])) v = set[i];
+		}
+		return v;
+	}
+
 	public static float Max(float a, float b, float c)
 	{
 		return Mathf.Max(Mathf.Max(a, b), c);
@@ -67,14 +87,14 @@ public static class Utils
 		return curvePoint;
 	}
 
-	public static bool AABBPlaneIntersect(Aabb aabb, Plane plane)
+	public static bool AABBPlaneIntersect(Vector3[] aabb, Plane plane)
 	{
 		//these two lines not necessary with a (center, extents) AABB representation
-		Point c = (aabb.Max + aabb.Min) * 0.5f;
-		Point e = aabb.Max - c;
+		Vector3 c = (Max(aabb) + Min(aabb)) * 0.5f;
+		Vector3 e = Max(aabb) - c;
 
 		//compute the projection interval radius of b onto L(t) = aabb.c + t * plane.normal
-		float r = e[0] * Mathf.Abs(plane.normal[0]) + e[1] * Mathf.Abs(plane.normal[1]) + e[2] * Mathf.Abs(plane.normal[2]);
+		float r = e[0] * Mathf.Abs(plane.Normal[0]) + e[1] * Mathf.Abs(plane.Normal[1]) + e[2] * Mathf.Abs(plane.Normal[2]);
 
 		//compute distance of box center from plane 
 		float s = plane.Normal.Dot(c) - plane.D;
@@ -84,20 +104,21 @@ public static class Utils
 	}
 
 	/// <summary>
-	/// Implementation of the Seperating Axis Theorem (SAT) agains a triangle and aabb
+	/// Implementation of the Seperating Axis Theorem (SAT) against a triangle and aabb
 	/// Checks 8 planes
 	/// </summary>
 	/// <returns>If the two passed in shapes overlap in any way</returns>
 	public static bool TriangleAABBSAT(Vector3[] triangle, Vector3[] box)
 	{
+		GD.Print("TRIAABBSAT Triangle: " + triangle[0] + triangle[1] + triangle[2] + " box: " + box[0] + box[1]);
 		if (triangle.Length <= 0) return false; //no triangle exists
 		float p0, p1, p2, r;
 
 		//compute the box center and extends (if not already given in that format)
-		Vector3 c = (box.Min() + box.Max()) * 0.5f;
-		float e0 = (box.Max().X - box.Min().X) * 0.5f;
-		float e1 = (box.Max().Y - box.Min().Y) * 0.5f;
-		float e2 = (box.Max().Z - box.Min().Z) * 0.5f;
+		Vector3 c = (Min(box) + Max(box)) * 0.5f;
+		float e0 = (Max(box).X - Min(box).X) * 0.5f;
+		float e1 = (Max(box).Y - Min(box).Y) * 0.5f;
+		float e2 = (Max(box).Z - Min(box).Z) * 0.5f;
 
 		//translate triangle as conceptually moving AABB to origin
 		triangle[0] = triangle[0] - c;
@@ -113,39 +134,35 @@ public static class Utils
 
 		Vector3 aij;
 
+		//TODO: Make these three loops DRY
 		//test axes a00...a22 (category 3)
-		//test a00
-		aij = new Vector3(0, -edges[0].Z, edges[0].Y);
-		p0 = triangle[0].Dot(aij);
-		p1 = triangle[1].Dot(aij);
-		p2 = triangle[2].Dot(aij);
-		r = e1 * Mathf.Abs(edges[0].Z)
-			+ e2 * Mathf.Abs(edges[0].Y);
-		if (Mathf.Max(-Mathf.Max(p0, p2), Mathf.Min(p0, p2)) > r) return false; //axis is a seperating axis
+		for (int i = 0; i < 3; i++)
+		{
+			aij = new Vector3(0, -edges[i].Z, edges[i].Y);
+			p0 = triangle[0].Dot(aij);
+			p1 = triangle[1].Dot(aij);
+			p2 = triangle[2].Dot(aij);
+			r = e1 * Mathf.Abs(edges[i].Z) + e2 * Mathf.Abs(edges[i].Y);
+			if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false; //axis is a seperating axis
+		}
 
-		//test a01
-		aij = new Vector3(0, -edges[1].Z, edges[1].Y);
-		p0 = triangle[0].Dot(aij);
-		p1 = triangle[1].Dot(aij);
-		p2 = triangle[2].Dot(aij);
-		r = e1 * Mathf.Abs(edges[1].Z)
-			+ e2 * Mathf.Abs(edges[1].Y);
-		if (Mathf.Max(-Mathf.Max(p0, p2), Mathf.Min(p0, p2)) > r) return false; //axis is a seperating axis
+		for (int i = 0; i < 3; i++){
+			aij = new Vector3 (edges[i].Z, 0, -edges[i].X);
+			p0 = triangle[0].Dot(aij);
+			p1 = triangle[1].Dot(aij);
+			p2 = triangle[2].Dot(aij);
+			r = e0 + Mathf.Abs(edges[i].Z) + e2 * Mathf.Abs(edges[i].X);
+			if (Mathf.Max(-Max(p0, p1,p2), Min(p0, p1,p2)) > r) return false; //axis is a seperating axis
+		}
 
-		//test a02
-		if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false;
-		//test a10
-		if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false;
-		//test a11
-		if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false;
-		//test a12
-		if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false;
-		//test a20
-		if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false;
-		//test a21
-		if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false;
-		//test a22
-		if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false;
+		for (int i = 0; i < 3; i++){
+			aij = new Vector3(-edges[i].Y, edges[i].Z, 0);
+			p0 = triangle[0].Dot(aij);
+			p1 = triangle[1].Dot(aij);
+			p2 = triangle[2].Dot(aij);
+			r = e0 * Mathf.Abs(edges[i].Y) + e1 * Mathf.Abs(edges[i].X);
+			if (Mathf.Max(-Max(p0, p1,p2), Min(p0, p1,p2)) > r) return false; //axis is a seperating axis
+		}
 		
 		//test the three axes corresponding to the face normals of AABB b (category 1)
 		//exit if...
@@ -165,6 +182,5 @@ public static class Utils
 		p.D = p.Normal.Dot(triangle[0]);
 		return AABBPlaneIntersect(box, p);
 
-		return true; //all tests fail, 
 	}
 }

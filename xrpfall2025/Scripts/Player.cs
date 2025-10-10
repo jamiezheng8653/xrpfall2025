@@ -57,7 +57,7 @@ public partial class Player : CharacterBody3D
 	private Path3D track;
 
 	//Gizmos for debugging
-	private Color color;
+	private Godot.Color color;
 	[Export] private CsgBox3D csgBox3D = null;
 
 	//Timer for transitioning between states
@@ -110,7 +110,7 @@ public partial class Player : CharacterBody3D
 	/// </summary>
 	public override void _Ready()
 	{
-		color = new Color("CYAN");
+		color = new Godot.Color("CYAN");
 		current = States.Regular;
 		timer = new Stopwatch();
 		prevPosition = new Vector3();
@@ -395,18 +395,31 @@ public partial class Player : CharacterBody3D
 		//generate a slice of angle 360/numOfPts and check for if the player is in the slice. 
 		//If true, teleport the player to the point that is behind the front most one (i - 1)
 
-		for (int i = 0; i < track.Curve.PointCount; i++)
+		for (int i = 0; i < track.Curve.PointCount - 1; i++)
 		{
 			//Triangle points: p[i], p[i+1], origin
-			ConvexPolygonShape3D triangle = new ConvexPolygonShape3D();
-			triangle.Points = [
+			Vector3[] triangle = [
 				Vector3.Zero,
 				//extra margins in case the player car exceeds the slice area
-				2 * track.Curve.GetPointPosition(i),
-				2* track.Curve.GetPointPosition(i + 1)
+				new Vector3((GlobalTransform*track.Curve.GetPointPosition(i)).X, (GlobalTransform*track.Curve.GetPointPosition(i)).Y, (GlobalTransform*track.Curve.GetPointPosition(i)).Z),
+				new Vector3((GlobalTransform*track.Curve.GetPointPosition(i + 1)).X, (GlobalTransform*track.Curve.GetPointPosition(i + 1)).Y, (GlobalTransform*track.Curve.GetPointPosition(i + 1)).Z)
+				//GlobalTransform * track.Curve.GetPointPosition(i),
+				//GlobalTransform * track.Curve.GetPointPosition(i + 1)
+			];
+
+			GD.Print("TPC Triangle: " + triangle[0] + triangle[1] + triangle[2]);
+
+			//getting the global points that make up the aabb
+			//aabb.position is the lower bottom left point (min). 
+			// Position/globalPosition is in the center of the object tho
+			Vector3[] boxPoints = [
+				new Vector3((GlobalPosition - (AABB.Size * 0.5f)).X, (GlobalPosition - (AABB.Size * 0.5f)).Y, (GlobalPosition - (AABB.Size * 0.5f)).Z),
+				new Vector3((GlobalPosition + (AABB.Size * 0.5f)).X, (GlobalPosition + (AABB.Size * 0.5f)).Y, (GlobalPosition + (AABB.Size * 0.5f)).Z)
+				//GlobalPosition - (AABB.Size * 0.5f), //min
+				//GlobalPosition + (AABB.Size * 0.5f)	//max
 			];
 			//if SAT returns true, move the player to p[i] checkpoint
-			if (true)
+			if (Utils.TriangleAABBSAT(triangle, boxPoints))
 			{
 				GlobalPosition = track.Curve.GetPointPosition(i);
 				//kill the loop

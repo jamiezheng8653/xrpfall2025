@@ -1,12 +1,20 @@
-[gd_scene load_steps=3 format=3 uid="uid://do3gixifb6rtv"]
+[gd_scene load_steps=6 format=3 uid="uid://do3gixifb6rtv"]
 
 [ext_resource type="Script" uid="uid://br51gwrotbasa" path="res://Scripts/Item.cs" id="1_8n5ru"]
+[ext_resource type="Texture2D" uid="uid://bi3wiywm6j1x8" path="res://Assets/Images/xrpLogo.png" id="2_iiaa8"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_8n5ru"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_q17ne"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mydh3"]
+albedo_texture = ExtResource("2_iiaa8")
+albedo_texture_force_srgb = true
+uv1_scale = Vector3(3, 2, 3)
+
 [node name="Item" type="Node" node_paths=PackedStringArray("cylinder", "area3d")]
 script = ExtResource("1_8n5ru")
-cylinder = NodePath("Area3D/CollisionShape3D/CSGCylinder3D")
+cylinder = NodePath("Area3D/CollisionShape3D/CSGMesh3D")
 area3d = NodePath("Area3D")
 
 [node name="Area3D" type="Area3D" parent="."]
@@ -15,4 +23,10 @@ area3d = NodePath("Area3D")
 shape = SubResource("CylinderShape3D_8n5ru")
 
 [node name="CSGCylinder3D" type="CSGCylinder3D" parent="Area3D/CollisionShape3D"]
+visible = false
 layers = 3
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="Area3D/CollisionShape3D"]
+transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0)
+mesh = SubResource("BoxMesh_q17ne")
+material = SubResource("StandardMaterial3D_mydh3")
