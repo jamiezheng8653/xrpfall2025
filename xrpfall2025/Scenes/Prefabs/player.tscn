@@ -10,9 +10,8 @@
 
 [node name="Node3D" type="Node3D" parent="."]
 
-[node name="Player" type="CharacterBody3D" parent="Node3D" node_paths=PackedStringArray("csgBox3D")]
+[node name="Player" type="CharacterBody3D" parent="Node3D"]
 script = ExtResource("1_4flbx")
-csgBox3D = NodePath("Pivot/CSGBox3D")
 
 [node name="Pivot" type="Node3D" parent="Node3D/Player"]
 

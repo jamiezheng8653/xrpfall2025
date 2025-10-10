@@ -26,7 +26,7 @@ func _process(_delta: float) -> void:
 		$TelemetryWindow/Position.text = " Position: (%.2f, %.2f)" % [player_node.CurrentPosition.x, player_node.CurrentPosition.z]
 		$TelemetryWindow/Speed.text = " Speed: %.2f" % current_speed
 		$PlaceText.text = get_place_suffix(player_node.Place) + " Place"
-		$LapText.text = "Lap: " + str(player_node.Lap) + "/3"
+		$LapText.text = "Lap \n       " + str(player_node.Lap) + "/3"
 		
 		# Speed bar. Toggles transparency of each bar
 		for i in bars.size():
@@ -38,7 +38,7 @@ func _process(_delta: float) -> void:
 		
 			
 		
-# Function to add the right suffix to the place number
+# FSunction to add the right suffix to the place number
 func get_place_suffix(place_number: int) -> String:
 	match place_number:
 		1:

@@ -1,9 +1,8 @@
 [gd_scene load_steps=13 format=3 uid="uid://drsnmi4pkc6t5"]
 
+[ext_resource type="Theme" uid="uid://boq5ganfh1ad6" path="res://UI/main_theme.tres" id="1_31rfd"]
 [ext_resource type="Script" uid="uid://cvcplcwtt1s7c" path="res://Scripts/hud.gd" id="1_p8haq"]
-
-[sub_resource type="Theme" id="Theme_kaos7"]
-default_font_size = 22
+[ext_resource type="Theme" uid="uid://d3ma2bitr5q7w" path="res://UI/window_theme.tres" id="3_yppxs"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_31rfd"]
 bg_color = Color(0.49, 0.49, 0.49, 1)
@@ -13,28 +12,6 @@ bg_color = Color(0.44, 0.44, 0.44, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1qlnu"]
 bg_color = Color(0.490196, 0.490196, 0.490196, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p8haq"]
-content_margin_left = 2.0
-content_margin_top = 2.0
-content_margin_right = 2.0
-content_margin_bottom = 2.0
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 5
-border_color = Color(0.37, 0.37, 0.37, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-expand_margin_left = 8.0
-expand_margin_top = 4.0
-expand_margin_right = 8.0
-expand_margin_bottom = 4.0
-shadow_color = Color(0, 0, 0, 0.184314)
-shadow_size = 4
-shadow_offset = Vector2(3, 3)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kaos7"]
 bg_color = Color(0.545098, 0.878431, 0.819608, 1)
@@ -61,6 +38,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_31rfd")
 script = ExtResource("1_p8haq")
 
 [node name="TelemetryWindow" type="VBoxContainer" parent="."]
@@ -69,7 +47,7 @@ offset_left = 27.0
 offset_top = 26.0
 offset_right = 281.0
 offset_bottom = 119.0
-theme = SubResource("Theme_kaos7")
+theme = ExtResource("3_yppxs")
 theme_override_constants/separation = 0
 
 [node name="Position" type="Label" parent="TelemetryWindow"]
@@ -85,6 +63,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_yppxs")
 text = "Speed:"
 
 [node name="Acceleration" type="Label" parent="TelemetryWindow"]
+visible = false
 layout_mode = 2
 theme_override_constants/outline_size = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_1qlnu")
@@ -100,12 +79,10 @@ offset_top = 28.0
 offset_right = -33.0
 offset_bottom = 93.0
 grow_horizontal = 0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.28, 0.28, 0.28, 1)
-theme_override_constants/outline_size = 7
-theme_override_font_sizes/font_size = 35
-theme_override_styles/normal = SubResource("StyleBoxFlat_p8haq")
-text = "Lap 1/3"
+theme_override_constants/line_spacing = -15
+theme_override_font_sizes/font_size = 46
+text = "Lap 
+     1/3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -119,11 +96,7 @@ offset_top = -92.0
 offset_right = 183.0
 offset_bottom = -27.0
 grow_vertical = 0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.28, 0.28, 0.28, 1)
-theme_override_constants/outline_size = 7
-theme_override_font_sizes/font_size = 35
-theme_override_styles/normal = SubResource("StyleBoxFlat_p8haq")
+theme_override_font_sizes/font_size = 40
 text = "1st Place"
 horizontal_alignment = 1
 vertical_alignment = 1
