@@ -21,7 +21,7 @@ public partial class Item : Node
 	private Player player; //Item manager will pass in this information
 
 	//references necessary for collision bounds
-	[Export] private CsgCylinder3D cylinder = null;
+	[Export] private CsgMesh3D cylinder = null;
 	[Export] private Area3D area3d = null;
 
 	private Stopwatch timer = null;
@@ -69,6 +69,8 @@ public partial class Item : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		//spin
+		cylinder.RotateObjectLocal(new Vector3(0, 1, 0), (float)Mathf.DegToRad(2));
 		//if a timer is going, then reset the item and the timer
 		if (timer.ElapsedMilliseconds > 10000)
 		{

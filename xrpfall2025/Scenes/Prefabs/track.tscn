@@ -6,9 +6,9 @@
 closed = true
 bake_interval = 20.0
 
-[node name="Track" type="Node" node_paths=PackedStringArray("path")]
+[node name="Track" type="Node" node_paths=PackedStringArray("innerPath")]
 script = ExtResource("1_mutsl")
-path = NodePath("Path3D")
+innerPath = NodePath("Path3D")
 scale = 15
 numOfPts = 10
 
