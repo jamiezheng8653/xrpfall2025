@@ -24,37 +24,67 @@ public static class Utils
 		return (v.Dot(u) / Mathf.Pow(v.Length(), 2)) * v;
 	}
 
-	public static Vector3 SortByMagnitude(Vector3 u, Vector3 v)
+	/// <summary>
+	/// Compares two vector3s and find which one has the larger magnitude
+	/// </summary>
+	/// <param name="u">Vector3 1</param>
+	/// <param name="v">Vector3 2</param>
+	/// <returns>Which vector of u and v is larger in magnitude</returns>
+	public static Vector3 GreaterMagnitude(Vector3 u, Vector3 v)
 	{
 		if (u.LengthSquared() < v.LengthSquared()) return v;
 		else return u;
 	}
 
+	/// <summary>
+	/// Finds the greatest Vector3 of a set of Vector3s based on its magnitude
+	/// </summary>
+	/// <param name="set">Set of Vector3s you are comparing and finding the largest of</param>
+	/// <returns>The Vector3 with the greatest magnitude</returns>
 	public static Vector3 Max(Vector3[] set)
 	{
 		Vector3 v = set[0];
 		for (int i = 1; i < set.Length; i++)
 		{
-			v = SortByMagnitude(v, set[i]);
+			v = GreaterMagnitude(v, set[i]);
 		}
 		return v;
 	}
 
+	/// <summary>
+	/// Returns the smallest Vector3 of a set of Vector3s based on its magnitude
+	/// </summary>
+	/// <param name="set">Set of Vector3s you are comparing and finding the smallest of</param>
+	/// <returns>The Vector3 with the smallest magnitude in the set</returns>
 	public static Vector3 Min(Vector3[] set)
 	{
 		Vector3 v = set[0];
 		for (int i = 1; i < set.Length; i++)
 		{
-			if (v > SortByMagnitude(v, set[i])) v = set[i];
+			if (v > GreaterMagnitude(v, set[i])) v = set[i];
 		}
 		return v;
 	}
 
+	/// <summary>
+	/// Finds the maximum between three values
+	/// </summary>
+	/// <param name="a">Value 1</param>
+	/// <param name="b">Value 2</param>
+	/// <param name="c">Value 3</param>
+	/// <returns>Which value is the greatest of a, b, and c</returns>
 	public static float Max(float a, float b, float c)
 	{
 		return Mathf.Max(Mathf.Max(a, b), c);
 	}
 
+	/// <summary>
+	/// Finds the minimum between three values
+	/// </summary>
+	/// <param name="a">Value 1</param>
+	/// <param name="b">Value 2</param>
+	/// <param name="c">Value 3</param>
+	/// <returns>Which values is the smallest of a, b, and c</returns>
 	public static float Min(float a, float b, float c)
 	{
 		return Mathf.Min(Mathf.Min(a, b), c);
@@ -87,6 +117,12 @@ public static class Utils
 		return curvePoint;
 	}
 
+	/// <summary>
+	/// Checks for intersection between an AABB and a plane
+	/// </summary>
+	/// <param name="aabb">And array of vector3s with at least the min and max points of the aabb</param>
+	/// <param name="plane">What plane are you testing against the aabb</param>
+	/// <returns></returns>
 	public static bool AABBPlaneIntersect(Vector3[] aabb, Plane plane)
 	{
 		//these two lines not necessary with a (center, extents) AABB representation
@@ -113,7 +149,7 @@ public static class Utils
 	public static bool TriangleAABBSAT(Vector3[] triangle, Vector3[] box)
 	{
 		GD.Print("TRIAABBSAT Triangle: " + triangle[0] + triangle[1] + triangle[2] + " box: " + box[0] + box[1]);
-		if (triangle.Length <= 0) return false; //no triangle exists
+		if (triangle.Length <= 0 || box.Length <= 0) return false; //no triangle nor aabb exists
 		float p0, p1, p2, r;
 
 		//compute the box center and extends (if not already given in that format)

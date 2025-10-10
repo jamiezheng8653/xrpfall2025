@@ -364,13 +364,13 @@ public partial class Player : CharacterBody3D
 
 			//calculate the projection of the vector between prv and current onto the kill plane
 			Vector3 u = pathOfFalling[^1] - pathOfFalling[0];
-			Vector3 v = new Vector3(pathOfFalling[0].X, pathOfFalling[^1].Y, pathOfFalling[0].Z);			
+			Vector3 v = new Vector3(pathOfFalling[0].X, pathOfFalling[^1].Y, pathOfFalling[0].Z);
 
 			//get the direction that points towards the origin
 			Vector3 d = (Vector3.Zero - pathOfFalling[0]).Normalized();
 
 			pathOfFalling.Clear(); //empty the list for the next fall
-			//set the player's global position to the new pt
+								   //set the player's global position to the new pt
 			GlobalPosition = -(Utils.ProjUOntoV(u, v).Normalized() - new Vector3(d.X, 5, d.Z))
 				+ Utils.GetClosestAbsolutePosition(track, GlobalPosition);
 
@@ -380,13 +380,17 @@ public partial class Player : CharacterBody3D
 				Utils.GetClosestAbsolutePosition(track, GlobalPosition + new Vector3(0.001f, 0, 0.001f))
 				).Normalized();
 			//only consistent if we are driving in the general south direction. Otherwise the direction given is backwards. 
-			LookAt(GlobalTransform.Origin + direction, Vector3.Up); 
+			LookAt(GlobalTransform.Origin + direction, Vector3.Up);
 
 			GD.Print("Projection vector: " + Utils.ProjUOntoV(u, v));
 		}
 
 	}
 
+	/// <summary>
+	/// Returns the player to the last point in the bezier curve 
+	/// they passed in the event they fall off the track and hit the kill plane
+	/// </summary>
 	public void ToPreviousCheckpoint()
 	{
 		//this method will be called when the player falls off the map
@@ -400,12 +404,13 @@ public partial class Player : CharacterBody3D
 			//Triangle points: p[i], p[i+1], origin
 			Vector3[] triangle = [
 				Vector3.Zero,
-				//extra margins in case the player car exceeds the slice area
 				new Vector3((GlobalTransform*track.Curve.GetPointPosition(i)).X, (GlobalTransform*track.Curve.GetPointPosition(i)).Y, (GlobalTransform*track.Curve.GetPointPosition(i)).Z),
 				new Vector3((GlobalTransform*track.Curve.GetPointPosition(i + 1)).X, (GlobalTransform*track.Curve.GetPointPosition(i + 1)).Y, (GlobalTransform*track.Curve.GetPointPosition(i + 1)).Z)
 				//GlobalTransform * track.Curve.GetPointPosition(i),
 				//GlobalTransform * track.Curve.GetPointPosition(i + 1)
 			];
+
+			DebugDraw3D.DrawPoints(triangle);
 
 			GD.Print("TPC Triangle: " + triangle[0] + triangle[1] + triangle[2]);
 
