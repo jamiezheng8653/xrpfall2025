@@ -99,6 +99,8 @@ public static class Utils
 		//compute distance of box center from plane 
 		float s = plane.Normal.Dot(c) - plane.D;
 
+		GD.Print("AABBPlaneIntersect: " + (Mathf.Abs(s) <= r));
+
 		//intersection occurs when distance s falls within [-r, r] interval
 		return Mathf.Abs(s) <= r;
 	}
@@ -176,9 +178,11 @@ public static class Utils
 		if (Max(triangle[0].Z, triangle[1].Z, triangle[2].Z) < -e2
 			|| Min(triangle[0].Z, triangle[1].Z, triangle[2].Z) > e2) return false;
 
+
 		//test seperating axis corresponding to triangle face normal (category 2)
-		Plane p = new Godot.Plane();
-		p.Normal = edges[0].Cross(edges[1]);
+		//param 1: normal
+		Plane p = new Plane(edges[0].Cross(edges[1]));
+		//distance from orgin
 		p.D = p.Normal.Dot(triangle[0]);
 		return AABBPlaneIntersect(box, p);
 

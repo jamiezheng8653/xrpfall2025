@@ -421,7 +421,7 @@ public partial class Player : CharacterBody3D
 			//if SAT returns true, move the player to p[i] checkpoint
 			if (Utils.TriangleAABBSAT(triangle, boxPoints))
 			{
-				GlobalPosition = track.Curve.GetPointPosition(i);
+				GlobalPosition = track.Curve.GetPointPosition(i) + (Vector3.Up * 5);
 				//kill the loop
 				return;
 			}
