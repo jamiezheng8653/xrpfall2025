@@ -32,7 +32,7 @@ public partial class KillPlane : Node
 	{
 		if (IsColliding())
 		{
-			GD.Print("I'm colliding!");
+			//GD.Print("I'm colliding!");
 			//fire event
 			IsCollidingKillPlane?.Invoke();
 		}

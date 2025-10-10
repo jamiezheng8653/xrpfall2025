@@ -83,7 +83,7 @@ public partial class Item : Node
 			//check for if this item has overlapped with the player.
 			if (AABB.Intersects(player.AABB))
 			{
-				GD.Print("I'm Colliding!");
+				//GD.Print("I'm Colliding!");
 				//invoke event
 				//if (OnItemCollision != null) OnItemCollision();
 				OnItemCollision?.Invoke(); //shorthand for above

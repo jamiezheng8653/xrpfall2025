@@ -23,7 +23,7 @@ public partial class Track : Node
 		get{ return startPoint; }
 	}
 
-    public override void _EnterTree()
+	public override void _EnterTree()
 	{
 
 	}
@@ -53,7 +53,7 @@ public partial class Track : Node
 		// then calculate the point from there
 		for (int i = 0; i < numOfPts; i++)
 		{
-			double hypotenus = rng.Next(1, 15); //how far from the origin is the point
+			double hypotenus = rng.Next(1, 12); //how far from the origin is the point
 			double x = hypotenus * Mathf.Cos(deltaTheta * i + 1); //find x coord
 			double z = hypotenus * Mathf.Sin(deltaTheta * i + 1); //find z coord
 			pts.Add(new Vector3((float)x, 0, (float)z) * scale); //add and scale the point

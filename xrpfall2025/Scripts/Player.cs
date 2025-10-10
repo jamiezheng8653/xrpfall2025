@@ -1,12 +1,8 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using Godot;
 using Vector3 = Godot.Vector3;
-using Vector2 = Godot.Vector2;
 
 //Enum States
 public enum States
@@ -24,9 +20,10 @@ public partial class Player : CharacterBody3D
 	//if the player gets a speedup or speed debuff, 
 	//multiply/divide speed by cooresponding multiplier
 	//has to be int because Vectors are made up by ints
-	[Export] private int slowMultiplier = 2;
-	[Export] private int fastMultiplier = 2;
+	[Export] private double slowMultiplier = 0.5;
+	[Export] private double fastMultiplier = 2;
 
+	private const double MAXSPEED = 30;
 	private double maxSpeed = 30;
 
 	// How fast the player moves in meters per second.
@@ -38,14 +35,13 @@ public partial class Player : CharacterBody3D
 	private int lap = 2;
 
 	// Expose properties for HUD
-	public double Speed => speed;
+	public double Speed => CurrentSpeed;
 	public double Acceleration => acceleration;
 	public Vector3 CurrentPosition => Position;
 	public int Place => place;
 	public int Lap => lap;
 
 	//Rotation speed
-	[Export] private double rotationSpeed = 1.5;
 	private double rotationIncrement = Mathf.DegToRad(2); //per delta
 
 	// The downward acceleration when in the air, in meters per second squared.
@@ -72,6 +68,27 @@ public partial class Player : CharacterBody3D
 	{
 		get { return current; }
 		set { current = value; }
+	}
+
+	public double CurrentSpeed
+	{
+		get
+		{
+			switch (current)
+			{
+				case States.Slow:
+					return speed * slowMultiplier;
+					break;
+
+				case States.Fast:
+					return speed * fastMultiplier;
+					break;
+
+				default:
+					return speed;
+					break;
+			}
+		}
 	}
 
 	/// <summary>
@@ -165,13 +182,11 @@ public partial class Player : CharacterBody3D
 			|| (Input.IsActionPressed("left") && current == States.Inverted)) && IsOnFloor())
 		{
 			RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
-			//GD.Print("Pressed D right");
 		}
 		else if (((Input.IsActionPressed("left") && current != States.Inverted)
 			|| (Input.IsActionPressed("right") && current == States.Inverted)) && IsOnFloor())
 		{
 			RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
-			//GD.Print("Pressed A left");
 		}
 
 		//accelerate in forward or backward direction
@@ -181,9 +196,7 @@ public partial class Player : CharacterBody3D
 		}
 		else if (Input.IsActionPressed("forward") && IsOnFloor())
 		{
-			//direction.Z -= 1.0f;
 			if (speed < maxSpeed) speed += acceleration * delta;
-			//GD.Print("Pressed W forward");
 		}
 		else
 		{
@@ -197,9 +210,6 @@ public partial class Player : CharacterBody3D
 			//keep adding position before gravity is implemented until impact with kill plane
 			pathOfFalling.Add(GlobalPosition);
 			Position -= GetTransform().Basis.Y * (float)(delta * fallAcceleration);
-			//how to check when player just starts falling and not more 
-			//GD.Print("I'm falling!");
-			GD.Print(pathOfFalling[^1]);
 		}
 		else
 		{
@@ -243,36 +253,30 @@ public partial class Player : CharacterBody3D
 	/// <returns>The final speed value to be fed to the player</returns>
 	private double UpdateStateSpeed(States state, double speed)
 	{
-		//check states and adjust the targetVelocity accordingly
 		switch (state)
 		{
 			//multiply speed
 			//quickly accelerate to twice the current speed (like one to 1.5 seconds, whatever feels good)
 			case States.Fast:
-				if (timer.ElapsedMilliseconds <= 0)
+				if (timer.ElapsedMilliseconds >= 0)
 				{
 					speed *= fastMultiplier;
-					if (speed > maxSpeed * 1.5) speed = maxSpeed * 1.5;
 				}
 				break;
 			//divide speed
 			//cut speed to 50% to 75% of the max speed
 			case States.Slow:
-				if (timer.ElapsedMilliseconds <= 0)
+				if (timer.ElapsedMilliseconds >= 0)
 				{
-					speed /= slowMultiplier;
-					maxSpeed /= 2;
+					speed *= slowMultiplier;
 				}
 				break;
 			//flip flop controls
 			case States.Inverted:
 				speed *= -1;
 				break;
-				//regular has no change
-				//case States.Regular:
-				//break;
 		}
-
+		//GD.Print("speed: " + speed);
 		return speed;
 	}
 
@@ -294,9 +298,10 @@ public partial class Player : CharacterBody3D
 			//slowly decelerate to the normal max speed (over the course of 5 seconds, whatever feels good)
 			//change state to Regular
 			case States.Fast:
-				if (timer.ElapsedMilliseconds <= 5000) speed -= acceleration * delta;
-				if (speed < maxSpeed)
+				//if (timer.ElapsedMilliseconds >= 5000) speed -= acceleration * delta;
+				if (timer.ElapsedMilliseconds >= 5000) //if (speed < maxSpeed)
 				{
+					maxSpeed = MAXSPEED;
 					current = States.Regular;
 					ClearTimer();
 				}
@@ -309,7 +314,7 @@ public partial class Player : CharacterBody3D
 				//after 10s, revert the maxSpeed
 				if (timer.ElapsedMilliseconds >= 10000)
 				{
-					maxSpeed *= 2;
+					maxSpeed = MAXSPEED;
 					current = States.Regular;
 					ClearTimer();
 				}
@@ -358,8 +363,8 @@ public partial class Player : CharacterBody3D
 	{
 		if (pathOfFalling?.Any() == true)
 		{
-			GD.Print("Getting back on track!");
-			GD.Print("First point: " + pathOfFalling[0] + " Last Point: " + pathOfFalling[^1]);
+			//GD.Print("Getting back on track!");
+			//GD.Print("First point: " + pathOfFalling[0] + " Last Point: " + pathOfFalling[^1]);
 			//calculate the point which the player is closests to the line. 
 
 			//calculate the projection of the vector between prv and current onto the kill plane
@@ -382,7 +387,7 @@ public partial class Player : CharacterBody3D
 			//only consistent if we are driving in the general south direction. Otherwise the direction given is backwards. 
 			LookAt(GlobalTransform.Origin + direction, Vector3.Up);
 
-			GD.Print("Projection vector: " + Utils.ProjUOntoV(u, v));
+			//GD.Print("Projection vector: " + Utils.ProjUOntoV(u, v));
 		}
 
 	}
@@ -412,7 +417,7 @@ public partial class Player : CharacterBody3D
 
 			DebugDraw3D.DrawPoints(triangle);
 
-			GD.Print("TPC Triangle: " + triangle[0] + triangle[1] + triangle[2]);
+			//GD.Print("TPC Triangle: " + triangle[0] + triangle[1] + triangle[2]);
 
 			//getting the global points that make up the aabb
 			//aabb.position is the lower bottom left point (min). 

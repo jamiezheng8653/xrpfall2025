@@ -62,12 +62,11 @@ theme_override_constants/outline_size = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_yppxs")
 text = "Speed:"
 
-[node name="Acceleration" type="Label" parent="TelemetryWindow"]
-visible = false
+[node name="State" type="Label" parent="TelemetryWindow"]
 layout_mode = 2
 theme_override_constants/outline_size = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_1qlnu")
-text = "Acceleration: "
+text = "State: "
 
 [node name="LapText" type="Label" parent="."]
 layout_mode = 1

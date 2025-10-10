@@ -22,7 +22,7 @@ func _process(_delta: float) -> void:
 		var current_speed = abs(player_node.Speed)
 		
 		# Updating text
-		$TelemetryWindow/Acceleration.text = " Acceleration: " + str(player_node.Acceleration)
+		$TelemetryWindow/State.text = " State: " + str(state_name(player_node.Current))
 		$TelemetryWindow/Position.text = " Position: (%.2f, %.2f)" % [player_node.CurrentPosition.x, player_node.CurrentPosition.z]
 		$TelemetryWindow/Speed.text = " Speed: %.2f" % current_speed
 		$PlaceText.text = get_place_suffix(player_node.Place) + " Place"
@@ -35,7 +35,20 @@ func _process(_delta: float) -> void:
 			else:
 				bars[i].modulate.a = 0.0
 		
-		
+
+#return the cooresponding name of the State enum because to_string() is being silly
+func state_name(current: int) -> String:
+	match current:
+		0:
+			return "Inverted"
+		1:
+			return "Slow"
+		2:
+			return "Fast"
+		3:
+			return "Regular"	
+		_:
+			return "Other"
 			
 		
 # FSunction to add the right suffix to the place number

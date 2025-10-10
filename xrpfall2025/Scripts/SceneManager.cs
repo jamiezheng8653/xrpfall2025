@@ -24,8 +24,8 @@ public partial class SceneManager : Node
 		playerP.Init(trackT.StartingPoint, trackT.Path3D);
 
 		//subscribe Player and Killplane Events
-		//killPlaneKP.IsCollidingKillPlane += playerP.ReturnToTrack;
-		killPlaneKP.IsCollidingKillPlane += playerP.ToPreviousCheckpoint;
+		killPlaneKP.IsCollidingKillPlane += playerP.ReturnToTrack;
+		//killPlaneKP.IsCollidingKillPlane += playerP.ToPreviousCheckpoint;
 	}
 
 }

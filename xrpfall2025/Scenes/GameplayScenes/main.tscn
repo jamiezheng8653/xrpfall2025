@@ -44,10 +44,15 @@ cull_mask = 1047553
 [node name="MinimapSystem" type="Node" parent="."]
 
 [node name="MarginContainer" type="MarginContainer" parent="MinimapSystem"]
-offset_left = 913.0
-offset_top = 393.0
-offset_right = 1152.0
-offset_bottom = 646.0
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -239.0
+offset_top = -253.0
+grow_horizontal = 0
+grow_vertical = 0
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="MinimapSystem/MarginContainer"]
 layout_mode = 2
