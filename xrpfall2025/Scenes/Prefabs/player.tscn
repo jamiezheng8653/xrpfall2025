@@ -12,9 +12,8 @@
 [node name="Node3D" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
 
-[node name="Player" type="CharacterBody3D" parent="Node3D" node_paths=PackedStringArray("csgBox3D")]
+[node name="Player" type="CharacterBody3D" parent="Node3D"]
 script = ExtResource("1_4flbx")
-csgBox3D = NodePath("CollisionShape3D/CSGBox3D")
 
 [node name="Pivot" type="Node3D" parent="Node3D/Player"]
 
