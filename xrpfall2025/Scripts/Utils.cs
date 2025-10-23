@@ -181,24 +181,26 @@ public static class Utils
 			if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false; //axis is a seperating axis
 		}
 
-		for (int i = 0; i < 3; i++){
-			aij = new Vector3 (edges[i].Z, 0, -edges[i].X);
+		for (int i = 0; i < 3; i++)
+		{
+			aij = new Vector3(edges[i].Z, 0, -edges[i].X);
 			p0 = triangle[0].Dot(aij);
 			p1 = triangle[1].Dot(aij);
 			p2 = triangle[2].Dot(aij);
 			r = e0 + Mathf.Abs(edges[i].Z) + e2 * Mathf.Abs(edges[i].X);
-			if (Mathf.Max(-Max(p0, p1,p2), Min(p0, p1,p2)) > r) return false; //axis is a seperating axis
+			if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false; //axis is a seperating axis
 		}
 
-		for (int i = 0; i < 3; i++){
+		for (int i = 0; i < 3; i++)
+		{
 			aij = new Vector3(-edges[i].Y, edges[i].Z, 0);
 			p0 = triangle[0].Dot(aij);
 			p1 = triangle[1].Dot(aij);
 			p2 = triangle[2].Dot(aij);
 			r = e0 * Mathf.Abs(edges[i].Y) + e1 * Mathf.Abs(edges[i].X);
-			if (Mathf.Max(-Max(p0, p1,p2), Min(p0, p1,p2)) > r) return false; //axis is a seperating axis
+			if (Mathf.Max(-Max(p0, p1, p2), Min(p0, p1, p2)) > r) return false; //axis is a seperating axis
 		}
-		
+
 		//test the three axes corresponding to the face normals of AABB b (category 1)
 		//exit if...
 		//... [-e0, e0] and [min(triangle[0].X, t1.X, t2.X), max(t0.X, t2.X, t2.X)] do not overlap
@@ -218,6 +220,37 @@ public static class Utils
 		//distance from orgin
 		p.D = p.Normal.Dot(triangle[0]);
 		return AABBPlaneIntersect(box, p);
+	}
 
+	/// <summary>
+	/// Checks if two objects are overlapping by drawing a circle 
+	/// around them on the x-z plane. Ignores the y-axis
+	/// </summary>
+	/// <param name="p1">origin of object one</param>
+	/// <param name="r1">radius of object one</param>
+	/// <param name="p2">origin of object 2</param>
+	/// <param name="r2">radius of object 2</param>
+	/// <returns></returns>
+	public static bool CircleCollision(Vector3 p1, double r1, Vector3 p2, double r2)
+	{
+		if (p1.DistanceSquaredTo(p2) <= Mathf.Pow(r1 + r2, 2)) return true;
+		else return false;
+	}
+	
+	/// <summary>
+	/// Checks if two objects are overlapping by drawing 
+	/// a box around them on the x-z plane. Ignores the y-axis
+	/// </summary>
+	/// <param name="p1">origin of object one</param>
+	/// <param name="halflength1">halflength of x, y, and z components of object one</param>
+	/// <param name="p2">origin of object two</param>
+	/// <param name="halflength2">halflength of x, y, and z components of object two</param>
+	/// <returns></returns>
+	public static bool AABBCollision(Vector3 p1, Vector3 halflength1, Vector3 p2, Vector3 halflength2)
+	{
+		Godot.Rect2 aabb1 = new Rect2(p1.X, p1.Z, halflength1.X * 2, halflength1.Z * 2);
+		Godot.Rect2 aabb2 = new Rect2(p2.X, p2.Z, halflength2.X * 2, halflength2.Z * 2);
+		if (aabb1.Intersects(aabb2)) return true;
+		else return false;
 	}
 }

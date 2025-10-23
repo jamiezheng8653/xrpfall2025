@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bd4sj4dkmbaqg"]
+[gd_scene load_steps=9 format=3 uid="uid://bd4sj4dkmbaqg"]
 
 [ext_resource type="PackedScene" uid="uid://sdm8yxrkofoh" path="res://Scenes/Prefabs/item_manager.tscn" id="1_evp6a"]
 [ext_resource type="PackedScene" uid="uid://dnkv3f1fu5fc8" path="res://Scenes/Prefabs/scene_manager.tscn" id="1_hx62u"]
@@ -6,18 +6,26 @@
 [ext_resource type="PackedScene" uid="uid://bhdc8up14ky8k" path="res://Scenes/Prefabs/track.tscn" id="2_hx62u"]
 [ext_resource type="PackedScene" uid="uid://drsnmi4pkc6t5" path="res://Scenes/Prefabs/hud.tscn" id="2_pw4we"]
 [ext_resource type="PackedScene" uid="uid://dry5xxoksd4yr" path="res://Scenes/Prefabs/kill_plane.tscn" id="3_33oou"]
+[ext_resource type="PackedScene" uid="uid://dqemkqrkjrxoy" path="res://Scenes/Prefabs/checkpoint_manager.tscn" id="5_hbpqu"]
+[ext_resource type="PackedScene" uid="uid://b0pyubict3ifh" path="res://Scenes/Prefabs/finishline.tscn" id="5_t5l7q"]
 
 [node name="Node" type="Node"]
 
-[node name="SceneManager" parent="." node_paths=PackedStringArray("player", "track", "itemManager", "killPlane") instance=ExtResource("1_hx62u")]
+[node name="SceneManager" parent="." node_paths=PackedStringArray("player", "track", "itemManager", "killPlane", "finishline", "checkpointManager") instance=ExtResource("1_hx62u")]
 player = NodePath("../Player")
 track = NodePath("../Track")
 itemManager = NodePath("../ItemManager")
 killPlane = NodePath("../killPlane")
+finishline = NodePath("../Finishline")
+checkpointManager = NodePath("../Checkpoint Manager")
 
 [node name="ItemManager" parent="." instance=ExtResource("1_evp6a")]
 
 [node name="Track" parent="." instance=ExtResource("2_hx62u")]
+
+[node name="Checkpoint Manager" parent="." instance=ExtResource("5_hbpqu")]
+
+[node name="Finishline" parent="." instance=ExtResource("5_t5l7q")]
 
 [node name="Player" parent="." instance=ExtResource("1_u1thq")]
 

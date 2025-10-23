@@ -8,10 +8,12 @@ using System.Collections.Generic;
 /// </summary>
 public partial class Track : Node
 {
-	[Export] private Path3D innerPath = null;
+	[Export] private Path3D innerPath;
+	[Export] private Path3D outerPath;
 	[Export] private int scale = 1;
 	[Export] private int numOfPts = 0;
 	private Vector3 startPoint;
+	private List<Vector3> checkPoints;
 
 	public Path3D Path3D
 	{
@@ -20,7 +22,12 @@ public partial class Track : Node
 
 	public Vector3 StartingPoint
 	{
-		get{ return startPoint; }
+		get { return startPoint; }
+	}
+	
+	public List<Vector3> Checkpoints
+	{
+		get { return checkPoints; }
 	}
 
 	public override void _EnterTree()
@@ -39,10 +46,15 @@ public partial class Track : Node
 	{
 	}
 
+	/// <summary>
+	/// Initializes the track curve and generates the trash mesh along it
+	/// </summary>
 	public void Init()
 	{
 		//list of points that will generate track loop
 		List<Vector3> pts = new List<Vector3>();
+		//checkpoints scattered throughout the track
+		checkPoints = new List<Vector3>(); 
 		Random rng = new Random();
 		//Path3D outerPath = new Path3D();
 
@@ -57,11 +69,10 @@ public partial class Track : Node
 			double x = hypotenus * Mathf.Cos(deltaTheta * i + 1); //find x coord
 			double z = hypotenus * Mathf.Sin(deltaTheta * i + 1); //find z coord
 			pts.Add(new Vector3((float)x, 0, (float)z) * scale); //add and scale the point
-			//GD.Print(pts[i]);
 		}
 
 		//get the starting point saved
-		startPoint = pts[0]; 
+		startPoint = pts[0];
 		//ensure the loop is closed
 		innerPath.Curve.Closed = true;
 		//start generating the track loo. 
@@ -72,10 +83,22 @@ public partial class Track : Node
 		{
 			//GD.Print(pts[i]);
 			innerPath.Curve.AddPoint(pts[i], null, null, i);
-			//outerPath.Curve.AddPoint(pts[i] * 2, null, null, i);
+			outerPath.Curve.AddPoint(pts[i] * (float)1.1, null, null, i);
+			if (i % 2 == 0) checkPoints.Add(pts[i]);
 		}
-		
-		
 
+
+
+	}
+	
+	/// <summary>
+	/// Get the direction of flow at a specific point on the track curve
+	/// </summary>
+	/// <returns></returns>
+	private Transform3D GetTangentOfPoint()
+	{
+		Transform3D result  = new Transform3D();
+
+		return result;
 	}
 }

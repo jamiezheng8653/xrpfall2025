@@ -42,11 +42,19 @@ public partial class KillPlane : Node
 
 	}
 
+	/// <summary>
+	/// Initializes the object. Associates any external references that this object needs
+	/// </summary>
+	/// <param name="player"></param>
 	public void Init(Player player)
 	{
 		playerP = player;
 	}
 
+	/// <summary>
+	/// Checks if the player is colliding with the kill plane
+	/// </summary>
+	/// <returns>True if the player is colliding with the kill plane</returns>
 	private bool IsColliding()
 	{
 		// we don't need to adjust the position of the kill plane's aabb 
