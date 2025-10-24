@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://b0pyubict3ifh"]
+
+[ext_resource type="Script" uid="uid://chk3q7uujpgmb" path="res://Scripts/Finishline.cs" id="1_lpy48"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3acci"]
+
+[node name="Finishline" type="Node" node_paths=PackedStringArray("area3D", "collisionShape3D")]
+script = ExtResource("1_lpy48")
+area3D = NodePath("Area3D")
+collisionShape3D = NodePath("Area3D/CollisionShape3D")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_3acci")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Area3D/CollisionShape3D"]

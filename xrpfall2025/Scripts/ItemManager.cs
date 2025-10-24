@@ -35,6 +35,11 @@ public partial class ItemManager : Node
 	{
 	}
 
+	/// <summary>
+	/// Set references to the player and track
+	/// </summary>
+	/// <param name="p">Reference to the player</param>
+	/// <param name="t">Reference to the track</param>
 	public void Init(Player p, Track t)
 	{
 		player = p;
@@ -42,6 +47,11 @@ public partial class ItemManager : Node
 
 	}
 
+	/// <summary>
+	/// Instantiates items scattered throughout the track 
+	/// </summary>
+	/// <param name="player">Necessary for each player to be hooked 
+	/// up to a collision event with each item spawned </param>
 	public void GenerateItems(Player player)
 	{
 		for (int i = 0; i < itemLocations; i++)

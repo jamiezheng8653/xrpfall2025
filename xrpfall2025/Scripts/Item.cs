@@ -96,7 +96,7 @@ public partial class Item : Node
 		//GD.Print("Item timer: " + timer.ElapsedMilliseconds);
 
 		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
-		DebugDraw3D.DrawAabb(AABB, color);
+		//DebugDraw3D.DrawAabb(AABB, color);
 	}
 
 	/// <summary>

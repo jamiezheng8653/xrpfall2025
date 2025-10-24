@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using Godot;
 using Vector3 = Godot.Vector3;
 
@@ -31,8 +33,9 @@ public partial class Player : CharacterBody3D
 	private double acceleration = 10;
 
 	// Temporary values
-	private int place = 3;
-	private int lap = 2;
+	private int place = 1;
+	private int lap = 1;
+	private bool finishedRace = false;
 
 	// Expose properties for HUD
 	public double Speed => CurrentSpeed;
@@ -48,7 +51,6 @@ public partial class Player : CharacterBody3D
 	[Export] private int fallAcceleration = 10;
 	private Vector3 prevPosition; //tracked just before an object starts falling
 	private List<Vector3> pathOfFalling;
-	private bool kpImpact = false;
 
 	private Path3D track;
 
@@ -56,8 +58,16 @@ public partial class Player : CharacterBody3D
 	private Godot.Color color;
 	[Export] private CsgBox3D csgBox3D = null;
 
+	private float radius = 1;
+	private Vector3 halflength;
+
 	//Timer for transitioning between states
 	private Stopwatch timer;
+
+	//checkpoints passed for the onFinishline Collision check --> lap increment
+	private List<Checkpoint> passedCheckpoints = new List<Checkpoint>();
+
+	private int totalCheckpoints = 0;
 
 	/// <summary>
 	/// The current state of the player car. Get/Set
@@ -70,24 +80,19 @@ public partial class Player : CharacterBody3D
 		set { current = value; }
 	}
 
+	/// <summary>
+	/// How fast is the car currently going
+	/// </summary>
 	public double CurrentSpeed
 	{
 		get
 		{
-			switch (current)
+			return current switch
 			{
-				case States.Slow:
-					return speed * slowMultiplier;
-					break;
-
-				case States.Fast:
-					return speed * fastMultiplier;
-					break;
-
-				default:
-					return speed;
-					break;
-			}
+				States.Slow => speed * slowMultiplier,
+				States.Fast => speed * fastMultiplier,
+				_ => speed,
+			};
 		}
 	}
 
@@ -108,15 +113,34 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
+	/// Refers to the radius of the bounding circle 
+	/// used in the checkpoint collision checks
+	/// </summary>
+	public float Radius
+	{
+		get { return radius; }
+	}
+	
+	/// <summary>
+	/// Refers to the halflength of the bounding box in 
+	/// the x, y, and z direction. Used for aabb collision checks
+	/// </summary>
+	public Vector3 Halflength
+	{
+		get { return halflength; }
+	}
+
+	/// <summary>
 	/// Initialize the spawning position of the player car 
 	/// and set the reference to the stage's track
 	/// </summary>
 	/// <param name="startingPosition"></param>
 	/// <param name="facingDirection"></param>
-	public void Init(Vector3 startingPosition, Path3D track/*, Vector3 facingDirection*/)
+	public void Init(Vector3 startingPosition, Path3D track, int totalCheckpoints/*, Vector3 facingDirection*/)
 	{
 		GlobalPosition = startingPosition + new Vector3(0, 5, 0);
 		this.track = track;
+		this.totalCheckpoints = totalCheckpoints;
 	}
 
 	/// <summary>
@@ -132,6 +156,7 @@ public partial class Player : CharacterBody3D
 		timer = new Stopwatch();
 		prevPosition = new Vector3();
 		pathOfFalling = new List<Vector3>();
+		halflength = new Vector3(radius, radius, radius); //TODO
 	}
 
 	/// <summary>
@@ -276,6 +301,8 @@ public partial class Player : CharacterBody3D
 				speed *= -1;
 				break;
 		}
+		//stop moving if you've completed all three laps
+		if (finishedRace) speed *= 0;
 		//GD.Print("speed: " + speed);
 		return speed;
 	}
@@ -398,43 +425,90 @@ public partial class Player : CharacterBody3D
 	/// </summary>
 	public void ToPreviousCheckpoint()
 	{
-		//this method will be called when the player falls off the map
-		//the slice will be simplified into a isosceles triangle with 
-		// the long sides being as long as the length of the longer two magnitudes.
-		//generate a slice of angle 360/numOfPts and check for if the player is in the slice. 
-		//If true, teleport the player to the point that is behind the front most one (i - 1)
+		//different checkpoint check
+		/* 		//this method will be called when the player falls off the map
+				//the slice will be simplified into a isosceles triangle with 
+				// the long sides being as long as the length of the longer two magnitudes.
+				//generate a slice of angle 360/numOfPts and check for if the player is in the slice. 
+				//If true, teleport the player to the point that is behind the front most one (i - 1)
 
-		for (int i = 0; i < track.Curve.PointCount - 1; i++)
-		{
-			//Triangle points: p[i], p[i+1], origin
-			Vector3[] triangle = [
-				Vector3.Zero,
-				new Vector3((GlobalTransform*track.Curve.GetPointPosition(i)).X, (GlobalTransform*track.Curve.GetPointPosition(i)).Y, (GlobalTransform*track.Curve.GetPointPosition(i)).Z),
-				new Vector3((GlobalTransform*track.Curve.GetPointPosition(i + 1)).X, (GlobalTransform*track.Curve.GetPointPosition(i + 1)).Y, (GlobalTransform*track.Curve.GetPointPosition(i + 1)).Z)
-				//GlobalTransform * track.Curve.GetPointPosition(i),
-				//GlobalTransform * track.Curve.GetPointPosition(i + 1)
-			];
+				for (int i = 0; i < track.Curve.PointCount - 1; i++)
+				{
+					//Triangle points: p[i], p[i+1], origin
+					Vector3[] triangle = [
+						Vector3.Zero,
+						new Vector3((GlobalTransform*track.Curve.GetPointPosition(i)).X, (GlobalTransform*track.Curve.GetPointPosition(i)).Y, (GlobalTransform*track.Curve.GetPointPosition(i)).Z),
+						new Vector3((GlobalTransform*track.Curve.GetPointPosition(i + 1)).X, (GlobalTransform*track.Curve.GetPointPosition(i + 1)).Y, (GlobalTransform*track.Curve.GetPointPosition(i + 1)).Z)
+						//GlobalTransform * track.Curve.GetPointPosition(i),
+						//GlobalTransform * track.Curve.GetPointPosition(i + 1)
+					];
 
-			DebugDraw3D.DrawPoints(triangle);
+					DebugDraw3D.DrawPoints(triangle);
 
-			//GD.Print("TPC Triangle: " + triangle[0] + triangle[1] + triangle[2]);
+					//GD.Print("TPC Triangle: " + triangle[0] + triangle[1] + triangle[2]);
 
-			//getting the global points that make up the aabb
-			//aabb.position is the lower bottom left point (min). 
-			// Position/globalPosition is in the center of the object tho
-			Vector3[] boxPoints = [
-				new Vector3((GlobalPosition - (AABB.Size * 0.5f)).X, (GlobalPosition - (AABB.Size * 0.5f)).Y, (GlobalPosition - (AABB.Size * 0.5f)).Z),
-				new Vector3((GlobalPosition + (AABB.Size * 0.5f)).X, (GlobalPosition + (AABB.Size * 0.5f)).Y, (GlobalPosition + (AABB.Size * 0.5f)).Z)
-				//GlobalPosition - (AABB.Size * 0.5f), //min
-				//GlobalPosition + (AABB.Size * 0.5f)	//max
-			];
-			//if SAT returns true, move the player to p[i] checkpoint
-			if (Utils.TriangleAABBSAT(triangle, boxPoints))
-			{
-				GlobalPosition = track.Curve.GetPointPosition(i) + (Vector3.Up * 5);
-				//kill the loop
-				return;
-			}
-		}
+					//getting the global points that make up the aabb
+					//aabb.position is the lower bottom left point (min). 
+					// Position/globalPosition is in the center of the object tho
+					Vector3[] boxPoints = [
+						new Vector3((GlobalPosition - (AABB.Size * 0.5f)).X, (GlobalPosition - (AABB.Size * 0.5f)).Y, (GlobalPosition - (AABB.Size * 0.5f)).Z),
+						new Vector3((GlobalPosition + (AABB.Size * 0.5f)).X, (GlobalPosition + (AABB.Size * 0.5f)).Y, (GlobalPosition + (AABB.Size * 0.5f)).Z)
+						//GlobalPosition - (AABB.Size * 0.5f), //min
+						//GlobalPosition + (AABB.Size * 0.5f)	//max
+					];
+					//if SAT returns true, move the player to p[i] checkpoint
+					if (Utils.TriangleAABBSAT(triangle, boxPoints))
+					{
+						GlobalPosition = track.Curve.GetPointPosition(i) + (Vector3.Up * 5);
+						//kill the loop
+						return;
+					}
+				} */
+
+		GlobalPosition = passedCheckpoints[^1].Position + new Vector3(0, 1, 0);
+
+	}
+
+	/// <summary>
+	/// Increment the lap counter. This is called upon
+	/// passing the finishline collision check
+	/// </summary>
+	public void IncrementLap()
+	{
+		if (lap + 1 > 3) finishedRace = true;
+		else lap++;
+
+	}
+
+	/// <summary>
+	/// If the player has crossed one of the checkpoints placed 
+	/// around the track, add that specific checkpoint to the 
+	/// player's list of passed checkpoints this lap
+	/// </summary>
+	/// <param name="chpt">The current checkpoint passed</param>
+	public void AddCheckpoint(Checkpoint chpt)
+	{
+		//ensure the checkpoint does not exist in the list before adding 
+		if (!passedCheckpoints.Contains(chpt)) passedCheckpoints.Add(chpt);
+		GD.Print("Adding Checkpoint: " + chpt);
+	}
+
+	/// <summary>
+	/// Checks if this player has gone through all checkpoints on the track
+	/// </summary>
+	/// <returns>True if all checkpoints exist in this "passedCheckpoints" list</returns>
+	public bool CheckCheckpoints()
+	{
+		if (passedCheckpoints.Count >= totalCheckpoints) return true;
+		else return false;
+	}
+	
+	/// <summary>
+	/// Clears the list of checkpoints passed. Called after CheckCheckpoints() returns true
+	/// </summary>
+	public void ClearCheckpoints()
+	{
+		passedCheckpoints.Clear();
+		GD.Print("Clearing Checkpoints");
 	}
 }
