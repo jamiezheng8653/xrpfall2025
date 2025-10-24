@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cuh3s1wm2itnm"
-path="res://.godot/imported/FastPlaceholder.png-642e2bc4c4c5d9b2403c59c21307a3c8.ctex"
+uid="uid://b14yivjktbsv8"
+path="res://.godot/imported/FastPlaceholder.png-d5bb16db12270f8ab09d89f3ff96cdee.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Images/FastPlaceholder.png"
-dest_files=["res://.godot/imported/FastPlaceholder.png-642e2bc4c4c5d9b2403c59c21307a3c8.ctex"]
+source_file="res://Scenes/FastPlaceholder.png"
+dest_files=["res://.godot/imported/FastPlaceholder.png-d5bb16db12270f8ab09d89f3ff96cdee.ctex"]
 
 [params]
 

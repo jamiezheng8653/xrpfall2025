@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata;
 using Godot;
 using Vector3 = Godot.Vector3;
 
@@ -15,7 +14,7 @@ public enum States
 	Regular
 };
 
-public partial class Player : CharacterBody3D
+public partial class Player : Node
 {
 	private States current; //current state
 
@@ -40,7 +39,7 @@ public partial class Player : CharacterBody3D
 	// Expose properties for HUD
 	public double Speed => CurrentSpeed;
 	public double Acceleration => acceleration;
-	public Vector3 CurrentPosition => Position;
+	public Vector3 CurrentPosition => charbody3d.Position;
 	public int Place => place;
 	public int Lap => lap;
 
@@ -57,6 +56,8 @@ public partial class Player : CharacterBody3D
 	//Gizmos for debugging
 	private Godot.Color color;
 	[Export] private CsgBox3D csgBox3D = null;
+	[Export] private CharacterBody3D charbody3d = null;
+	[Export] private Camera3D camera = null;
 
 	private float radius = 1;
 	private Vector3 halflength;
@@ -97,6 +98,15 @@ public partial class Player : CharacterBody3D
 	}
 
 	/// <summary>
+	/// get/set the position of this player in global space
+	/// </summary>
+	public Vector3 GlobalPosition
+	{
+		get { return charbody3d.GlobalPosition; }
+		set {charbody3d.GlobalPosition = value;}
+	}
+
+	/// <summary>
 	/// Property to give the player's aabb centered on the player,
 	/// used for collision calculations happening in the collided item
 	/// </summary>
@@ -107,7 +117,7 @@ public partial class Player : CharacterBody3D
 			//move the aabb to the actual object's transform
 			//otherwise the aabb sits in the origin
 			Aabb temp = csgBox3D.GetAabb();
-			temp.Position = this.GlobalPosition - temp.Size / 2;
+			temp.Position = charbody3d.GlobalPosition - temp.Size / 2;
 			return temp;
 		}
 	}
@@ -138,10 +148,17 @@ public partial class Player : CharacterBody3D
 	/// <param name="facingDirection"></param>
 	public void Init(Vector3 startingPosition, Path3D track, int totalCheckpoints/*, Vector3 facingDirection*/)
 	{
-		GlobalPosition = startingPosition + new Vector3(0, 5, 0);
+		charbody3d.GlobalPosition = startingPosition + new Vector3(0, 5, 0);
 		this.track = track;
 		this.totalCheckpoints = totalCheckpoints;
 	}
+
+	public override void _EnterTree()
+	{
+		SetMultiplayerAuthority(int.Parse(Name));
+		camera.Visible = IsMultiplayerAuthority();
+	}
+
 
 	/// <summary>
 	/// Initialize any values upon load. If you're initializing this 
@@ -202,24 +219,25 @@ public partial class Player : CharacterBody3D
 	/// <param name="delta">delta time</param>
 	public override void _PhysicsProcess(double delta)
 	{
+		if (IsMultiplayerAuthority())
 		//Adjust left and right steering
 		if (((Input.IsActionPressed("right") && current != States.Inverted)
-			|| (Input.IsActionPressed("left") && current == States.Inverted)) && IsOnFloor())
+			|| (Input.IsActionPressed("left") && current == States.Inverted)) && charbody3d.IsOnFloor())
 		{
-			RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
+			charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
 		}
 		else if (((Input.IsActionPressed("left") && current != States.Inverted)
-			|| (Input.IsActionPressed("right") && current == States.Inverted)) && IsOnFloor())
+			|| (Input.IsActionPressed("right") && current == States.Inverted)) && charbody3d.IsOnFloor())
 		{
-			RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
+			charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
 		}
 
 		//accelerate in forward or backward direction
-		if (Input.IsActionPressed("back") && IsOnFloor())
+		if (Input.IsActionPressed("back") && charbody3d.IsOnFloor())
 		{
 			if (speed > -maxSpeed) speed -= acceleration * delta;
 		}
-		else if (Input.IsActionPressed("forward") && IsOnFloor())
+		else if (Input.IsActionPressed("forward") && charbody3d.IsOnFloor())
 		{
 			if (speed < maxSpeed) speed += acceleration * delta;
 		}
@@ -230,11 +248,11 @@ public partial class Player : CharacterBody3D
 		}
 
 		// Vertical velocity
-		if (!IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
+		if (!charbody3d.IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
 		{
 			//keep adding position before gravity is implemented until impact with kill plane
 			pathOfFalling.Add(GlobalPosition);
-			Position -= GetTransform().Basis.Y * (float)(delta * fallAcceleration);
+			charbody3d.Position -= charbody3d.GetTransform().Basis.Y * (float)(delta * fallAcceleration);
 		}
 		else
 		{
@@ -248,9 +266,9 @@ public partial class Player : CharacterBody3D
 		}
 
 		// Moving the character
-		Position += GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
+		charbody3d.Position += charbody3d.GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
 
-		MoveAndSlide();
+		charbody3d.MoveAndSlide();
 		//GD.Print("Player speed: " + speed);
 	}
 
@@ -412,7 +430,7 @@ public partial class Player : CharacterBody3D
 				Utils.GetClosestAbsolutePosition(track, GlobalPosition + new Vector3(0.001f, 0, 0.001f))
 				).Normalized();
 			//only consistent if we are driving in the general south direction. Otherwise the direction given is backwards. 
-			LookAt(GlobalTransform.Origin + direction, Vector3.Up);
+			charbody3d.LookAt(charbody3d.GlobalTransform.Origin + direction, Vector3.Up);
 
 			//GD.Print("Projection vector: " + Utils.ProjUOntoV(u, v));
 		}
@@ -465,7 +483,7 @@ public partial class Player : CharacterBody3D
 					}
 				} */
 
-		GlobalPosition = passedCheckpoints[^1].Position + new Vector3(0, 1, 0);
+		charbody3d.GlobalPosition = passedCheckpoints[^1].Position + new Vector3(0, 1, 0);
 
 	}
 

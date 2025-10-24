@@ -6,8 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://bhdc8up14ky8k" path="res://Scenes/Prefabs/track.tscn" id="2_hx62u"]
 [ext_resource type="PackedScene" uid="uid://drsnmi4pkc6t5" path="res://Scenes/Prefabs/hud.tscn" id="2_pw4we"]
 [ext_resource type="PackedScene" uid="uid://dry5xxoksd4yr" path="res://Scenes/Prefabs/kill_plane.tscn" id="3_33oou"]
-[ext_resource type="PackedScene" path="res://Scenes/Prefabs/checkpoint_manager.tscn" id="5_hbpqu"]
-[ext_resource type="PackedScene" path="res://Scenes/Prefabs/finishline.tscn" id="5_t5l7q"]
+[ext_resource type="PackedScene" uid="uid://dqemkqrkjrxoy" path="res://Scenes/Prefabs/checkpoint_manager.tscn" id="5_hbpqu"]
+[ext_resource type="PackedScene" uid="uid://b0pyubict3ifh" path="res://Scenes/Prefabs/finishline.tscn" id="5_t5l7q"]
 
 [node name="Node" type="Node"]
 
@@ -68,7 +68,7 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="MinimapSystem/MarginContainer/SubViewportContainer"]
 handle_input_locally = false
-size = Vector2i(239, 253)
+size = Vector2i(2, 2)
 render_target_update_mode = 4
 
 [node name="minimapCamera" type="Camera3D" parent="MinimapSystem/MarginContainer/SubViewportContainer/SubViewport"]

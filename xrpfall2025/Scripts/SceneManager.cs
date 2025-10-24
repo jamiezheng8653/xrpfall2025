@@ -14,7 +14,7 @@ public partial class SceneManager : Node
 	public override void _Ready()
 	{
 		//get the correct cooresponding child of each node
-		Player playerP = (Player)player.GetNode<CharacterBody3D>("Node3D/Player");
+		Player playerP = (Player)player;
 		Track trackT = (Track)track;
 		ItemManager itemManagerIM = (ItemManager)itemManager;
 		KillPlane killPlaneKP = (KillPlane)killPlane;
