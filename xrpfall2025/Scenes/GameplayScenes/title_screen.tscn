@@ -1,0 +1,44 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmeufvqsj8ocv"]
+
+[ext_resource type="Script" uid="uid://bcs5fr58pstg" path="res://Scripts/title_screen.gd" id="1_4wxs3"]
+[ext_resource type="Texture2D" uid="uid://bi3wiywm6j1x8" path="res://Assets/Images/xrpLogo.png" id="2_x4ro0"]
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4wxs3")
+
+[node name="StartButton" type="Button" parent="."]
+process_mode = 3
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -111.0
+offset_top = -252.0
+offset_right = 111.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Start"
+
+[node name="Logo" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -285.0
+offset_top = 98.0
+offset_right = 285.0
+offset_bottom = 322.0
+grow_horizontal = 2
+texture = ExtResource("2_x4ro0")
+expand_mode = 1
+
+[connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]

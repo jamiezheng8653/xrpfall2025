@@ -32,6 +32,7 @@ bg_color = Color(0.88, 0.707227, 0.5456, 1)
 bg_color = Color(0.88, 0.590187, 0.5456, 1)
 
 [node name="HUD" type="Control"]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -42,6 +43,7 @@ theme = ExtResource("1_31rfd")
 script = ExtResource("1_p8haq")
 
 [node name="TelemetryWindow" type="VBoxContainer" parent="."]
+visible = false
 layout_mode = 0
 offset_left = 27.0
 offset_top = 26.0
@@ -132,3 +134,82 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_jyfor")
 [node name="SpeedOne" type="Label" parent="SpeedBar"]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_avvnu")
+
+[node name="CountdownLabel" type="Label" parent="."]
+process_mode = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -10.0
+offset_right = 20.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_31rfd")
+theme_override_font_sizes/font_size = 230
+
+[node name="ItemWindow" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 51.0
+offset_top = 40.0
+offset_right = 183.0
+offset_bottom = 160.0
+
+[node name="Item1" type="TextureRect" parent="ItemWindow"]
+layout_mode = 2
+expand_mode = 2
+
+[node name="PauseMenu" type="Control" parent="."]
+process_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Background" type="ColorRect" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1115.0
+offset_bottom = 614.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.25098)
+
+[node name="ResumeButton" type="Button" parent="PauseMenu"]
+layout_mode = 0
+offset_left = 368.0
+offset_top = 293.0
+offset_right = 711.0
+offset_bottom = 383.0
+theme_override_font_sizes/font_size = 30
+text = "Resume"
+
+[node name="Home" type="Button" parent="PauseMenu"]
+layout_mode = 0
+offset_left = 368.0
+offset_top = 402.0
+offset_right = 711.0
+offset_bottom = 492.0
+theme_override_font_sizes/font_size = 30
+text = "Home"
+
+[node name="Label" type="Label" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 227.0
+offset_top = 127.0
+offset_right = 830.0
+offset_bottom = 249.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 100
+text = "Game Paused"
+
+[connection signal="pressed" from="PauseMenu/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="PauseMenu/Home" to="." method="_on_home_pressed"]

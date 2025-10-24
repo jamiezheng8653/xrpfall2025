@@ -1,0 +1,45 @@
+[gd_scene load_steps=2 format=3 uid="uid://cbp7qp5e2ngx5"]
+
+[ext_resource type="Script" uid="uid://dtk177h4s1wmh" path="res://Scripts/end_screen.gd" id="1_ro61g"]
+
+[node name="EndScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ro61g")
+
+[node name="RestartButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -114.0
+offset_top = -335.0
+offset_right = 114.0
+offset_bottom = -246.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Restart"
+
+[node name="HomeButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -114.0
+offset_top = -231.0
+offset_right = 114.0
+offset_bottom = -142.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Home Screen"
+
+[connection signal="pressed" from="RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="HomeButton" to="." method="_on_home_button_pressed"]
