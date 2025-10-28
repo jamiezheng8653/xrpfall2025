@@ -220,56 +220,59 @@ public partial class Player : Node
 	public override void _PhysicsProcess(double delta)
 	{
 		if (IsMultiplayerAuthority())
-		//Adjust left and right steering
-		if (((Input.IsActionPressed("right") && current != States.Inverted)
-			|| (Input.IsActionPressed("left") && current == States.Inverted)) && charbody3d.IsOnFloor())
 		{
-			charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
-		}
-		else if (((Input.IsActionPressed("left") && current != States.Inverted)
-			|| (Input.IsActionPressed("right") && current == States.Inverted)) && charbody3d.IsOnFloor())
-		{
-			charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
+			//Adjust left and right steering
+			if (((Input.IsActionPressed("right") && current != States.Inverted)
+				|| (Input.IsActionPressed("left") && current == States.Inverted)) && charbody3d.IsOnFloor())
+			{
+				charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
+			}
+			else if (((Input.IsActionPressed("left") && current != States.Inverted)
+				|| (Input.IsActionPressed("right") && current == States.Inverted)) && charbody3d.IsOnFloor())
+			{
+				charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
+			}
+
+			//accelerate in forward or backward direction
+			if (Input.IsActionPressed("back") && charbody3d.IsOnFloor())
+			{
+				if (speed > -maxSpeed) speed -= acceleration * delta;
+			}
+			else if (Input.IsActionPressed("forward") && charbody3d.IsOnFloor())
+			{
+				if (speed < maxSpeed) speed += acceleration * delta;
+			}
+			else
+			{
+				//will eventually add friction to come to a gradual stop
+				speed *= 0.9 * delta;
+			}
+
+			// Vertical velocity
+			if (!charbody3d.IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
+			{
+				//keep adding position before gravity is implemented until impact with kill plane
+				pathOfFalling.Add(GlobalPosition);
+				charbody3d.Position -= charbody3d.GetTransform().Basis.Y * (float)(delta * fallAcceleration);
+			}
+			else
+			{
+				pathOfFalling.Clear();
+				//GD.Print("Clearing list!");
+			}
+
+			if (timer.ElapsedMilliseconds > 0)
+			{
+				RevertState(current, speed, delta);
+			}
+
+			// Moving the character
+			charbody3d.Position += charbody3d.GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
+
+			charbody3d.MoveAndSlide();
+			//GD.Print("Player speed: " + speed);
 		}
 
-		//accelerate in forward or backward direction
-		if (Input.IsActionPressed("back") && charbody3d.IsOnFloor())
-		{
-			if (speed > -maxSpeed) speed -= acceleration * delta;
-		}
-		else if (Input.IsActionPressed("forward") && charbody3d.IsOnFloor())
-		{
-			if (speed < maxSpeed) speed += acceleration * delta;
-		}
-		else
-		{
-			//will eventually add friction to come to a gradual stop
-			speed *= 0.9 * delta;
-		}
-
-		// Vertical velocity
-		if (!charbody3d.IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
-		{
-			//keep adding position before gravity is implemented until impact with kill plane
-			pathOfFalling.Add(GlobalPosition);
-			charbody3d.Position -= charbody3d.GetTransform().Basis.Y * (float)(delta * fallAcceleration);
-		}
-		else
-		{
-			pathOfFalling.Clear();
-			//GD.Print("Clearing list!");
-		}
-
-		if (timer.ElapsedMilliseconds > 0)
-		{
-			RevertState(current, speed, delta);
-		}
-
-		// Moving the character
-		charbody3d.Position += charbody3d.GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
-
-		charbody3d.MoveAndSlide();
-		//GD.Print("Player speed: " + speed);
 	}
 
 	/// <summary>

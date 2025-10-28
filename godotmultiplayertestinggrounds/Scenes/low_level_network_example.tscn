@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://fq5p743kvhxi"]
+
+[ext_resource type="PackedScene" uid="uid://bg5as5xruy2wl" path="res://Scenes/low_level_ui.tscn" id="1_p32be"]
+[ext_resource type="PackedScene" uid="uid://foadlpruqsua" path="res://Scenes/player_spawner.tscn" id="2_7njdk"]
+
+[node name="LowLevelNetworkExample" type="Node"]
+
+[node name="LowLevelUi" parent="." instance=ExtResource("1_p32be")]
+
+[node name="PlayerSpawner" parent="." instance=ExtResource("2_7njdk")]
