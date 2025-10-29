@@ -2,9 +2,11 @@
 
 [ext_resource type="Script" uid="uid://cfd54v0ji0q3x" path="res://Scripts/low_level_ui.gd" id="1_6w0w0"]
 
-[node name="LowLevelUi" type="Node" node_paths=PackedStringArray("ui_node")]
+[node name="LowLevelUi" type="Node" node_paths=PackedStringArray("ip_input", "port_input", "port_output")]
 script = ExtResource("1_6w0w0")
-ui_node = NodePath("Control")
+ip_input = NodePath("Control/userInput/IPLabel/ipInput")
+port_input = NodePath("Control/userInput/portLabel/portInput")
+port_output = NodePath("Control/portOutput")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -12,18 +14,63 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+[node name="portOutput" type="RichTextLabel" parent="Control"]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 96.0
+offset_top = 135.0
+offset_right = 383.0
+offset_bottom = 175.0
+text = "---"
 
-[node name="Server" type="Button" parent="Control/VBoxContainer"]
+[node name="Buttons" type="VBoxContainer" parent="Control"]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 40.0
+offset_right = 75.0
+offset_bottom = 106.0
+
+[node name="Server" type="Button" parent="Control/Buttons"]
 layout_mode = 2
 text = "Server"
 
-[node name="Client" type="Button" parent="Control/VBoxContainer"]
+[node name="Client" type="Button" parent="Control/Buttons"]
 layout_mode = 2
 text = "Client"
 
-[connection signal="pressed" from="Control/VBoxContainer/Server" to="." method="_on_server_pressed"]
-[connection signal="pressed" from="Control/VBoxContainer/Client" to="." method="_on_client_pressed"]
+[node name="userInput" type="Control" parent="Control"]
+layout_mode = 2
+anchors_preset = 0
+offset_left = 84.0
+offset_top = 3.0
+offset_right = 124.0
+offset_bottom = 43.0
+
+[node name="IPLabel" type="RichTextLabel" parent="Control/userInput"]
+layout_mode = 2
+offset_left = 10.0
+offset_top = 23.0
+offset_right = 352.0
+offset_bottom = 63.0
+text = "IP: "
+
+[node name="ipInput" type="LineEdit" parent="Control/userInput/IPLabel"]
+offset_left = 46.0
+offset_top = 4.0
+offset_right = 334.0
+offset_bottom = 35.0
+
+[node name="portLabel" type="RichTextLabel" parent="Control/userInput"]
+layout_mode = 2
+offset_left = 6.0
+offset_top = 88.0
+offset_right = 356.0
+offset_bottom = 128.0
+text = "Port: "
+
+[node name="portInput" type="LineEdit" parent="Control/userInput/portLabel"]
+offset_left = 50.0
+offset_right = 338.0
+offset_bottom = 31.0
+
+[connection signal="pressed" from="Control/Buttons/Server" to="." method="_on_server_pressed"]
+[connection signal="pressed" from="Control/Buttons/Client" to="." method="_on_client_pressed"]

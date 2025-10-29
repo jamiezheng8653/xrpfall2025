@@ -155,8 +155,6 @@ public partial class Player : Node
 
 	public override void _EnterTree()
 	{
-		SetMultiplayerAuthority(int.Parse(Name));
-		camera.Visible = IsMultiplayerAuthority();
 	}
 
 
