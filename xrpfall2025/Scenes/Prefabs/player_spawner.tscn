@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://foslx0bcvv0j"]
+
+[ext_resource type="Script" uid="uid://cqow5uyp7ghxk" path="res://Scripts/MultiplayerSetup/PlayerSpawner.cs" id="1_gc8qr"]
+
+[node name="PlayerSpawner" type="Node"]
+script = ExtResource("1_gc8qr")

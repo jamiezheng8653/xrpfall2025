@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3 uid="uid://dfcf4dx6sihca"]
+
+[ext_resource type="Script" uid="uid://cjdygxfcltd08" path="res://Scripts/MultiplayerSetup/ServerSetupUi.cs" id="1_v5740"]
+
+[node name="ServerSetupUI" type="Node"]
+script = ExtResource("1_v5740")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="serverOutput" type="RichTextLabel" parent="Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="buttons" type="VBoxContainer" parent="Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="client" type="Button" parent="Control/buttons"]
+layout_mode = 2
+
+[node name="server" type="Button" parent="Control/buttons"]
+layout_mode = 2
+
+[node name="userInput" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="IPLabel" type="RichTextLabel" parent="userInput"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ipInput" type="LineEdit" parent="userInput/IPLabel"]
+layout_mode = 0
+offset_right = 68.5625
+offset_bottom = 31.0
+
+[node name="portLabel" type="RichTextLabel" parent="userInput"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="portInput" type="LineEdit" parent="userInput/portLabel"]
+layout_mode = 0
+offset_right = 68.5625
+offset_bottom = 31.0
+
+[connection signal="pressed" from="Control/buttons/client" to="." method="_on_client_pressed"]
+[connection signal="pressed" from="Control/buttons/server" to="." method="_on_server_pressed"]

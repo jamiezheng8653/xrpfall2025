@@ -70,6 +70,21 @@ public partial class Player : Node
 
 	private int totalCheckpoints = 0;
 
+	//multiplayer tracking
+	private bool isAuthority;
+	private int ownerID;
+
+	public int OwnerID
+    {
+		get { return ownerID; }
+		set { ownerID = value; }
+    }
+
+	public bool IsAuthority
+    {
+        get{ return !NetworkHandler.Instance.IsServer && ownerID == ClientNetworkGlobals.Instance.ID; }
+    }
+
 	/// <summary>
 	/// The current state of the player car. Get/Set
 	/// Relevant when we eventually add items that modify
@@ -155,8 +170,9 @@ public partial class Player : Node
 
 	public override void _EnterTree()
 	{
+		ServerNetworkGlobals.Instance.HandlePlayerPosition += ServerHandlePlayerPosition;
+		ClientNetworkGlobals.Instance.HandlePlayerPosition += ClientHandlePlayerPosition;
 	}
-
 
 	/// <summary>
 	/// Initialize any values upon load. If you're initializing this 
@@ -179,8 +195,10 @@ public partial class Player : Node
 	/// when this Player leaves the scene tree during runtime for whatever reason
 	/// </summary>
 	public override void _ExitTree()
-	{
-	}
+    {
+        ServerNetworkGlobals.Instance.HandlePlayerPosition -= ServerHandlePlayerPosition;
+		ClientNetworkGlobals.Instance.HandlePlayerPosition -= ClientHandlePlayerPosition;
+    }
 
 	/// <summary>
 	/// General game logic being run every frame.
@@ -217,59 +235,58 @@ public partial class Player : Node
 	/// <param name="delta">delta time</param>
 	public override void _PhysicsProcess(double delta)
 	{
-		if (IsMultiplayerAuthority())
+		if (!IsAuthority) return;
+
+		//Adjust left and right steering
+		if (((Input.IsActionPressed("right") && current != States.Inverted)
+			|| (Input.IsActionPressed("left") && current == States.Inverted)) && charbody3d.IsOnFloor())
 		{
-			//Adjust left and right steering
-			if (((Input.IsActionPressed("right") && current != States.Inverted)
-				|| (Input.IsActionPressed("left") && current == States.Inverted)) && charbody3d.IsOnFloor())
-			{
-				charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
-			}
-			else if (((Input.IsActionPressed("left") && current != States.Inverted)
-				|| (Input.IsActionPressed("right") && current == States.Inverted)) && charbody3d.IsOnFloor())
-			{
-				charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
-			}
-
-			//accelerate in forward or backward direction
-			if (Input.IsActionPressed("back") && charbody3d.IsOnFloor())
-			{
-				if (speed > -maxSpeed) speed -= acceleration * delta;
-			}
-			else if (Input.IsActionPressed("forward") && charbody3d.IsOnFloor())
-			{
-				if (speed < maxSpeed) speed += acceleration * delta;
-			}
-			else
-			{
-				//will eventually add friction to come to a gradual stop
-				speed *= 0.9 * delta;
-			}
-
-			// Vertical velocity
-			if (!charbody3d.IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
-			{
-				//keep adding position before gravity is implemented until impact with kill plane
-				pathOfFalling.Add(GlobalPosition);
-				charbody3d.Position -= charbody3d.GetTransform().Basis.Y * (float)(delta * fallAcceleration);
-			}
-			else
-			{
-				pathOfFalling.Clear();
-				//GD.Print("Clearing list!");
-			}
-
-			if (timer.ElapsedMilliseconds > 0)
-			{
-				RevertState(current, speed, delta);
-			}
-
-			// Moving the character
-			charbody3d.Position += charbody3d.GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
-
-			charbody3d.MoveAndSlide();
-			//GD.Print("Player speed: " + speed);
+			charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
 		}
+		else if (((Input.IsActionPressed("left") && current != States.Inverted)
+			|| (Input.IsActionPressed("right") && current == States.Inverted)) && charbody3d.IsOnFloor())
+		{
+			charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
+		}
+		
+		//accelerate in forward or backward direction
+		if (Input.IsActionPressed("back") && charbody3d.IsOnFloor())
+		{
+			if (speed > -maxSpeed) speed -= acceleration * delta;
+		}
+		else if (Input.IsActionPressed("forward") && charbody3d.IsOnFloor())
+		{
+			if (speed < maxSpeed) speed += acceleration * delta;
+		}
+		else
+		{
+			//will eventually add friction to come to a gradual stop
+			speed *= 0.9 * delta;
+		}
+
+		// Vertical velocity
+		if (!charbody3d.IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
+		{
+			//keep adding position before gravity is implemented until impact with kill plane
+			pathOfFalling.Add(GlobalPosition);
+			charbody3d.Position -= charbody3d.GetTransform().Basis.Y * (float)(delta * fallAcceleration);
+		}
+		else
+		{
+			pathOfFalling.Clear();
+			//GD.Print("Clearing list!");
+		}
+
+		if (timer.ElapsedMilliseconds > 0)
+		{
+			RevertState(current, speed, delta);
+		}
+
+		// Moving the character
+		charbody3d.Position += charbody3d.GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
+
+		charbody3d.MoveAndSlide();
+		//GD.Print("Player speed: " + speed);
 
 	}
 
@@ -521,7 +538,7 @@ public partial class Player : Node
 		if (passedCheckpoints.Count >= totalCheckpoints) return true;
 		else return false;
 	}
-	
+
 	/// <summary>
 	/// Clears the list of checkpoints passed. Called after CheckCheckpoints() returns true
 	/// </summary>
@@ -530,4 +547,20 @@ public partial class Player : Node
 		passedCheckpoints.Clear();
 		GD.Print("Clearing Checkpoints");
 	}
+
+	private void ServerHandlePlayerPosition(int peerID, PlayerPosition playerPosition)
+	{
+		if (ownerID != peerID) return;
+
+		charbody3d.GlobalPosition = playerPosition.Position;
+		PlayerPosition.Create(ownerID, charbody3d.GlobalPosition).Broadcast(NetworkHandler.Instance.Connection);
+	}
+	
+	private void ClientHandlePlayerPosition(PlayerPosition playerPosition)
+    {
+		if (isAuthority || ownerID != playerPosition.ID) return;
+
+		charbody3d.GlobalPosition = playerPosition.Position;
+    }
 }
+
