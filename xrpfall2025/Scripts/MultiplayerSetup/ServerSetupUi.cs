@@ -8,31 +8,56 @@ public partial class ServerSetupUi : Node
 	[Export] private LineEdit portInput;
 	[Export] private RichTextLabel portOutput;
 
-	public void _OnServerPressed()
+	/// <summary>
+	/// Actions that occur upon attempting to set up a new server
+	/// </summary>
+	public void OnServerPressed()
 	{
-		String ip = null;
-		int port = 0;
+		string ip;
+		int port;
 		if (ipInput.Text != string.Empty || portInput.Text != string.Empty)
 		{
 			ip = ipInput.Text.ToLower().Trim();
 			Int32.TryParse(portInput.Text.Trim(), out port);
 			NetworkHandler.Instance.StartServer(ip, port);
 		}
-		else NetworkHandler.Instance.StartServer();
+		else { NetworkHandler.Instance.StartServer(); }
 
-		if (NetworkHandler.Instance.IsServer) portOutput.Text = "Server hosted on port " + port.ToString() + " and ip is " + ip;
-		else portOutput.Text = "ERROR, please check your ip and port input!";
+		if (NetworkHandler.Instance.IsServer)
+		{
+			portOutput.Text =
+			"Server hosted on port " + NetworkHandler.Instance.CurrentPort.ToString()
+			+ " and ip is " + NetworkHandler.Instance.ServerIP.ToString();
+		}
+		else { portOutput.Text = "Connection failed, please check IP and port input"; }
 	}
 	
-	public void _OnClientPressed()
+	/// <summary>
+	/// Actions that occur when trying to connect to an existing server as a client
+	/// </summary>
+	public void OnClientPressed()
 	{
 		if (ipInput.Text != string.Empty || portInput.Text != string.Empty)
 		{
 			int port;
 			string ip = ipInput.Text.ToLower().Trim();
-			Int32.TryParse(portInput.Text.Trim(), out port);
-			NetworkHandler.Instance.StartClient(ip, port);
+			if (Int32.TryParse(portInput.Text.Trim(), out port))
+			{
+				NetworkHandler.Instance.StartClient(ip, port);
+			}
+			else
+			{
+				portOutput.Text = "ERROR, incorrect port input";
+			}
 		}
-		else NetworkHandler.Instance.StartClient();
+		else { NetworkHandler.Instance.StartClient(); }
+
+		if (NetworkHandler.Instance.Connection != null)
+		{
+			portOutput.Text =
+				"Joined server on port " + NetworkHandler.Instance.CurrentPort
+				+ " and ip is " + NetworkHandler.Instance.ServerIP;
+		}
+		else { portOutput.Text = "ERROR, please check your ip and port input!"; }
 	}
 }

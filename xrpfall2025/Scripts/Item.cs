@@ -18,7 +18,6 @@ public partial class Item : Node
 	// The item will set off an event that will notify the player to change its state
 	// accordingly.
 	public event ItemCollisionDelegate OnItemCollision;
-	private Player player; //Item manager will pass in this information
 
 	//references necessary for collision bounds
 	[Export] private CsgMesh3D cylinder = null;
@@ -50,7 +49,6 @@ public partial class Item : Node
 
 	public Item()
 	{
-		player = null;
 	}
 
 	// Called when the node enters the scene tree for the first time.
@@ -80,17 +78,21 @@ public partial class Item : Node
 		//otherwise read for collisions with the player
 		else if (timer.ElapsedMilliseconds >= 0)
 		{
-			//check for if this item has overlapped with the player.
-			if (AABB.Intersects(player.AABB))
-			{
-				//GD.Print("I'm Colliding!");
-				//invoke event
-				//if (OnItemCollision != null) OnItemCollision();
-				OnItemCollision?.Invoke(); //shorthand for above
+			foreach (Player p in PlayerList.Instance.List)
+            {
+                //check for if this item has overlapped with the player.
+				if (AABB.Intersects(p.AABB))
+				{
+					//GD.Print("I'm Colliding!");
+					//invoke event
+					//if (OnItemCollision != null) OnItemCollision();
+					OnItemCollision?.Invoke(p); //shorthand for above
 
-				//have the model be hidden from the scene 
-				//unsubscribe from OnItemCollision Event 
-			}
+					//have the model be hidden from the scene 
+					//unsubscribe from OnItemCollision Event 
+				}
+            }
+
 		}
 
 		//GD.Print("Item timer: " + timer.ElapsedMilliseconds);
@@ -105,13 +107,13 @@ public partial class Item : Node
 	/// should this project expand into multiplayer, the event would only signal to the 
 	/// specific player that collided with this item.
 	/// </summary>
-	private void SelectItem()
+	private void SelectItem(Player p)
 	{
 		Random rng = new Random();
 		//will need to manually update should we choose to update the list of items
 		//currently no error checking of if the selected item is valid in the enum list
 		int result = rng.Next(0, 3);
-		player.Current = (States)result;
+		p.Current = (States)result;
 	}
 
 	/// <summary>
@@ -120,13 +122,12 @@ public partial class Item : Node
 	/// this instance in a different scene
 	/// </summary>
 	/// <param name="player">Reference to the Player instance in scene</param>
-	public void CustomInit(Player player, Vector3 position)
+	public void CustomInit(Vector3 position)
 	{
-		this.player = player;
 		Position = position;
 	}
 
-	private void StartTimer()
+	private void StartTimer(Player p)
 	{
 		timer.Start();
 		//unsubscribe from event
@@ -144,7 +145,7 @@ public partial class Item : Node
 		OnItemCollision += HideModel;
 	}
 
-	private void HideModel()
+	private void HideModel(Player p)
 	{
 		cylinder.Hide();
 	}

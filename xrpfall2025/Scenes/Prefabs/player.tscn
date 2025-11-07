@@ -33,7 +33,8 @@ texture = ExtResource("2_4ntmi")
 
 [node name="fpsCamera" type="Camera3D" parent="Node3D/Player/CollisionShape3D/XRP_Car"]
 transform = Transform3D(-0.2, -6.54983e-09, 1.62114e-08, 0, 0.185437, 0.0749214, -1.74846e-08, 0.0749214, -0.185437, -2.01605e-08, 0.2, 0.230609)
-cull_mask = 1047553
+cull_mask = 1048573
+far = 200.0
 
 [node name="circle" type="Sprite3D" parent="Node3D/Player/CollisionShape3D/XRP_Car"]
 transform = Transform3D(-0.25, -3.7749e-08, -6.60024e-15, 0, -1.09278e-08, 1, -3.7749e-08, 0.25, 4.37114e-08, 0, 0.2, 1)
@@ -43,8 +44,10 @@ texture = ExtResource("3_btcbx")
 [node name="CSGBox3D" type="CSGBox3D" parent="Node3D/Player/CollisionShape3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00164795, -0.124939, -0.00753784)
 visible = false
+layers = 1023
 size = Vector3(1.35046, 0.750122, 3.1955)
 
 [node name="overheadCamera" type="Camera3D" parent="Node3D/Player"]
 transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 20, -5)
+visible = false
 cull_mask = 1048574

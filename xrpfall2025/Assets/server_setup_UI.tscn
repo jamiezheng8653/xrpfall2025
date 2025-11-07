@@ -1,0 +1,79 @@
+[gd_scene load_steps=2 format=3 uid="uid://dfcf4dx6sihca"]
+
+[ext_resource type="Script" uid="uid://cjdygxfcltd08" path="res://Scripts/MultiplayerSetup/ServerSetupUi.cs" id="1_v5740"]
+
+[node name="ServerSetupUI" type="Node" node_paths=PackedStringArray("ipInput", "portInput", "portOutput")]
+script = ExtResource("1_v5740")
+ipInput = NodePath("userInput/IPLabel/ipInput")
+portInput = NodePath("userInput/portLabel/portInput")
+portOutput = NodePath("Control/serverOutput")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 401.0
+offset_bottom = 193.0
+
+[node name="serverOutput" type="RichTextLabel" parent="Control"]
+layout_mode = 0
+offset_left = 98.0
+offset_top = 116.0
+offset_right = 408.0
+offset_bottom = 198.0
+text = "output"
+
+[node name="buttons" type="VBoxContainer" parent="Control"]
+layout_mode = 0
+offset_left = 386.0
+offset_top = 13.0
+offset_right = 452.0
+offset_bottom = 79.0
+
+[node name="client" type="Button" parent="Control/buttons"]
+layout_mode = 2
+text = "JOIN"
+
+[node name="server" type="Button" parent="Control/buttons"]
+layout_mode = 2
+text = "HOST"
+
+[node name="userInput" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 22.0
+offset_top = 8.0
+offset_right = 360.0
+offset_bottom = 133.0
+
+[node name="IPLabel" type="RichTextLabel" parent="userInput"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 10.0
+offset_right = 340.0
+offset_bottom = 41.0
+text = "IP:"
+
+[node name="ipInput" type="LineEdit" parent="userInput/IPLabel"]
+layout_mode = 0
+offset_left = 31.0
+offset_top = -2.0
+offset_right = 302.0
+offset_bottom = 29.0
+
+[node name="portLabel" type="RichTextLabel" parent="userInput"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 44.0
+offset_right = 225.0
+offset_bottom = 84.0
+text = "Port:"
+
+[node name="portInput" type="LineEdit" parent="userInput/portLabel"]
+layout_mode = 0
+offset_left = 55.0
+offset_top = 5.0
+offset_right = 123.563
+offset_bottom = 36.0
+
+[connection signal="pressed" from="Control/buttons/client" to="." method="OnClientPressed"]
+[connection signal="pressed" from="Control/buttons/server" to="." method="OnServerPressed"]

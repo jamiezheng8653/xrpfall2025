@@ -70,16 +70,23 @@ public partial class Player : Node
 
 	private int totalCheckpoints = 0;
 
-	//multiplayer tracking
-	private bool isAuthority;
+	//the id specific to this player when in multiplayer
 	private int ownerID;
 
+	/// <summary>
+    /// The peer ID specific to this player when 
+	/// in multiplayer and connected to a server
+    /// </summary>
 	public int OwnerID
-    {
+	{
 		get { return ownerID; }
 		set { ownerID = value; }
-    }
+	}
 
+	/// <summary>
+	/// Checks to ensure the player is a client and not a host, 
+	/// and that the client id and this player id matches
+    /// </summary>
 	public bool IsAuthority
     {
         get{ return !NetworkHandler.Instance.IsServer && ownerID == ClientNetworkGlobals.Instance.ID; }
@@ -188,6 +195,9 @@ public partial class Player : Node
 		prevPosition = new Vector3();
 		pathOfFalling = new List<Vector3>();
 		halflength = new Vector3(radius, radius, radius); //TODO
+		GlobalPosition = new Vector3(0, 5, 0);
+
+		if (IsAuthority) camera.MakeCurrent();
 	}
 
 	/// <summary>
@@ -208,6 +218,7 @@ public partial class Player : Node
 	/// <param name="delta">delta time</param>
 	public override void _Process(double delta)
 	{
+		
 		//draw gizmos
 		//DebugDraw3D.DrawBox(AABB.Position, Godot.Quaternion.Identity, Vector3.One, color);
 		//GD.Print("Player State: " + Current);
@@ -288,6 +299,8 @@ public partial class Player : Node
 		charbody3d.MoveAndSlide();
 		//GD.Print("Player speed: " + speed);
 
+		//create a player position packet to broadcast and let connected clients know where you are in game
+		PlayerPosition.Create(ownerID, GlobalPosition).Broadcast(NetworkHandler.Instance.Connection);
 	}
 
 	/// <summary>
@@ -403,9 +416,9 @@ public partial class Player : Node
 	/// Starts the timer associated with the state transition logic
 	/// Unsubscribes this method from the OnItemCollision event once called
 	/// </summary>
-	public void StartTimer()
+	public void StartTimer(Player p)
 	{
-		timer.Restart();
+		if (p == this) timer.Restart();
 	}
 
 	/// <summary>
@@ -424,7 +437,7 @@ public partial class Player : Node
 	/// <param name="currentPosition">the position of the player upon impact with the kill plane</param>
 	public void ReturnToTrack()
 	{
-		if (pathOfFalling?.Any() == true)
+		if ((bool)pathOfFalling?.Any())
 		{
 			//GD.Print("Getting back on track!");
 			//GD.Print("First point: " + pathOfFalling[0] + " Last Point: " + pathOfFalling[^1]);
@@ -459,7 +472,7 @@ public partial class Player : Node
 	/// Returns the player to the last point in the bezier curve 
 	/// they passed in the event they fall off the track and hit the kill plane
 	/// </summary>
-	public void ToPreviousCheckpoint()
+	public void ToPreviousCheckpoint(Player p)
 	{
 		//different checkpoint check
 		/* 		//this method will be called when the player falls off the map
@@ -500,8 +513,10 @@ public partial class Player : Node
 						return;
 					}
 				} */
-
-		charbody3d.GlobalPosition = passedCheckpoints[^1].Position + new Vector3(0, 1, 0);
+		if (p == this)
+        {
+            charbody3d.GlobalPosition = passedCheckpoints[^1].Position + new Vector3(0, 1, 0);
+        }
 
 	}
 
@@ -522,10 +537,10 @@ public partial class Player : Node
 	/// player's list of passed checkpoints this lap
 	/// </summary>
 	/// <param name="chpt">The current checkpoint passed</param>
-	public void AddCheckpoint(Checkpoint chpt)
+	public void AddCheckpoint(Checkpoint chpt, Player p)
 	{
 		//ensure the checkpoint does not exist in the list before adding 
-		if (!passedCheckpoints.Contains(chpt)) passedCheckpoints.Add(chpt);
+		if (!passedCheckpoints.Contains(chpt) && p == this) passedCheckpoints.Add(chpt);
 		GD.Print("Adding Checkpoint: " + chpt);
 	}
 
@@ -548,18 +563,34 @@ public partial class Player : Node
 		GD.Print("Clearing Checkpoints");
 	}
 
+	/// <summary>
+	/// Information from the server on a player position. If the packet is 
+	/// meant for this player, then the position will be updated and the 
+	/// whole server will know
+	/// </summary>
+	/// <param name="peerID">Who is suppose to recieve the playerposition packet</param>
+	/// <param name="playerPosition">The playerPosition packet</param>
 	private void ServerHandlePlayerPosition(int peerID, PlayerPosition playerPosition)
 	{
+		//if the packet is not meant for the player, ignore it
 		if (ownerID != peerID) return;
-
+		//assign the retrieved position to the player's global position
 		charbody3d.GlobalPosition = playerPosition.Position;
+		//broadcast your new position to all other players 
 		PlayerPosition.Create(ownerID, charbody3d.GlobalPosition).Broadcast(NetworkHandler.Instance.Connection);
 	}
 	
+	/// <summary>
+    /// Information from a client on a player position. If the packet 
+	/// is meant for this player, then the position will be updated
+    /// </summary>
+    /// <param name="playerPosition">Player position packet</param>
 	private void ClientHandlePlayerPosition(PlayerPosition playerPosition)
-    {
-		if (isAuthority || ownerID != playerPosition.ID) return;
+	{
+		//if this player is the owner or the packet was not meant for this player, ignore
+		if (IsAuthority || ownerID != playerPosition.ID) return;
 
+		//update this player's position with the passed in position from the packet
 		charbody3d.GlobalPosition = playerPosition.Position;
     }
 }

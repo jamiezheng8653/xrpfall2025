@@ -1,16 +1,11 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 
 //delegate declaration
-public delegate void ItemCollisionDelegate();
+public delegate void ItemCollisionDelegate(Player p);
 
 public partial class ItemManager : Node
 {
-	//grab a reference to the player
-	//Every item generated will get a reference to the player's bounds 
-	//Used in collision detection & item event declaration
-	private Player player = null;
 	private PackedScene itemPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/item.tscn");
 
 	//list of all items generated
@@ -27,7 +22,7 @@ public partial class ItemManager : Node
 		items = new List<Node>();
 		itemLocations = track.Path3D.Curve.PointCount;
 
-		GenerateItems(player);
+		GenerateItems();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -38,11 +33,9 @@ public partial class ItemManager : Node
 	/// <summary>
 	/// Set references to the player and track
 	/// </summary>
-	/// <param name="p">Reference to the player</param>
 	/// <param name="t">Reference to the track</param>
-	public void Init(Player p, Track t)
+	public void Init(Track t)
 	{
-		player = p;
 		track = t;
 
 	}
@@ -50,9 +43,7 @@ public partial class ItemManager : Node
 	/// <summary>
 	/// Instantiates items scattered throughout the track 
 	/// </summary>
-	/// <param name="player">Necessary for each player to be hooked 
-	/// up to a collision event with each item spawned </param>
-	public void GenerateItems(Player player)
+	public void GenerateItems()
 	{
 		for (int i = 0; i < itemLocations; i++)
 		{
@@ -69,9 +60,13 @@ public partial class ItemManager : Node
 				items.Add(itemPrefab.Instantiate()); //create the new item
 				AddChild(items[^1]); //add to the scene tree
 				temp = (Item)items[i]; //grab reference to call its init()
-				temp.CustomInit(player, spawnPos + (5 * dir));
+				temp.CustomInit(spawnPos + (5 * dir));
 				//player subscribes to each item individually
-				temp.OnItemCollision += player.StartTimer;
+				foreach (Player p in PlayerList.Instance.List)
+                {
+                    temp.OnItemCollision += p.StartTimer;
+                }
+				
 			}			
 		}
 	}

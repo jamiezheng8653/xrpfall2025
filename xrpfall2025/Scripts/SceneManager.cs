@@ -1,10 +1,8 @@
 using Godot;
-using System;
 
 public partial class SceneManager : Node
 {
 	//parts involved in the scene.
-	[Export] private Node player;
 	[Export] private Node track;
 	[Export] private Node itemManager;
 	[Export] private Node killPlane;
@@ -14,7 +12,7 @@ public partial class SceneManager : Node
 	public override void _Ready()
 	{
 		//get the correct cooresponding child of each node
-		Player playerP = (Player)player;
+		//Player playerP = (Player)player;
 		Track trackT = (Track)track;
 		ItemManager itemManagerIM = (ItemManager)itemManager;
 		KillPlane killPlaneKP = (KillPlane)killPlane;
@@ -22,19 +20,25 @@ public partial class SceneManager : Node
 		CheckpointManager checkpointManagerCM = (CheckpointManager)checkpointManager;
 
 		//initialize everyone
-		killPlaneKP.Init(playerP);
+		killPlaneKP.Init();
 		trackT.Init();
-		checkpointManagerCM.Init(playerP, trackT.Checkpoints);
-		playerP.Init(trackT.StartingPoint, trackT.Path3D, checkpointManagerCM.TotalCheckpoints);
-		finishlineFL.Init(playerP, trackT.StartingPoint); 
-		itemManagerIM.Init(playerP, trackT);
+		checkpointManagerCM.Init(trackT.Checkpoints);
+		//spawn all players
+		foreach (Player p in PlayerList.Instance.List)
+		{
+			AddChild(p);
+			p.Init(trackT.StartingPoint, trackT.Path3D, checkpointManagerCM.TotalCheckpoints);
+			//subscribe Player and Killplane Events
+			//killPlaneKP.IsCollidingKillPlane += playerP.ReturnToTrack;
+			killPlaneKP.IsCollidingKillPlane += p.ToPreviousCheckpoint;
 
-		//subscribe Player and Killplane Events
-		//killPlaneKP.IsCollidingKillPlane += playerP.ReturnToTrack;
-		killPlaneKP.IsCollidingKillPlane += playerP.ToPreviousCheckpoint;
+			finishlineFL.OnCrossingEvent += p.IncrementLap;
+			finishlineFL.OnCrossingEvent += p.ClearCheckpoints;
+		}
+		finishlineFL.Init(trackT.StartingPoint);
+		itemManagerIM.Init(trackT);
 
-		finishlineFL.OnCrossingEvent += playerP.IncrementLap;
-		finishlineFL.OnCrossingEvent += playerP.ClearCheckpoints;
+
 	}
 
 }

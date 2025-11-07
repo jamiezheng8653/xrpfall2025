@@ -6,7 +6,6 @@ public partial class Checkpoint : Node
 	public event CheckpointCollisionDelegate OnCheckpointCollision;
 	private float radius;
 	[Export] private Area3D area3d;
-	private Player player;
 	private Checkpoint self;
 	private Color color;
 
@@ -15,7 +14,6 @@ public partial class Checkpoint : Node
 
 	public Checkpoint()
 	{
-		player = null;
 		self = this;
 	}
 
@@ -28,7 +26,11 @@ public partial class Checkpoint : Node
 	public override void _Process(double delta)
 	{
 		DebugDraw3D.DrawSphere(GlobalPosition, radius, color);
-		if (OnCollision()) OnCheckpointCollision?.Invoke(this);
+		foreach (Player p in PlayerList.Instance.List)
+        {
+            if (OnCollision(p)) OnCheckpointCollision?.Invoke(this, p);
+        }
+		
 	}
 
 	/// <summary>
@@ -37,21 +39,20 @@ public partial class Checkpoint : Node
 	/// <param name="spawnPos">where the checkpoint is located, should be in the middle of the track</param>
 	/// <param name="player">Reference to the player for collision checks</param>
 	/// <param name="radius">Should be at least the half length of the track's width</param>
-	public void Init(Vector3 spawnPos, Player player, float radius = 1)
+	public void Init(Vector3 spawnPos, float radius = 1)
 	{
 		color = new Color("YELLOW");
 		area3d.Position = spawnPos;
 		this.radius = radius;
-		this.player = player;
 	}
 
 	/// <summary>
 	/// Performs a circle collision check on if the player is overlapping with the checkpoint
 	/// </summary>
 	/// <returns>If the player is colliding with the checkpoint, return true. Otherwise false</returns>
-	public bool OnCollision()
+	public bool OnCollision(Player p)
 	{
-		if (Utils.CircleCollision(GlobalPosition, radius, player.GlobalPosition, player.Radius)) return true;
+		if (Utils.CircleCollision(GlobalPosition, radius, p.GlobalPosition, p.Radius)) return true;
 		else return false;
 	}
 }

@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 //upon collision from a direction call this event
 public delegate void OnCrossing();
@@ -8,7 +7,6 @@ public partial class Finishline : Node
 {
 	public event OnCrossing OnCrossingEvent;
 	[Export] private Area3D area3D;
-	private Player player;
 	private bool prevCollisionState = false;
 	[Export] private CollisionShape3D collisionShape3D;
 	private Vector3 halflength;
@@ -28,7 +26,10 @@ public partial class Finishline : Node
 	{
 		//check for when overlap and the direction of the velocity vector of the player points correctly
 		//this will have to be revamped when enemy ai cars get implemented
-		if (IsOverlapping(player) && HitAllCheckpoints(player)) OnCrossingEvent?.Invoke(); //call event
+		foreach (Player p in PlayerList.Instance.List)
+        {
+            if (IsOverlapping(p) && HitAllCheckpoints(p)) OnCrossingEvent?.Invoke(); //call event
+        }
 		DebugDraw3D.DrawBox(area3D.GlobalPosition, Quaternion.Identity, 2 * halflength, color, true);
 	}
 
@@ -38,9 +39,8 @@ public partial class Finishline : Node
 	/// <param name="p">Reference the player in scene</param>
 	/// <param name="startPt">Where the track first begins generating, where the finish line will be placed</param>
 	/// <param name="scale">How big is the track, and therefore how wide do we need the track</param>
-	public void Init(Player p, Vector3 startPt, double scale = 1)
+	public void Init(Vector3 startPt, double scale = 1)
 	{
-		player = p;
 		area3D.Position = startPt + new Vector3(0, 1.5f, 0);
 
 		//ensure the finishline takes up the width of the road

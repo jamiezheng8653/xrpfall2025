@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://brql82ag8w73c"]
+
+[ext_resource type="PackedScene" uid="uid://dfcf4dx6sihca" path="res://Assets/server_setup_UI.tscn" id="1_ldo4a"]
+[ext_resource type="PackedScene" uid="uid://foslx0bcvv0j" path="res://Scenes/Prefabs/player_spawner.tscn" id="2_syxqh"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ldo4a"]
+albedo_color = Color(0.282353, 0.298039, 0.298039, 1)
+
+[node name="ConfigServerScreen" type="Node"]
+
+[node name="ServerSetupUI" parent="." instance=ExtResource("1_ldo4a")]
+
+[node name="PlayerSpawner" parent="." instance=ExtResource("2_syxqh")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.64647, 0.762939, 0, -0.762939, 0.64647, 0, 10.0596, 15.1903)
+layers = 31
+light_color = Color(0.215189, 0.659385, 0.874744, 1)
+light_cull_mask = 4294966275
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
+transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 20, -10, -4, 10)
+layers = 3
+use_collision = true
+material = SubResource("StandardMaterial3D_ldo4a")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 12, 0)
+cull_mask = 1047583
+far = 50.0
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.51936, -1.97739, 0)
+calculate_tangents = false
+use_collision = true
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.48042, -2.4624, 0)
+layers = 3
+calculate_tangents = false
+use_collision = true

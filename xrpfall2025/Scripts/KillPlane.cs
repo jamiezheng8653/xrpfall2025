@@ -1,11 +1,11 @@
 using Godot;
 using System;
 
-public delegate void OnKillPlaneDelegate();
+public delegate void OnKillPlaneDelegate(Player p);
 public partial class KillPlane : Node
 {
 	public event OnKillPlaneDelegate IsCollidingKillPlane;
-	private Player playerP = null;
+	//private Player playerP = null;
 	[Export] private CsgBox3D planeBox = null;
 	private Color color;
 
@@ -30,12 +30,15 @@ public partial class KillPlane : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (IsColliding())
-		{
-			//GD.Print("I'm colliding!");
-			//fire event
-			IsCollidingKillPlane?.Invoke();
-		}
+		foreach (Player p in PlayerList.Instance.List)
+        {
+			if (IsColliding(p))
+			{
+				//GD.Print("I'm colliding!");
+				//fire event
+				IsCollidingKillPlane?.Invoke(p);
+			}
+        }
 
 		//draw aabb 
 		DebugDraw3D.DrawAabb(AABB, color);
@@ -46,19 +49,19 @@ public partial class KillPlane : Node
 	/// Initializes the object. Associates any external references that this object needs
 	/// </summary>
 	/// <param name="player"></param>
-	public void Init(Player player)
+	public void Init()
 	{
-		playerP = player;
+		
 	}
 
 	/// <summary>
 	/// Checks if the player is colliding with the kill plane
 	/// </summary>
 	/// <returns>True if the player is colliding with the kill plane</returns>
-	private bool IsColliding()
+	private bool IsColliding(Player p)
 	{
 		// we don't need to adjust the position of the kill plane's aabb 
 		// because the kill plane is never going to move while the game is running
-		return playerP.AABB.Intersects(AABB);
+		return p.AABB.Intersects(AABB);
 	}
 }

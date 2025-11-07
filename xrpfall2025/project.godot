@@ -20,6 +20,7 @@ config/icon="res://Assets/Images/icon.svg"
 NetworkHandler="*res://Scripts/MultiplayerSetup/NetworkHandler.cs"
 ClientNetworkGlobals="*res://Scripts/MultiplayerSetup/ClientNetworkGlobals.cs"
 ServerNetworkGlobals="*res://Scripts/MultiplayerSetup/ServerNetworkGlobals.cs"
+PlayerList="*res://Scripts/PlayerList.cs"
 
 [debug_draw_3d]
 
