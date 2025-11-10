@@ -30,11 +30,11 @@ public partial class ServerNetworkGlobals : Node
 	/// and broadcast the information to the ENet Connection
 	/// </summary>
 	/// <param name="peerID">ID of the peer that joined</param>
-	private void OnPeerConnected(int peerID)
+	private void OnPeerConnected(int peerIDNew)
 	{
 		//peerIDs.Append<>(peerID);
-		peerIDs.Add(peerID);
-		IDAssignment.Create(peerID, peerIDs).Broadcast(NetworkHandler.Instance.Connection);
+		peerIDs.Add(peerIDNew);
+		IDAssignment.Create(peerIDNew, peerIDs).Broadcast(NetworkHandler.Instance.Connection);
 	}
 
 	/// <summary>
@@ -48,10 +48,10 @@ public partial class ServerNetworkGlobals : Node
 	}
 
 	/// <summary>
-    /// Process any packets the server recieves
-    /// </summary>
-    /// <param name="peerID">Who is sending the packet to the server</param>
-    /// <param name="data">The packet information</param>
+	/// Process any packets the server recieves
+	/// </summary>
+	/// <param name="peerID">Who is sending the packet to the server</param>
+	/// <param name="data">The packet information</param>
 	private void OnServerPacket(int peerID, byte[] data)
 	{
 		//int packetType = data.DecodeU8(0);

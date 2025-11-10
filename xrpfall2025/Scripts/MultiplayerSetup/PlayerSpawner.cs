@@ -20,14 +20,13 @@ public partial class PlayerSpawner : Node
 	/// When a new client connects to the server, create 
 	/// a player instance and assign the passed in id to them
 	/// </summary>
-	/// <param name="id">The cooresponding peer id number of this player as a client</param>
+	/// <param name="id">Id of the player being added to the scene</param>
 	private void SpawnPlayer(int id)
 	{
 		Player player = (Player)playerPrefab.Instantiate();
 		player.OwnerID = id;
 		player.Name = id.ToString();
 		this.CallDeferred(Node.MethodName.AddChild, player);
-		//player.GlobalPosition = new Vector3(0, 5, 0);
 		PlayerList.Instance.List.Add(player);
 	}
 }

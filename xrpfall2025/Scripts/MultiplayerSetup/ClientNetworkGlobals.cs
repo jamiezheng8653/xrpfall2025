@@ -7,8 +7,8 @@ using System.Collections.Generic;
 /// </summary>
 public partial class ClientNetworkGlobals : Node
 {
-	public delegate void HandleLocalIDAssignmentDelegate(int localID);
-	public delegate void HandleRemoteIDAssignmentDelegate(int remoteID);
+	public delegate void HandleLocalIDAssignmentDelegate(int peerID);
+	public delegate void HandleRemoteIDAssignmentDelegate(int peerID);
 	public delegate void HandlePlayerPositionDelegate(PlayerPosition playerPosition);
 
 	public event HandleLocalIDAssignmentDelegate HandleLocalIDAssignment;
@@ -23,16 +23,16 @@ public partial class ClientNetworkGlobals : Node
 	public static ClientNetworkGlobals Instance { get; private set; }
 
 	/// <summary>
-    /// the ID of the client
-    /// </summary>
+	/// the ID of the client
+	/// </summary>
 	public int ID
 	{
 		get { return id; }
 	}
 
 	/// <summary>
-    /// the client's reference of all other remote clients' ids.
-    /// </summary>
+	/// the client's reference of all other remote clients' ids.
+	/// </summary>
 	public List<int> RemoteIDs
 	{
 		get { return remoteIDs; }
@@ -74,11 +74,11 @@ public partial class ClientNetworkGlobals : Node
 	}
 
 	/// <summary>
-    /// Pass in an IDAssignment packet. If we the client do not already 
+	/// Pass in an IDAssignment packet. If we the client do not already 
 	/// have an id assigned, assume the passed in packet's information is ours.
 	/// Otherwise save the passed in packet's id into the remote id list
-    /// </summary>
-    /// <param name="idAssignment">IDAssignment packet</param>
+	/// </summary>
+	/// <param name="idAssignment">IDAssignment packet</param>
 	private void ManageIDs(IDAssignment idAssignment)
 	{
 		// check if there is an id assigned

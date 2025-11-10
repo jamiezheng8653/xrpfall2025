@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -74,9 +73,9 @@ public partial class Player : Node
 	private int ownerID;
 
 	/// <summary>
-    /// The peer ID specific to this player when 
+	/// The peer ID specific to this player when 
 	/// in multiplayer and connected to a server
-    /// </summary>
+	/// </summary>
 	public int OwnerID
 	{
 		get { return ownerID; }
@@ -86,11 +85,11 @@ public partial class Player : Node
 	/// <summary>
 	/// Checks to ensure the player is a client and not a host, 
 	/// and that the client id and this player id matches
-    /// </summary>
+	/// </summary>
 	public bool IsAuthority
-    {
-        get{ return !NetworkHandler.Instance.IsServer && ownerID == ClientNetworkGlobals.Instance.ID; }
-    }
+	{
+		get{ return !NetworkHandler.Instance.IsServer && ownerID == ClientNetworkGlobals.Instance.ID; }
+	}
 
 	/// <summary>
 	/// The current state of the player car. Get/Set
@@ -197,7 +196,8 @@ public partial class Player : Node
 		halflength = new Vector3(radius, radius, radius); //TODO
 		GlobalPosition = new Vector3(0, 5, 0);
 
-		if (IsAuthority) camera.MakeCurrent();
+		if (!IsAuthority) return;
+		camera.MakeCurrent();
 	}
 
 	/// <summary>
@@ -205,10 +205,10 @@ public partial class Player : Node
 	/// when this Player leaves the scene tree during runtime for whatever reason
 	/// </summary>
 	public override void _ExitTree()
-    {
-        ServerNetworkGlobals.Instance.HandlePlayerPosition -= ServerHandlePlayerPosition;
+	{
+		ServerNetworkGlobals.Instance.HandlePlayerPosition -= ServerHandlePlayerPosition;
 		ClientNetworkGlobals.Instance.HandlePlayerPosition -= ClientHandlePlayerPosition;
-    }
+	}
 
 	/// <summary>
 	/// General game logic being run every frame.
@@ -300,7 +300,7 @@ public partial class Player : Node
 		//GD.Print("Player speed: " + speed);
 
 		//create a player position packet to broadcast and let connected clients know where you are in game
-		PlayerPosition.Create(ownerID, GlobalPosition).Broadcast(NetworkHandler.Instance.Connection);
+		PlayerPosition.Create(ownerID, GlobalPosition).Send(NetworkHandler.Instance.ServerPeer);
 	}
 
 	/// <summary>
@@ -325,6 +325,7 @@ public partial class Player : Node
 	/// <param name="state">What state is the player in currently</param>
 	/// <param name="speed">How fast is the player supposedly going</param>
 	/// <returns>The final speed value to be fed to the player</returns>
+	//[Rpc] 
 	private double UpdateStateSpeed(States state, double speed)
 	{
 		switch (state)
@@ -365,6 +366,7 @@ public partial class Player : Node
 	/// <param name="prevState">The player's current state that is not States.Regular</param>
 	/// <param name="speed">How fast is the player moving right now</param>
 	/// <param name="delta">deltatime</param>
+	//[Rpc] 
 	private void RevertState(States prevState, double speed, double delta)
 	{
 		//according to what state was previously, the process to revert back to States.Regular will differ slightly
@@ -435,6 +437,7 @@ public partial class Player : Node
 	/// </summary>
 	/// <param name="prevPosition">the position of the player just before falling</param>
 	/// <param name="currentPosition">the position of the player upon impact with the kill plane</param>
+	//[Rpc] 
 	public void ReturnToTrack()
 	{
 		if ((bool)pathOfFalling?.Any())
@@ -472,6 +475,7 @@ public partial class Player : Node
 	/// Returns the player to the last point in the bezier curve 
 	/// they passed in the event they fall off the track and hit the kill plane
 	/// </summary>
+	//[Rpc] 
 	public void ToPreviousCheckpoint(Player p)
 	{
 		//different checkpoint check
@@ -514,9 +518,9 @@ public partial class Player : Node
 					}
 				} */
 		if (p == this)
-        {
-            charbody3d.GlobalPosition = passedCheckpoints[^1].Position + new Vector3(0, 1, 0);
-        }
+		{
+			charbody3d.GlobalPosition = passedCheckpoints[^1].Position + new Vector3(0, 1, 0);
+		}
 
 	}
 
@@ -581,10 +585,10 @@ public partial class Player : Node
 	}
 	
 	/// <summary>
-    /// Information from a client on a player position. If the packet 
+	/// Information from a client on a player position. If the packet 
 	/// is meant for this player, then the position will be updated
-    /// </summary>
-    /// <param name="playerPosition">Player position packet</param>
+	/// </summary>
+	/// <param name="playerPosition">Player position packet</param>
 	private void ClientHandlePlayerPosition(PlayerPosition playerPosition)
 	{
 		//if this player is the owner or the packet was not meant for this player, ignore
@@ -592,6 +596,5 @@ public partial class Player : Node
 
 		//update this player's position with the passed in position from the packet
 		charbody3d.GlobalPosition = playerPosition.Position;
-    }
+	}
 }
-

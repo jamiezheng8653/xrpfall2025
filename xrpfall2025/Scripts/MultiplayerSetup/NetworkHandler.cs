@@ -51,8 +51,8 @@ public partial class NetworkHandler : Node
 	public static NetworkHandler Instance { get; private set; }
 
 	/// <summary>
-    /// What is the port number the server is hosted on
-    /// </summary>
+	/// What is the port number the server is hosted on
+	/// </summary>
 	public int CurrentPort
 	{
 		get
@@ -63,25 +63,30 @@ public partial class NetworkHandler : Node
 	}
 
 	/// <summary>
-    /// What is the IP of the server
-    /// </summary>
+	/// What is the IP of the server
+	/// </summary>
 	public string ServerIP
 	{
 		get { return serverIP; }
 	}
 
+	public ENetPacketPeer ServerPeer
+	{
+		get { return serverPeer; }
+	}
+
 	/// <summary>
-    /// Is the host the server or client. 
+	/// Is the host the server or client. 
 	/// Returns true if the host is the server
-    /// </summary>
+	/// </summary>
 	public bool IsServer
 	{
 		get { return isServer; }
 	}
 
 	/// <summary>
-    /// 
-    /// </summary>
+	/// 
+	/// </summary>
 	public ENetConnection Connection
 	{
 		get { return connection; }
@@ -226,6 +231,7 @@ public partial class NetworkHandler : Node
 
 		GD.Print("Peer connected with assigned id: ", peerID);
 		//call methods associated to the appropriate event
+		//update
 		OnPeerConnected?.Invoke(peerID);
 	}
 
@@ -270,6 +276,7 @@ public partial class NetworkHandler : Node
 		//otherwise connect to the server
 		GD.Print("Client Started");
 		serverPeer = connection.ConnectToHost(ipAddress, port);
+
 	}
 
 	/// <summary>
@@ -292,9 +299,9 @@ public partial class NetworkHandler : Node
 	}
 
 	/// <summary>
-    /// Disconnect yourself from the server
+	/// Disconnect yourself from the server
 	/// Called on client side
-    /// </summary>
+	/// </summary>
 	private void DisconnectedFromServer()
 	{
 		GD.Print("Successfully disconnected from server");

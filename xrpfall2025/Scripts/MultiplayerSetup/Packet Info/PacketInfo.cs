@@ -47,7 +47,7 @@ public class PacketInfo
 	/// Call when you want to send this packet's data to the passed in target
 	/// </summary>
 	/// <param name="target">who do you want to send information to</param>
-	private void Send(ENetPacketPeer target)
+	public void Send(ENetPacketPeer target)
 	{
 		if (target == null) return;
 		//param: channel (0), the packet we want to send, and this packet's flag

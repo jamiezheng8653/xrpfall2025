@@ -1,6 +1,8 @@
 extends Node
 
 @export var charbody2d: CharacterBody2D;
+@export var charbody3d: CharacterBody3D;
+@export var camera: Camera3D;
 
 const SPEED: float = 500
 
@@ -12,6 +14,8 @@ var owner_id: int;
 func _enter_tree() -> void:
 	ServerNetworkGlobals.handle_player_position.connect(server_handle_player_position);
 	ClientNetworkGlobals.handle_player_position.connect(client_handle_player_position);
+	if is_authority: camera.make_current();
+	charbody3d.global_position = Vector3(0, 5, 0);
 
 func _exit_tree() -> void:
 	ServerNetworkGlobals.handle_player_position.disconnect(server_handle_player_position);

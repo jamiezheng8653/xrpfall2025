@@ -8,3 +8,6 @@
 [node name="LowLevelUi" parent="." instance=ExtResource("1_p32be")]
 
 [node name="PlayerSpawner" parent="." instance=ExtResource("2_7njdk")]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+size = Vector3(20, 1, 20)

@@ -16,9 +16,4 @@ public partial class PlayerList : Node
 		Instance = this;
 		list = new List<Player>();
 	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
 }
