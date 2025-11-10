@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection.Metadata;
 using Godot;
 using Vector3 = Godot.Vector3;
+using System.IO;
+using System.Text.Json;
 
 //Enum States
 public enum States
@@ -68,6 +70,9 @@ public partial class Player : CharacterBody3D
 	private List<Checkpoint> passedCheckpoints = new List<Checkpoint>();
 
 	private int totalCheckpoints = 0;
+	
+	// Used for customization of car mesh color
+	private MeshInstance3D carMesh;
 
 	/// <summary>
 	/// The current state of the player car. Get/Set
@@ -129,6 +134,12 @@ public partial class Player : CharacterBody3D
 	{
 		get { return halflength; }
 	}
+	
+	// making end condition public so it can be reached in HUD
+	public bool FinishedRace
+	{
+		get { return finishedRace; }
+	}
 
 	/// <summary>
 	/// Initialize the spawning position of the player car 
@@ -157,6 +168,11 @@ public partial class Player : CharacterBody3D
 		prevPosition = new Vector3();
 		pathOfFalling = new List<Vector3>();
 		halflength = new Vector3(radius, radius, radius); //TODO
+		
+		// For customization, not yet applied
+		carMesh = GetNode<MeshInstance3D>("CollisionShape3D/XRP_Car/SM_Car");
+		ApplySavedCarColor();
+		
 	}
 
 	/// <summary>
@@ -511,4 +527,64 @@ public partial class Player : CharacterBody3D
 		passedCheckpoints.Clear();
 		GD.Print("Clearing Checkpoints");
 	}
+	
+	//Customization file reading, saves the color to be applied to the car
+	private void ApplySavedCarColor()
+	{
+		string path = ProjectSettings.GlobalizePath("user://customization.json");
+		if (!File.Exists(path))
+		{
+			GD.Print("No customization file found.");
+			return;
+		}
+		else 
+		{
+			GD.Print("File Found.");
+		}
+
+		string json = File.ReadAllText(path);
+		var data = JsonSerializer.Deserialize<CustomizationData>(json);
+
+		if (data != null && !string.IsNullOrEmpty(data.CarColor))
+		{
+			Color color = new Color(data.CarColor); // Godot parses "#RRGGBB"
+			
+			if (color != null){
+				GD.Print(color);
+			}
+			
+			SetCarColor(color);
+		}
+	}
+	
+	// Sets the material of the car to the proper color
+	private void SetCarColor(Color color)
+	{
+		if (carMesh == null)
+		{
+			GD.PrintErr("Car mesh not found!");
+			return;
+		}
+
+		var mat = carMesh.GetActiveMaterial(0) as StandardMaterial3D;
+		if (mat != null)
+		{
+			var newMat = (StandardMaterial3D)mat.Duplicate();
+			newMat.AlbedoColor = color;
+			carMesh.SetSurfaceOverrideMaterial(0, newMat);
+		}
+		else
+		{
+			var newMat = new StandardMaterial3D();
+			newMat.AlbedoColor = color;
+			carMesh.MaterialOverride = newMat;
+		}
+	}
+
+	private class CustomizationData
+	{
+		[System.Text.Json.Serialization.JsonPropertyName("car_color")]
+		public string CarColor { get; set; }
+	}
+	 
 }

@@ -31,7 +31,7 @@ var item_textures = {
 	"Fast": preload("res://Assets/Images/FastPlaceholder.png"),
 	"Slow": preload("res://Assets/Images/SlowPlaceholder.png"),
 	"Inverted": preload("res://Assets/Images/InvertedPlaceholder.png")
-	# I need to add images for the other states
+
 }
 
 var last_item_type: String = ""
@@ -39,11 +39,22 @@ var last_item_type: String = ""
 # Pause menu
 @onready var pause_menu: Control = $PauseMenu
 
+# Stopwatch variables
+var race_time: float = 0.0
+var lap_start_time: float = 0.0
+var lap_times: Array = [0.0, 0.0, 0.0]
+var current_lap: int = 1
+var stopwatch_running: bool = false
+
+@onready var stopwatch_label: Label = $Stopwatch/StopwatchLabel
+
 # On game start
 func _ready():
 	# When I want it to start at the beginning of the race instead I would add
 	# $HUD.start_countdown() to scene manager script instead
 	start_countdown() 
+	connect("countdown_finished", Callable(self, "_on_countdown_finished"))
+
 	
 	#create a default texture for item
 	if not item_icon.texture:
@@ -52,9 +63,11 @@ func _ready():
 	
 	# Make sure Pause Menu isn't visible
 	pause_menu.visible = false
+	
+	
 
 # Constantly updating
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if player_node:
 		# Set speed to absolute value
 		var current_speed = abs(player_node.Speed)
@@ -79,6 +92,14 @@ func _process(_delta: float) -> void:
 			update_item_icon(current_state_name)
 			last_item_type = current_state_name
 		
+		# Stopwatch
+		if stopwatch_running and not get_tree().paused:
+			race_time += delta
+			stopwatch_label.text = format_time(race_time)
+		
+			if player_node and player_node.Lap != current_lap:
+				record_lap_time()
+
 # Helper functions:
 
 #return the cooresponding name of the State enum because to_string() is being silly
@@ -119,6 +140,11 @@ func start_countdown():
 	$PlaceText.visible = false
 	$SpeedBar.visible = false
 	$TelemetryWindow.visible = false
+	$Stopwatch/StopwatchLabel.visible = false
+	
+	race_time = 0.0
+	stopwatch_running = false
+	stopwatch_label.text = "00:00.00"
 	
 	_show_number()
 	
@@ -177,7 +203,13 @@ func _end_countdown():
 	$LapText.visible = true
 	$PlaceText.visible = true
 	$SpeedBar.visible = true
+	$Stopwatch/StopwatchLabel.visible = true
 	
+	# Start Stopwatch
+	race_time = 0.0
+	lap_start_time = 0.0
+	current_lap = player_node.Lap
+	stopwatch_running = true
 	
 	emit_signal("countdown_finished")
 
@@ -218,3 +250,71 @@ func _on_home_pressed() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://Scenes/GameplayScenes/title_screen.tscn")
 	pass # Replace with function body.
+	
+	# STOPWATCH
+	
+# Function to get individual lap times and store them
+# Also used to display the times, both in list and popup
+func record_lap_time():
+	# Calculate the time for this lap
+	var lap_time = race_time - lap_start_time
+	lap_start_time = race_time 
+
+	# Store the lap time in array
+	if current_lap - 1 < lap_times.size():
+		lap_times[current_lap - 1] = lap_time
+	else:
+		lap_times.append(lap_time)
+		
+	# Pop up label each lap
+	var popup_label = $Stopwatch/LapTimePopupLabel  
+	popup_label.text = "Lap %d: %s" % [current_lap, format_time(lap_time)]
+	popup_label.visible = true
+	popup_label.modulate.a = 1.0
+	
+	# Fade out
+	var tween := create_tween()
+	tween.tween_interval(0.8)
+	tween.tween_property(popup_label, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(Callable(self, "_hide_lap_popup"))
+
+	# List of times. Likely temporary and will only be shown on end screen
+	$Stopwatch/LapTimesLabel.text = "Lap 1: %s\nLap 2: %s\nLap 3: %s" % [
+		format_time(lap_times[0]),
+		format_time(lap_times[1]),
+		format_time(lap_times[2])
+	]
+	# Update to new lap number
+	current_lap = player_node.Lap
+	
+	# Uses player end condition
+	if player_node.FinishedRace:
+		finished_race()
+	
+# Simple helper function to format the time properly
+func format_time(time_sec: float) -> String:
+	var minutes = int(time_sec) / 60
+	var seconds = int(time_sec) % 60
+	var milliseconds = int((time_sec - int(time_sec)) * 100)
+	return "%02d:%02d.%02d" % [minutes, seconds, milliseconds]
+
+# Lap button for testing purposes that calls players "IncrementLap"
+func _on_lap_button_pressed() -> void:
+	if player_node:
+		player_node.call("IncrementLap")
+		record_lap_time()
+		
+# Simple helper (possibly unnecessary) to hide and reset label
+func _hide_lap_popup():
+	$Stopwatch/LapTimePopupLabel.visible = false
+	$Stopwatch/LapTimePopupLabel.modulate.a = 1.0 
+
+# Function for when the race is ended, triggering end screen and stopping the clock
+func finished_race():
+	stopwatch_running = false
+	
+	var end_screen = preload("res://Scenes/GameplayScenes/end_screen.tscn").instantiate()
+	end_screen.set_lap_times(lap_times, race_time)
+	get_tree().root.add_child(end_screen)
+
+	get_tree().current_scene.queue_free()

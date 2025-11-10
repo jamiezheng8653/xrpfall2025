@@ -47,3 +47,5 @@ size = Vector3(1.35046, 0.750122, 3.1955)
 [node name="overheadCamera" type="Camera3D" parent="Node3D/Player"]
 transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 20, -5)
 cull_mask = 1048574
+
+[editable path="Node3D/Player/CollisionShape3D/XRP_Car"]
