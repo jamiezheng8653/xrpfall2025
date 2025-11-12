@@ -236,7 +236,7 @@ public static class Utils
 		if (p1.DistanceSquaredTo(p2) <= Mathf.Pow(r1 + r2, 2)) return true;
 		else return false;
 	}
-	
+
 	/// <summary>
 	/// Checks if two objects are overlapping by drawing 
 	/// a box around them on the x-z plane. Ignores the y-axis
@@ -252,5 +252,20 @@ public static class Utils
 		Godot.Rect2 aabb2 = new Rect2(p2.X, p2.Z, halflength2.X * 2, halflength2.Z * 2);
 		if (aabb1.Intersects(aabb2)) return true;
 		else return false;
+	}
+	
+	/// <summary>
+	/// Calculating the Axis Realigned Bounding Box (ARBB) of this object
+	/// </summary>
+	private static void CalculateARBB()
+	{
+		//find 8 corners of oriented bounding box
+
+		//will need to globalize the vectors vector3(matrix4 * vector4(vector, 1))
+
+		//find min and max of the 8 corners
+
+		//find size of the box
+
 	}
 }
