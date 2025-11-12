@@ -44,7 +44,6 @@ public partial class ServerNetworkGlobals : Node
 	private void OnPeerDisconnected(int peerID)
 	{
 		peerIDs.Remove(peerID);
-		//create IDAssignment to broadcase to all peers
 	}
 
 	/// <summary>
