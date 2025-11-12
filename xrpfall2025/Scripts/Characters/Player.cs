@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata;
 using Godot;
 using Vector3 = Godot.Vector3;
 using System.IO;
@@ -17,7 +16,7 @@ public enum States
 	Regular
 };
 
-public partial class Player : CharacterBody3D
+public partial class Player : CharacterBody3D, ICharacter
 {
 	private States current; //current state
 
@@ -292,7 +291,7 @@ public partial class Player : CharacterBody3D
 	/// <param name="state">What state is the player in currently</param>
 	/// <param name="speed">How fast is the player supposedly going</param>
 	/// <returns>The final speed value to be fed to the player</returns>
-	private double UpdateStateSpeed(States state, double speed)
+	public double UpdateStateSpeed(States state, double speed)
 	{
 		switch (state)
 		{
@@ -392,7 +391,7 @@ public partial class Player : CharacterBody3D
 	/// Resets the timer associated with the state transition logic
 	/// Resubscribes StartTimer method to OnItemCollision event
 	/// </summary>
-	private void ClearTimer()
+	public void ClearTimer()
 	{
 		timer.Reset();
 	}
