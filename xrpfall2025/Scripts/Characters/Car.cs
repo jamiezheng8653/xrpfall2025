@@ -3,14 +3,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-//Enum States
+#region Enums
+/// <summary>
+/// Enum for defining the car's current 
+/// state given an item effect from impact/use
+/// </summary>
 public enum States
 {
-	Inverted,
-	Slow,
-	Fast,
-	Regular
+    Inverted,
+    Slow,
+    Fast,
+    Regular
 };
+#endregion
 
 /// <summary>
 /// Parent class that all car types will inherit from.
@@ -18,7 +23,7 @@ public enum States
 /// </summary>
 public partial class Car : Node
 {
-    //Fields
+    #region Fields
     protected States current; //current state
     //Timer for transitioning between states
     protected Stopwatch timer;
@@ -40,13 +45,13 @@ public partial class Car : Node
     protected const double MAXSPEED = 30;
     protected double maxSpeed = 30;
 
-    //if the player gets a speedup or speed debuff, 
+    //if the car gets a speedup or speed debuff, 
     //multiply/divide speed by cooresponding multiplier
     //has to be int because Vectors are made up by ints
     [Export] protected double slowMultiplier = 0.5;
     [Export] protected double fastMultiplier = 2;
 
-    // How fast the player moves in meters per second.
+    // How fast the car moves in meters per second.
     protected double speed = 0;
     protected double acceleration = 10;
     //Rotation speed
@@ -63,10 +68,11 @@ public partial class Car : Node
     [Export] protected CsgBox3D csgBox3D = null;
     [Export] protected CharacterBody3D charbody3d = null;
     // Used for customization of car mesh color
-    protected MeshInstance3D carMesh;
+    [Export] protected MeshInstance3D carMesh = null;
 
     protected float radius = 1;
     protected Vector3 halflength;
+    #endregion
     #endregion
 
     #region Properties
@@ -79,9 +85,9 @@ public partial class Car : Node
     public int Lap => lap;
 
     /// <summary>
-    /// The current state of the player car. Get/Set
+    /// The current state of the car. Get/Set
     /// Relevant when we eventually add items that modify
-    /// the player's state (defined by enum State)
+    /// the car's state (defined by enum State)
     /// </summary>
     public States Current
     {
@@ -106,7 +112,7 @@ public partial class Car : Node
     }
 
     /// <summary>
-    /// Property to give the player's aabb centered on the player,
+    /// Property to give the car's aabb centered on the car,
     /// used for collision calculations happening in the collided item
     /// </summary>
     public Aabb AABB
@@ -146,12 +152,61 @@ public partial class Car : Node
     }
     #endregion
 
+    #region Methods
+
     /// <summary>
-    /// Initialize the spawning position of the player car 
+	/// Initialize any values upon load. If you're initializing this 
+	/// through another script, please utilize the Init() method.
+	/// </summary>
+    public override void _Ready()
+    {
+        color = new Godot.Color("CYAN");
+        current = States.Regular;
+        timer = new Stopwatch();
+        prevPosition = new Vector3();
+        pathOfFalling = new List<Vector3>();
+        halflength = new Vector3(radius, radius, radius); //TODO
+    }
+
+    /// <summary>
+    /// Handle any forces or causes of speed change. 
+    /// Call this method base._PhysicsProcess(delta) 
+    /// in children AFTER handling input
+    /// </summary>
+    /// <param name="delta">Delta time</param>
+    public override void _PhysicsProcess(double delta)
+    {
+        // Vertical velocity
+        if (!charbody3d.IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
+        {
+            //keep adding position before gravity is implemented until impact with kill plane
+            pathOfFalling.Add(charbody3d.GlobalPosition);
+            charbody3d.Position -= charbody3d.GetTransform().Basis.Y * (float)(delta * fallAcceleration);
+        }
+        else
+        {
+            pathOfFalling?.Clear();
+            //GD.Print("Clearing list!");
+        }
+
+        if (timer.ElapsedMilliseconds > 0)
+        {
+            RevertState(current, speed, delta);
+        }
+
+        // Moving the character
+        charbody3d.Position += charbody3d.GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
+
+        charbody3d.MoveAndSlide();
+    }
+
+
+    /// <summary>
+    /// Initialize the spawning position of the car 
     /// and set the reference to the stage's track
     /// </summary>
-    /// <param name="startingPosition"></param>
-    /// <param name="facingDirection"></param>
+    /// <param name="startingPosition">Where is the car going to spawn on the track</param>
+    /// <param name="facingDirection">which way should the car be facing</param>
     public void Init(Vector3 startingPosition, Path3D track, int totalCheckpoints/*, Vector3 facingDirection*/)
     {
         charbody3d.GlobalPosition = startingPosition + new Vector3(0, 5, 0);
@@ -164,9 +219,9 @@ public partial class Car : Node
     /// Calculates the speed value for the final position change 
     /// without modifying the original speed value. 
     /// </summary>
-    /// <param name="state">What state is the player in currently</param>
-    /// <param name="speed">How fast is the player supposedly going</param>
-    /// <returns>The final speed value to be fed to the player</returns>
+    /// <param name="state">What state is the car in currently</param>
+    /// <param name="speed">How fast is the car supposedly going</param>
+    /// <returns>The final speed value to be fed to the car</returns>
     protected double UpdateStateSpeed(States state, double speed)
     {
         switch (state)
@@ -199,13 +254,13 @@ public partial class Car : Node
     }
 
     /// <summary>
-    /// Transition logic that should happen after the player 
+    /// Transition logic that should happen after the car 
     /// transitions from States.Regular to any other state.
-    /// After a clear condition is met, the player's current 
+    /// After a clear condition is met, the car's current 
     /// state will revert back to States.Regular.
     /// </summary>
-    /// <param name="prevState">The player's current state that is not States.Regular</param>
-    /// <param name="speed">How fast is the player moving right now</param>
+    /// <param name="prevState">The car's current state that is not States.Regular</param>
+    /// <param name="speed">How fast is the car moving right now</param>
     /// <param name="delta">deltatime</param>
     protected void RevertState(States prevState, double speed, double delta)
     {
@@ -275,9 +330,9 @@ public partial class Car : Node
 
     #region methods regarding the car's checkpoint tracking
     /// <summary>
-    /// If the player has crossed one of the checkpoints placed 
+    /// If the car has crossed one of the checkpoints placed 
     /// around the track, add that specific checkpoint to the 
-    /// player's list of passed checkpoints this lap
+    /// car's list of passed checkpoints this lap
     /// </summary>
     /// <param name="chpt">The current checkpoint passed</param>
     public void AddCheckpoint(Checkpoint chpt)
@@ -288,7 +343,7 @@ public partial class Car : Node
     }
 
     /// <summary>
-    /// Checks if this player has gone through all checkpoints on the track
+    /// Checks if this car has gone through all checkpoints on the track
     /// </summary>
     /// <returns>True if all checkpoints exist in this "passedCheckpoints" list</returns>
     public bool CheckCheckpoints()
@@ -319,17 +374,17 @@ public partial class Car : Node
     }
 
     /// <summary>
-    /// Logic that happens whenever the player falls off the track and hits the kill plane
+    /// Logic that happens whenever the car falls off the track and hits the kill plane
     /// </summary>
-    /// <param name="prevPosition">the position of the player just before falling</param>
-    /// <param name="currentPosition">the position of the player upon impact with the kill plane</param>
+    /// <param name="prevPosition">the position of the car just before falling</param>
+    /// <param name="currentPosition">the position of the car upon impact with the kill plane</param>
     public void ReturnToTrack()
     {
         if (pathOfFalling?.Any() == true)
         {
             //GD.Print("Getting back on track!");
             //GD.Print("First point: " + pathOfFalling[0] + " Last Point: " + pathOfFalling[^1]);
-            //calculate the point which the player is closests to the line. 
+            //calculate the point which the car is closests to the line. 
 
             //calculate the projection of the vector between prv and current onto the kill plane
             Vector3 u = pathOfFalling[^1] - pathOfFalling[0];
@@ -339,11 +394,11 @@ public partial class Car : Node
             Vector3 d = (Vector3.Zero - pathOfFalling[0]).Normalized();
 
             pathOfFalling.Clear(); //empty the list for the next fall
-                                   //set the player's global position to the new pt
+                                   //set the car's global position to the new pt
             charbody3d.GlobalPosition = -(Utils.ProjUOntoV(u, v).Normalized() - new Vector3(d.X, 5, d.Z))
                 + Utils.GetClosestAbsolutePosition(track, charbody3d.GlobalPosition);
 
-            //point the player towards the track direction of flow.
+            //point the car towards the track direction of flow.
             Vector3 direction = (
                 Utils.GetClosestAbsolutePosition(track, charbody3d.GlobalPosition) -
                 Utils.GetClosestAbsolutePosition(track, charbody3d.GlobalPosition + new Vector3(0.001f, 0, 0.001f))
@@ -357,7 +412,7 @@ public partial class Car : Node
     }
 
     /// <summary>
-    /// Returns the player to the last point in the bezier curve 
+    /// Returns the car to the last point in the bezier curve 
     /// they passed in the event they fall off the track and hit the kill plane
     /// </summary>
     public void ToPreviousCheckpoint()
@@ -367,4 +422,7 @@ public partial class Car : Node
 
     virtual protected void ApplySavedCarColor() { }
     virtual protected void SetCarColor(Color color) { }
+
+    #endregion
+
 }

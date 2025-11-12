@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Diagnostics;
 using Godot;
 using Vector3 = Godot.Vector3;
 using System.IO;
@@ -9,22 +7,15 @@ using System.Text.Json;
 public partial class Player : Car
 {
 	/// <summary>
-	/// Initialize any values upon load. If you're initializing this 
-	/// through another script, please utilize the Init() method.
-	/// Currently no Init() method is in place, if we choose to 
-	/// programmatically load all objects in, be sure to implement Init()
+	/// Any additional set up logic here outside of Init and parent field set up
 	/// </summary>
 	public override void _Ready()
 	{
-		color = new Godot.Color("CYAN");
-		current = States.Regular;
-		timer = new Stopwatch();
-		prevPosition = new Vector3();
-		pathOfFalling = new List<Vector3>();
-		halflength = new Vector3(radius, radius, radius); //TODO
+		base._Ready();
 		
 		// For customization, not yet applied
-		carMesh = GetNode<MeshInstance3D>("CollisionShape3D/XRP_Car/SM_Car");
+		//path has changed, had carMesh be assigned via [Export]
+		//carMesh = GetNode<MeshInstance3D>("CollisionShape3D/XRP_Car/SM_Car");
 		ApplySavedCarColor();
 		
 	}
@@ -72,6 +63,7 @@ public partial class Player : Car
 	/// <param name="delta">delta time</param>
 	public override void _PhysicsProcess(double delta)
 	{
+		#region handle player input
 		//Adjust left and right steering
 		if (((Input.IsActionPressed("right") && current != States.Inverted)
 			|| (Input.IsActionPressed("left") && current == States.Inverted)) && charbody3d.IsOnFloor())
@@ -98,30 +90,10 @@ public partial class Player : Car
 			//will eventually add friction to come to a gradual stop
 			speed *= 0.9 * delta;
 		}
+		#endregion
 
-		// Vertical velocity
-		if (!charbody3d.IsOnFloor()) // If in the air, fall towards the floor. Literally gravity
-		{
-			//keep adding position before gravity is implemented until impact with kill plane
-			pathOfFalling.Add(charbody3d.GlobalPosition);
-			charbody3d.Position -= charbody3d.GetTransform().Basis.Y * (float)(delta * fallAcceleration);
-		}
-		else
-		{
-			pathOfFalling.Clear();
-			//GD.Print("Clearing list!");
-		}
-
-		if (timer.ElapsedMilliseconds > 0)
-		{
-			RevertState(current, speed, delta);
-		}
-
-		// Moving the character
-		charbody3d.Position += charbody3d.GetTransform().Basis.Z * (float)(delta * UpdateStateSpeed(current, speed)) * -1;
-
-		charbody3d.MoveAndSlide();
-		//GD.Print("Player speed: " + speed);
+		//Process input to reflect appropriate movement
+		base._PhysicsProcess(delta);
 	}
 	
 	//Customization file reading, saves the color to be applied to the car

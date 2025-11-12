@@ -1,8 +1,22 @@
 using Godot;
 using System;
 
+/// <summary>
+/// Class for Enemy cars. Inherits from parent Car class. 
+/// Only difference between enemy and player is how movement
+/// is handled and preset decision making
+/// </summary>
 public partial class EnemyAi : Car
 {
+	private enum RacingState
+	{
+		NormalDriving,
+		Overtake,
+		Attack,
+		Defend,
+		Recover
+
+	}
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
