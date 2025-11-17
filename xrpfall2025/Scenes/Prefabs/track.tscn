@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bhdc8up14ky8k"]
+[gd_scene load_steps=6 format=3 uid="uid://bhdc8up14ky8k"]
 
 [ext_resource type="Script" uid="uid://dydu1dl18474i" path="res://Scripts/Track.cs" id="1_mutsl"]
 
@@ -7,6 +7,12 @@
 [sub_resource type="Curve3D" id="Curve3D_mutsl"]
 closed = true
 bake_interval = 20.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mutsl"]
+albedo_color = Color(0.0117647, 0.447059, 0.698039, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5eegi"]
+albedo_color = Color(0.137921, 0.612636, 0.464006, 1)
 
 [node name="Track" type="Node" node_paths=PackedStringArray("innerPath", "outerPath")]
 script = ExtResource("1_mutsl")
@@ -42,6 +48,7 @@ path_local = false
 path_continuous_u = true
 path_u_distance = 1.0
 path_joined = true
+material = SubResource("StandardMaterial3D_mutsl")
 
 [node name="outpathMesh" type="CSGPolygon3D" parent="."]
 layers = 3
@@ -60,3 +67,4 @@ path_local = false
 path_continuous_u = true
 path_u_distance = 1.0
 path_joined = true
+material = SubResource("StandardMaterial3D_5eegi")

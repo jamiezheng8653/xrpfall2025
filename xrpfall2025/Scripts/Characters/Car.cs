@@ -56,7 +56,8 @@ public partial class Car : Node
     protected double acceleration = 10;
     //Rotation speed
     protected double rotationIncrement = Mathf.DegToRad(2); //per delta
-                                                            // The downward acceleration when in the air, in meters per second squared.
+    
+    // The downward acceleration when in the air, in meters per second squared.
     [Export] protected int fallAcceleration = 10;
     protected Vector3 prevPosition; //tracked just before an object starts falling
     protected List<Vector3> pathOfFalling;
