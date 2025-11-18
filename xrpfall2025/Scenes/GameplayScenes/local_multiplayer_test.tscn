@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://cobbt62gib7sf"]
+
+[ext_resource type="PackedScene" uid="uid://3g60yhmd7u5x" path="res://Scenes/Prefabs/multiplayer_manager.tscn" id="1_6pm08"]
+
+[node name="LocalMultiplayerTest" type="Node3D"]
+
+[node name="MultiplayerManager" parent="." instance=ExtResource("1_6pm08")]
