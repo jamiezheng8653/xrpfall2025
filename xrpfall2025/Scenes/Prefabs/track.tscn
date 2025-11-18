@@ -19,7 +19,7 @@ script = ExtResource("1_mutsl")
 innerPath = NodePath("innerPath3D")
 outerPath = NodePath("outerPath3D")
 scale = 15
-numOfPts = 10
+numOfPts = 15
 
 [node name="outerPath3D" type="Path3D" parent="."]
 curve = SubResource("Curve3D_5eegi")

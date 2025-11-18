@@ -8,6 +8,9 @@ using System;
 /// </summary>
 public partial class EnemyAi : Car
 {
+	/// <summary>
+    /// Different driving modes the Enemy AI would be in
+    /// </summary>
 	private enum RacingState
 	{
 		NormalDriving,
@@ -17,6 +20,7 @@ public partial class EnemyAi : Car
 		Recover
 
 	}
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -29,7 +33,35 @@ public partial class EnemyAi : Car
 
 	public override void _PhysicsProcess(double delta)
 	{
+		//get input
+
+		//process input
 		base._PhysicsProcess(delta);
 	}
+
+	private void NormalDriving()
+    {
+        
+    }
+
+	private void Overtake()
+    {
+        
+    }
+
+	private void Attack()
+    {
+        
+    }
+
+	private void Defend()
+    {
+        
+    }
+
+	private void Recover()
+    {
+        
+    }
 
 }

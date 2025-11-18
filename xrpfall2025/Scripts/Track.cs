@@ -11,6 +11,7 @@ using Vector3 = Godot.Vector3;
 /// </summary>
 public partial class Track : Node
 {
+	#region Fields
 	[Export] private Path3D innerPath;
 	[Export] private Path3D outerPath;
 	[Export] private int scale = 1;
@@ -18,37 +19,33 @@ public partial class Track : Node
 	private Vector3 startPoint;
 	private List<Vector3> checkPoints = new List<Vector3>();
 	private List<Vector3> points = new List<Vector3>();
+	#endregion
 
+	#region Properties
+	/// <summary>
+	/// The Main Path3D underlying the track mesh
+	/// </summary>
 	public Path3D Path3D
 	{
 		get { return innerPath; }
 	}
 
+	/// <summary>
+	/// First point where the track generates. The finish line will spawn here
+	/// </summary>
 	public Vector3 StartingPoint
 	{
 		get { return startPoint; }
 	}
 	
+	/// <summary>
+	/// List of all checkpoint locations scattered through out the track
+	/// </summary>
 	public List<Vector3> Checkpoints
 	{
 		get { return checkPoints; }
 	}
-
-	public override void _EnterTree()
-	{
-
-	}
-
-
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
+	#endregion
 
 	/// <summary>
 	/// Initializes the track curve and generates the trash mesh along it
@@ -58,7 +55,7 @@ public partial class Track : Node
 		if (points.Count <= 0)
 		{
 			
-			PopulateList(points);
+			GeneratePoints(points, numOfPts);
 			//get the starting point saved
 			startPoint = points[0];
 			//ensure the loop is closed
@@ -70,6 +67,7 @@ public partial class Track : Node
 		GenerateTrackMeshBezier(checkPoints, points, innerPath);
 	}
 
+	#region Math + Bezier curve calculations
 	/// <summary>
 	/// Interpolate point of a quadratic bezier 
 	/// </summary>
@@ -107,10 +105,24 @@ public partial class Track : Node
 	}
 
 	/// <summary>
-	/// 
+	/// Get the direction of flow at a specific point on the track curve
 	/// </summary>
-	/// <param name="pts"></param>
-	private void PopulateList(List<Vector3> pts)
+	/// <returns></returns>
+	private Transform3D GetTangentOfPoint()
+	{
+		Transform3D result  = new Transform3D();
+
+		return result;
+	}
+	#endregion
+
+	#region Related track generation functions
+	/// <summary>
+	/// Generates a list of points 
+	/// </summary>
+	/// <param name="pts">List to upload points to</param>
+	/// <param name="n">Number of points to be generated</param>
+	private void GeneratePoints(List<Vector3> pts, int n)
 	{
 		//list of points that will generate track loop
 		//checkpoints scattered throughout the track
@@ -118,7 +130,7 @@ public partial class Track : Node
 		//Path3D outerPath = new Path3D();
 
 		//change in angle
-		double deltaTheta = Mathf.DegToRad(360 / numOfPts);
+		double deltaTheta = Mathf.DegToRad(360 / n);
 
 		//with the origin being the center of generation, we generate numOfPts random lengths. 
 		// then calculate the point from there
@@ -132,12 +144,13 @@ public partial class Track : Node
 	}
 
 	/// <summary>
-	/// 
+	/// Generates a track by drawing a straight 
+	/// line between each consecutive point
 	/// </summary>
-	/// <param name="chckpts"></param>
-	/// <param name="pts"></param>
-	/// <param name="pathA"></param>
-	/// <param name="pathB"></param>
+	/// <param name="chckpts">A list to record checkpoints to</param>
+	/// <param name="pts">A list of pregenerated points</param>
+	/// <param name="pathA">Main path</param>
+	/// <param name="pathB">Optional second path for a wider track while centering checkpoints</param>
 	private void GenerateTrackMeshStraight(List<Vector3> chckpts, List<Vector3> pts, Path3D pathA, Path3D pathB = null)
 	{
 		//start generating the track loop. 
@@ -154,30 +167,38 @@ public partial class Track : Node
 	}
 
 	/// <summary>
-	/// 
+	/// Takes a set of points arranged in a sequencial loop, 
+	/// and creates a set of compound bezier curves to form 
+	/// a new loop that will be the shape of the track
 	/// </summary>
-	/// <param name="chckpts"></param>
-	/// <param name="pts"></param>
-	/// <param name="path"></param>
+	/// <param name="chckpts">A list to record where checkpoints will be on the track</param>
+	/// <param name="pts">Pre generated points</param>
+	/// <param name="path">Where the path will be generated on</param>
 	public void GenerateTrackMeshBezier(List<Vector3> chckpts, List<Vector3> pts, Path3D path)
 	{
-		float t = 0;
-		float tI = 0.1f;
+		//bezier curve calculation weight, sum will have to remain under zero
+		float t = 0; 
+		float tI = 0.2f;	//increment for t
+		//increment counting of which point we are starting at
 		int i = 0;
+		//track the last point before t resets and i increments that ensures mesh continuity
 		Vector3 lastPoint = pts[0];
 
+		//
 		while(i < pts.Count - 2)
 		{
-			if(i == pts.Count - 3)
+			//special case for the last point to ensure no index errors
+			if(i == pts.Count - 2)
 			{
 				path.Curve.AddPoint(QuadraticBezier(
 					lastPoint,
 					//pts[i], 
-					pts[pts.Count-1], 
 					pts[0], 
+					pts[1], 
 					t
 				));
 			}
+
 			path.Curve.AddPoint(QuadraticBezier(
 				lastPoint,
 				//pts[i], 
@@ -185,12 +206,15 @@ public partial class Track : Node
 				pts[i + 2], 
 				t
 			));
+
+			//increment t
 			t += tI;
 
+			//t has to remain under one for the bezier calculations work
 			if (t > 1) 
 			{
-				if(i % 2 == 0) chckpts.Add(pts[i]);
-				GD.Print("_i = ", i, ", ", pts[i]);
+				//add every other last point to be a checkpoint
+				if(i % 2 == 0) chckpts.Add(lastPoint); 
 				t = 0;
 				i += 2;
 				lastPoint = path.Curve.GetPointPosition(path.Curve.PointCount - 1);
@@ -198,15 +222,29 @@ public partial class Track : Node
 		}
 		
 	}
-	
-	/// <summary>
-	/// Get the direction of flow at a specific point on the track curve
-	/// </summary>
-	/// <returns></returns>
-	private Transform3D GetTangentOfPoint()
-	{
-		Transform3D result  = new Transform3D();
 
-		return result;
+	/// <summary>
+	/// Public facing method to clear the track upon all cars finishing the race.
+	/// </summary>
+	public void ResetTrack()
+	{
+		ResetTrack(points, checkPoints, innerPath);
 	}
+
+	/// <summary>
+	/// Clears a list storing points, checkpoints, and all track mesh paths
+	/// </summary>
+	/// <param name="pts">List storing points</param>
+	/// <param name="chckpts">List storing checkpoints</param>
+	/// <param name="pathA">The main track mesh</param>
+	/// <param name="pathB">Optional track mesh generated for a wider track and centered checkpoints</param>
+	private void ResetTrack(List<Vector3> pts, List<Vector3> chckpts, Path3D pathA, Path3D pathB = null)
+	{
+		pts.Clear();
+		chckpts.Clear();
+		pathA.Curve.ClearPoints();
+		if(pathB != null) pathB.Curve.ClearPoints();
+	}
+	#endregion
+	
 }
