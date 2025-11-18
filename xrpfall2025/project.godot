@@ -19,6 +19,11 @@ config/icon="res://Assets/Images/icon.svg"
 
 settings/addon_root_folder="res://addons/debug_draw_3d"
 
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+
 [dotnet]
 
 project/assembly_name="xrpFall2025"

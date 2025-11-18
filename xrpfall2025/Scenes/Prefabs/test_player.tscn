@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=3 uid="uid://c4eyuw47ab782"]
+
+[ext_resource type="Script" uid="uid://bmbm813n45kkg" path="res://Scripts/test_player.gd" id="1_ylc3b"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ylc3b"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_ylc3b"]
+material = SubResource("StandardMaterial3D_ylc3b")
+radius = 2.0
+height = 4.0
+
+[node name="test_player" type="Node3D"]
+script = ExtResource("1_ylc3b")
+speed = 10
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+offset_right = 960.0
+offset_bottom = 1080.0
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport"]
+mesh = SubResource("SphereMesh_ylc3b")
+
+[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport/MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 0.885742, 0.464178, 0, -0.464178, 0.885742, 0, 10.68, 18.0568)
+current = true
+
+[node name="SpotLight3D" type="SpotLight3D" parent="SubViewportContainer/SubViewport/MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 6.85329, 0)
+spot_range = 22.523
