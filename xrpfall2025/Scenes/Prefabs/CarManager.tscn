@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cq8d54wgym507"]
+
+[ext_resource type="Script" uid="uid://wp8i3xu4nn5" path="res://Scripts/Characters/CarManager.cs" id="1_11y84"]
+
+[node name="CarManager" type="Node"]
+script = ExtResource("1_11y84")

@@ -5,6 +5,7 @@ public partial class SceneManager : Node
 {
 	//parts involved in the scene.
 	[Export] private Node player;
+	[Export] private Node carManager;
 	[Export] private Node track;
 	[Export] private Node itemManager;
 	[Export] private Node killPlane;
@@ -14,6 +15,7 @@ public partial class SceneManager : Node
 	public override void _Ready()
 	{
 		//get the correct cooresponding child of each node
+		CarManager carManagerCM = (CarManager)carManager;
 		Player playerP = (Player)player;
 		Track trackT = (Track)track;
 		ItemManager itemManagerIM = (ItemManager)itemManager;
@@ -26,6 +28,7 @@ public partial class SceneManager : Node
 		trackT.Init();
 		checkpointManagerCM.Init(playerP, trackT.Checkpoints);
 		playerP.Init(trackT.StartingPoint, trackT.Path3D, checkpointManagerCM.TotalCheckpoints);
+		carManagerCM.Init(trackT.StartingPoint, trackT.Path3D, checkpointManagerCM.TotalCheckpoints);
 		finishlineFL.Init(playerP, trackT.StartingPoint); 
 		itemManagerIM.Init(playerP, trackT);
 

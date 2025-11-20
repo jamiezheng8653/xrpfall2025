@@ -56,7 +56,7 @@ public partial class Finishline : Node
 	{
 		if (Utils.AABBCollision(p.GlobalPosition, p.Halflength, area3D.GlobalPosition, halflength))
 		{
-			GD.Print("is overlapping finishline true");
+			//GD.Print("is overlapping finishline true");
 			return true;
 		}
 		else return false;
@@ -73,12 +73,12 @@ public partial class Finishline : Node
 		//check if the player has crossed all checkpoints
 		if (p.CheckCheckpoints())
 		{
-			GD.Print("Checking checkpoints true");
+			//GD.Print("Checking checkpoints true");
 			return true;
 		}
 		else
 		{
-			GD.Print("Checking checkpoints false");
+			//GD.Print("Checking checkpoints false");
 			return false;
 		}
 	}

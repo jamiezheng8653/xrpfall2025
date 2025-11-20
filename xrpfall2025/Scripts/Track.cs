@@ -65,6 +65,7 @@ public partial class Track : Node
 		
 		//GenerateTrackMeshStraight(Checkpoints, points, outerPath);
 		GenerateTrackMeshBezier(checkPoints, points, innerPath);
+		GD.Print("Track point count: ", innerPath.Curve.PointCount);
 	}
 
 	#region Math + Bezier curve calculations

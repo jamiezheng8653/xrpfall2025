@@ -57,8 +57,8 @@ public partial class ItemManager : Node
 		for (int i = 0; i < itemLocations; i++)
 		{
 			//calculate where on the track we want to generate this row of items
-			double theta = Mathf.DegToRad(i * 360 / itemLocations);
-			Vector3 spawnPos = track.Path3D.Curve.GetPointPosition(i) + new Vector3(0, 1, 0);
+			//double theta = Mathf.DegToRad(i * 360 / itemLocations);
+			Vector3 spawnPos = track.Path3D.Curve.GetPointPosition(i + 1) + new Vector3(0, 1, 0);
 
 			//get direction vector towards the origin from this point
 			Vector3 dir = (Vector3.Zero - spawnPos).Normalized();
