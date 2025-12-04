@@ -25,12 +25,13 @@ signal countdown_finished
 var use_tween := false # Toggle tween if wanted
 
 # Item Bar variables
-@onready var item_icon: TextureRect = $ItemWindow/Item1
+@onready var item_icon: TextureRect = $CurrentItem
+@onready var stored_item_icon: TextureRect = $StoredItem
 
 var item_textures = {
-	"Fast": preload("res://Assets/Images/FastPlaceholder.png"),
-	"Slow": preload("res://Assets/Images/SlowPlaceholder.png"),
-	"Inverted": preload("res://Assets/Images/InvertedPlaceholder.png")
+	"Fast": preload("res://Assets/Images/FastIcon.png"),
+	"Slow": preload("res://Assets/Images/SlowIcon.png"),
+	"Inverted": preload("res://Assets/Images/InvertedIcon.png")
 
 }
 
@@ -64,6 +65,7 @@ func _ready():
 	# Make sure Pause Menu isn't visible
 	pause_menu.visible = false
 	
+	bounce_icon()
 	
 
 # Constantly updating
@@ -77,7 +79,7 @@ func _process(delta: float) -> void:
 		$TelemetryWindow/Position.text = " Position: (%.2f, %.2f)" % [player_node.CurrentPosition.x, player_node.CurrentPosition.z]
 		$TelemetryWindow/Speed.text = " Speed: %.2f" % current_speed
 		$PlaceText.text = get_place_suffix(player_node.Place) + " Place"
-		$LapText.text = "Lap \n       " + str(player_node.Lap) + "/3"
+		$LapText.text = "Lap \n     " + str(player_node.Lap) + "/3"
 		
 		# Speed bar. Toggles transparency of each bar
 		for i in bars.size():
@@ -91,6 +93,10 @@ func _process(delta: float) -> void:
 		if current_state_name != last_item_type:
 			update_item_icon(current_state_name)
 			last_item_type = current_state_name
+			
+			# Update stored item icon
+		var stored_state_name = state_name(player_node.storedItem)  # Assuming you exposed this as public in C#
+		update_stored_item_icon(stored_state_name)
 		
 		# Stopwatch
 		if stopwatch_running and not get_tree().paused:
@@ -140,7 +146,9 @@ func start_countdown():
 	$PlaceText.visible = false
 	$SpeedBar.visible = false
 	$TelemetryWindow.visible = false
-	$Stopwatch/StopwatchLabel.visible = false
+	$Stopwatch.visible = false
+	$Images.visible = false
+	
 	
 	race_time = 0.0
 	stopwatch_running = false
@@ -203,7 +211,8 @@ func _end_countdown():
 	$LapText.visible = true
 	$PlaceText.visible = true
 	$SpeedBar.visible = true
-	$Stopwatch/StopwatchLabel.visible = true
+	$Stopwatch.visible = true
+	$Images.visible = true
 	
 	# Start Stopwatch
 	race_time = 0.0
@@ -318,3 +327,16 @@ func finished_race():
 	get_tree().root.add_child(end_screen)
 
 	get_tree().current_scene.queue_free()
+	
+func update_stored_item_icon(item_type: String) -> void:
+	if item_type != "Regular" and item_type in item_textures:
+		stored_item_icon.texture = item_textures[item_type]
+		stored_item_icon.visible = true
+	else:
+		stored_item_icon.visible = false  # Hide if no stored item
+		
+func bounce_icon():
+	var tween = create_tween()
+	tween.set_loops() # loops forever
+	tween.tween_property(stored_item_icon, "position:y", stored_item_icon.position.y - 3, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(stored_item_icon, "position:y", stored_item_icon.position.y + 3, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)

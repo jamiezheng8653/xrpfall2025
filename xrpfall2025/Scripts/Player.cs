@@ -20,6 +20,7 @@ public enum States
 public partial class Player : CharacterBody3D
 {
 	private States current; //current state
+	private States storedItem = States.Regular;
 
 	//if the player gets a speedup or speed debuff, 
 	//multiply/divide speed by cooresponding multiplier
@@ -83,6 +84,12 @@ public partial class Player : CharacterBody3D
 	{
 		get { return current; }
 		set { current = value; }
+	}
+	// Makes the current stored item publc to be able to access in hud.gd
+	public States StoredItem
+	{
+		get { return storedItem; }
+		set { storedItem = value; }
 	}
 
 	/// <summary>
@@ -218,6 +225,19 @@ public partial class Player : CharacterBody3D
 	/// <param name="delta">delta time</param>
 	public override void _PhysicsProcess(double delta)
 	{
+		// Activate stored item when E is pressed
+		if (Input.IsActionJustPressed("use_item"))
+		{
+			if (storedItem != States.Regular)
+			{
+				ApplyItemEffect(storedItem); // Apply the stored effect
+				storedItem = States.Regular; // Clear stored item after use
+			}
+			else
+			{
+				GD.Print("No stored item to use.");
+			}
+		}
 		//Adjust left and right steering
 		if (((Input.IsActionPressed("right") && current != States.Inverted)
 			|| (Input.IsActionPressed("left") && current == States.Inverted)) && IsOnFloor())
@@ -268,6 +288,8 @@ public partial class Player : CharacterBody3D
 
 		MoveAndSlide();
 		//GD.Print("Player speed: " + speed);
+		
+		
 	}
 
 	/// <summary>
@@ -295,28 +317,11 @@ public partial class Player : CharacterBody3D
 	private double UpdateStateSpeed(States state, double speed)
 	{
 		switch (state)
-		{
-			//multiply speed
-			//quickly accelerate to twice the current speed (like one to 1.5 seconds, whatever feels good)
-			case States.Fast:
-				if (timer.ElapsedMilliseconds >= 0)
-				{
-					speed *= fastMultiplier;
-				}
-				break;
-			//divide speed
-			//cut speed to 50% to 75% of the max speed
-			case States.Slow:
-				if (timer.ElapsedMilliseconds >= 0)
-				{
-					speed *= slowMultiplier;
-				}
-				break;
-			//flip flop controls
-			case States.Inverted:
-				speed *= -1;
-				break;
-		}
+{
+	case States.Inverted:
+		speed *= -1; // keep inverted controls
+		break;
+}
 		//stop moving if you've completed all three laps
 		if (finishedRace) speed *= 0;
 		//GD.Print("speed: " + speed);
@@ -346,7 +351,7 @@ public partial class Player : CharacterBody3D
 				{
 					maxSpeed = MAXSPEED;
 					current = States.Regular;
-					ClearTimer();
+					//ClearTimer();
 				}
 				break;
 
@@ -359,7 +364,7 @@ public partial class Player : CharacterBody3D
 				{
 					maxSpeed = MAXSPEED;
 					current = States.Regular;
-					ClearTimer();
+					//ClearTimer();
 				}
 
 				break;
@@ -373,7 +378,7 @@ public partial class Player : CharacterBody3D
 				if (timer.ElapsedMilliseconds >= 10000)
 				{
 					current = States.Regular;
-					ClearTimer();
+					//ClearTimer();
 				}
 				break;
 		}
@@ -585,6 +590,46 @@ public partial class Player : CharacterBody3D
 	{
 		[System.Text.Json.Serialization.JsonPropertyName("car_color")]
 		public string CarColor { get; set; }
+	}
+/// <summary>
+/// Applies the chosen item effect to the player and starts the timer
+/// </summary>
+private void ApplyItemEffect(States item)
+{
+	switch (item)
+	{
+		case States.Fast:
+			current = States.Fast;
+			maxSpeed = MAXSPEED * fastMultiplier;
+			timer.Restart();
+			GD.Print("Activated Fast item");
+			break;
+
+		case States.Slow:
+			current = States.Slow;
+			maxSpeed = MAXSPEED * slowMultiplier;
+			timer.Restart();
+			GD.Print("Activated Slow item");
+			break;
+
+		case States.Inverted:
+			current = States.Inverted;
+			timer.Restart();
+			GD.Print("Activated Inverted item");
+			break;
+
+		default:
+			GD.Print("Invalid item state.");
+			break;
+	}
+}
+	/// <summary>
+	/// Stores an item. Overrides any existing stored item.
+	/// </summary>
+	public void StoreItem(States newItem)
+	{
+		storedItem = newItem;
+		GD.Print($"Stored new item: {storedItem}");
 	}
 	 
 }
