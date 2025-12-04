@@ -25,6 +25,8 @@ public partial class Car : Node
 {
 	#region Fields
 	protected States current; //current state
+	protected States storedItem = States.Regular;
+
 	//Timer for transitioning between states
 	protected Stopwatch timer;
 
@@ -110,6 +112,13 @@ public partial class Car : Node
 				_ => speed,
 			};
 		}
+	}
+
+	// Makes the current stored item publc to be able to access in hud.gd
+	public States StoredItem
+	{
+		get { return storedItem; }
+		set { storedItem = value; }
 	}
 
 	/// <summary>
@@ -460,6 +469,48 @@ public partial class Car : Node
 
 	virtual protected void ApplySavedCarColor() { }
 	virtual protected void SetCarColor(Color color) { }
+
+	/// <summary>
+	/// Applies the chosen item effect to the player and starts the timer
+	/// </summary>
+	private void ApplyItemEffect(States item)
+	{
+		switch (item)
+		{
+			case States.Fast:
+				current = States.Fast;
+				maxSpeed = MAXSPEED * fastMultiplier;
+				timer.Restart();
+				GD.Print("Activated Fast item");
+				break;
+
+			case States.Slow:
+				current = States.Slow;
+				maxSpeed = MAXSPEED * slowMultiplier;
+				timer.Restart();
+				GD.Print("Activated Slow item");
+				break;
+
+			case States.Inverted:
+				current = States.Inverted;
+				timer.Restart();
+				GD.Print("Activated Inverted item");
+				break;
+
+			default:
+				GD.Print("Invalid item state.");
+				break;
+		}
+	}
+
+	/// <summary>
+	/// Stores an item. Overrides any existing stored item.
+	/// </summary>
+	public void StoreItem(States newItem)
+	{
+		storedItem = newItem;
+		GD.Print($"Stored new item: {storedItem}");
+	}
 
 	#endregion
 

@@ -1,9 +1,17 @@
-[gd_scene load_steps=21 format=3 uid="uid://drsnmi4pkc6t5"]
+[gd_scene load_steps=30 format=3 uid="uid://drsnmi4pkc6t5"]
 
 [ext_resource type="Theme" uid="uid://boq5ganfh1ad6" path="res://UI/main_theme.tres" id="1_31rfd"]
 [ext_resource type="Script" uid="uid://cvcplcwtt1s7c" path="res://Scripts/hud.gd" id="1_p8haq"]
 [ext_resource type="Theme" uid="uid://d3ma2bitr5q7w" path="res://UI/window_theme.tres" id="3_yppxs"]
+[ext_resource type="Texture2D" uid="uid://dc1qlw7s4xpcm" path="res://Assets/Images/Bubble2.png" id="4_h05n4"]
 [ext_resource type="Theme" uid="uid://5le0dxw4t2ql" path="res://UI/basic_theme.tres" id="4_yppxs"]
+[ext_resource type="Texture2D" uid="uid://dg10u40cx6u3" path="res://Assets/Images/BubbleBox.png" id="5_0d6x4"]
+[ext_resource type="Theme" uid="uid://fkat5bpgiklk" path="res://ScreenMainTheme.tres" id="5_jyfor"]
+[ext_resource type="Texture2D" uid="uid://bfkjk87oq7wdr" path="res://Assets/Images/bluebutton.png" id="6_avvnu"]
+[ext_resource type="Texture2D" uid="uid://ud0yygbjmm3m" path="res://Assets/Images/FastIcon.png" id="7_h05n4"]
+[ext_resource type="Texture2D" uid="uid://b6831shic5cbr" path="res://Assets/Images/RoundBubbleRed2.png" id="9_jvp40"]
+[ext_resource type="Theme" uid="uid://bee3jtcppvowa" path="res://RedTextTheme.tres" id="10_jvp40"]
+[ext_resource type="Texture2D" uid="uid://bojtpih8vidqa" path="res://Assets/Images/RoundBubbleBlue.png" id="10_wv8s0"]
 
 [sub_resource type="SystemFont" id="SystemFont_yppxs"]
 subpixel_positioning = 0
@@ -16,8 +24,37 @@ subpixel_positioning = 0
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n0juk"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[sub_resource type="SystemFont" id="SystemFont_31rfd"]
+[sub_resource type="FontFile" id="FontFile_0d6x4"]
 subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+cache/0/30/0/ascent = 0.0
+cache/0/30/0/descent = 0.0
+cache/0/30/0/underline_position = 0.0
+cache/0/30/0/underline_thickness = 0.0
+cache/0/30/0/scale = 1.0
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0d6x4"]
+
+[sub_resource type="SystemFont" id="SystemFont_1qlnu"]
+subpixel_positioning = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvp40"]
+bg_color = Color(0.24, 0.0312, 0.0346799, 0.694118)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_31rfd"]
 bg_color = Color(0.49, 0.49, 0.49, 1)
@@ -46,21 +83,6 @@ bg_color = Color(0.88, 0.707227, 0.5456, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avvnu"]
 bg_color = Color(0.88, 0.590187, 0.5456, 1)
 
-[sub_resource type="SystemFont" id="SystemFont_1qlnu"]
-subpixel_positioning = 0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvp40"]
-bg_color = Color(0.24, 0.0312, 0.0346799, 0.694118)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.25, 0, 0, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
 [node name="HUD" type="Control"]
 process_mode = 3
 layout_mode = 3
@@ -77,6 +99,15 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 theme = ExtResource("4_yppxs")
+
+[node name="ColorRect" type="ColorRect" parent="Stopwatch"]
+visible = false
+layout_mode = 0
+offset_left = 490.0
+offset_top = 1.0
+offset_right = 663.0
+offset_bottom = 45.0
+color = Color(0.36, 0.2124, 0.21486, 0.658824)
 
 [node name="LapTimesLabel" type="Label" parent="Stopwatch"]
 layout_mode = 0
@@ -109,82 +140,135 @@ theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("StyleBoxFlat_n0juk")
 horizontal_alignment = 1
 
+[node name="BubbleBox2" type="TextureRect" parent="Stopwatch"]
+layout_mode = 0
+offset_left = 489.0
+offset_top = 1.0
+offset_right = 663.0
+offset_bottom = 46.0
+texture = ExtResource("4_h05n4")
+expand_mode = 1
+
 [node name="StopwatchLabel" type="Label" parent="Stopwatch"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = 470.0
-offset_right = 642.0
-offset_bottom = 46.0
+offset_left = 471.0
+offset_top = 1.0
+offset_right = 643.0
+offset_bottom = 47.0
 grow_horizontal = 2
 theme = ExtResource("4_yppxs")
-theme_override_fonts/font = SubResource("SystemFont_31rfd")
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = SubResource("FontFile_0d6x4")
 theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxEmpty_0d6x4")
 text = "Timer"
 horizontal_alignment = 1
 
-[node name="PauseMenu" type="Control" parent="."]
-process_mode = 3
+[node name="Images" type="Control" parent="."]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Background" type="ColorRect" parent="PauseMenu"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 1115.0
-offset_bottom = 614.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.25098)
+[node name="ItemDirectionText" type="Label" parent="Images"]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 134.0
+offset_right = 137.0
+offset_bottom = 154.0
+theme_override_constants/outline_size = 0
+theme_override_constants/shadow_outline_size = 0
+text = "Press E to use"
 
-[node name="Label" type="Label" parent="PauseMenu"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = 253.0
-offset_top = 139.0
-offset_right = 859.0
-offset_bottom = 276.0
-grow_horizontal = 2
-theme_override_font_sizes/font_size = 100
-text = "Game Paused"
+[node name="ColorRect" type="ColorRect" parent="Images"]
+visible = false
+layout_mode = 0
+offset_left = 28.0
+offset_top = 30.0
+offset_right = 136.0
+offset_bottom = 132.0
+color = Color(0.0605, 0.248142, 0.55, 0.541176)
 
-[node name="ResumeButton" type="Button" parent="PauseMenu"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 384.5
-offset_top = 274.0
-offset_right = 727.5
-offset_bottom = 364.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="TextureRect3" type="TextureRect" parent="Images"]
+layout_mode = 0
+offset_left = 1052.0
+offset_top = 14.0
+offset_right = 1132.0
+offset_bottom = 94.0
+texture = ExtResource("9_jvp40")
+expand_mode = 1
+
+[node name="BubbleBox1" type="TextureRect" parent="Images"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 30.0
+offset_right = 136.0
+offset_bottom = 132.0
+texture = ExtResource("5_0d6x4")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="Images"]
+visible = false
+layout_mode = 0
+offset_left = 995.0
+offset_top = 17.0
+offset_right = 1130.0
+offset_bottom = 152.0
+texture = ExtResource("10_wv8s0")
+expand_mode = 1
+
+[node name="TextureRect6" type="TextureRect" parent="Images"]
+visible = false
+layout_mode = 0
+offset_left = 995.0
+offset_top = 17.0
+offset_right = 1130.0
+offset_bottom = 152.0
+texture = ExtResource("10_wv8s0")
+expand_mode = 1
+
+[node name="TextureRect4" type="TextureRect" parent="Images"]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 555.0
+offset_right = 182.0
+offset_bottom = 630.0
+texture = ExtResource("9_jvp40")
+expand_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="Images"]
+visible = false
+layout_mode = 0
+offset_left = 34.0
+offset_top = 557.0
+offset_right = 179.0
+offset_bottom = 628.0
+texture = ExtResource("10_wv8s0")
+expand_mode = 1
+
+[node name="TextureRect7" type="TextureRect" parent="Images"]
+visible = false
+layout_mode = 0
+offset_left = 34.0
+offset_top = 557.0
+offset_right = 178.0
+offset_bottom = 628.0
+texture = ExtResource("10_wv8s0")
+expand_mode = 1
+
+[node name="LapButton" type="Button" parent="Images"]
+layout_mode = 0
+offset_left = 1008.0
+offset_top = 121.0
+offset_right = 1142.0
+offset_bottom = 196.0
+theme_override_colors/font_color = Color(0.752014, 0.649217, 0.645131, 1)
+theme_override_fonts/font = SubResource("SystemFont_1qlnu")
 theme_override_font_sizes/font_size = 30
-text = "Resume"
-
-[node name="Home" type="Button" parent="PauseMenu"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 384.5
-offset_top = 384.0
-offset_right = 727.5
-offset_bottom = 474.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 30
-text = "Home"
+theme_override_styles/normal = SubResource("StyleBoxFlat_jvp40")
+text = "LAP"
 
 [node name="TelemetryWindow" type="VBoxContainer" parent="."]
 visible = false
@@ -216,10 +300,10 @@ text = "State: "
 
 [node name="SpeedBar" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 84.0
-offset_top = 535.0
-offset_right = 134.0
-offset_bottom = 695.0
+offset_left = 83.0
+offset_top = 521.0
+offset_right = 133.0
+offset_bottom = 681.0
 rotation = 3.14159
 
 [node name="SpeedSix" type="Label" parent="SpeedBar"]
@@ -247,29 +331,43 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_jyfor")
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_avvnu")
 
-[node name="ItemWindow" type="HBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 51.0
-offset_top = 40.0
-offset_right = 183.0
-offset_bottom = 160.0
-
-[node name="Item1" type="TextureRect" parent="ItemWindow"]
+[node name="CurrentItem" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
-expand_mode = 2
+offset_left = 145.0
+offset_top = 18.0
+offset_right = 220.0
+offset_bottom = 93.0
+texture = ExtResource("7_h05n4")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="StoredItem" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+offset_left = 33.0
+offset_top = 31.0
+offset_right = 135.0
+offset_bottom = 133.0
+texture = ExtResource("7_h05n4")
+expand_mode = 4
 
 [node name="LapText" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -185.0
-offset_top = 28.0
-offset_right = -33.0
-offset_bottom = 127.0
+offset_left = -144.0
+offset_top = 1.0
+offset_right = 8.0
+offset_bottom = 100.0
 grow_horizontal = 0
+theme_override_colors/font_shadow_color = Color(0.294118, 0.368627, 0.568627, 1)
+theme_override_colors/font_outline_color = Color(0.788235, 0.403922, 0.435294, 1)
 theme_override_constants/line_spacing = -15
-theme_override_font_sizes/font_size = 46
+theme_override_constants/outline_size = 8
+theme_override_constants/shadow_outline_size = 20
+theme_override_font_sizes/font_size = 36
 text = "Lap 
      1/3"
 horizontal_alignment = 1
@@ -280,12 +378,16 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 30.0
+offset_left = 17.0
 offset_top = -92.0
-offset_right = 211.0
+offset_right = 198.0
 offset_bottom = -27.0
 grow_vertical = 0
-theme_override_font_sizes/font_size = 40
+theme_override_colors/font_shadow_color = Color(0.294118, 0.368627, 0.568627, 1)
+theme_override_colors/font_outline_color = Color(0.764706, 0.403922, 0.443137, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/shadow_outline_size = 20
+theme_override_font_sizes/font_size = 35
 text = "1st Place"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -307,18 +409,86 @@ grow_vertical = 2
 theme = ExtResource("1_31rfd")
 theme_override_font_sizes/font_size = 230
 
-[node name="LapButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 993.0
-offset_top = 144.0
-offset_right = 1127.0
-offset_bottom = 219.0
-theme_override_colors/font_color = Color(0.752014, 0.649217, 0.645131, 1)
-theme_override_fonts/font = SubResource("SystemFont_1qlnu")
-theme_override_font_sizes/font_size = 30
-theme_override_styles/normal = SubResource("StyleBoxFlat_jvp40")
-text = "LAP"
+[node name="PauseMenu" type="Control" parent="."]
+process_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
+[node name="Background" type="ColorRect" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.075
+anchor_right = 1.0
+anchor_bottom = 0.85
+offset_left = -3.0
+offset_right = 1112.0
+offset_bottom = 614.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.25098)
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 253.0
+offset_top = 139.0
+offset_right = 859.0
+offset_bottom = 276.0
+grow_horizontal = 2
+theme = ExtResource("10_jvp40")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.79, 0.4029, 0.435158, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.2805, 0.302958, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 100
+text = "Game Paused"
+
+[node name="ResumeButton" type="Button" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 415.0
+offset_top = 283.0
+offset_right = 681.0
+offset_bottom = 402.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("5_jyfor")
+theme_override_font_sizes/font_size = 35
+text = "Resume"
+icon = ExtResource("6_avvnu")
+clip_text = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="Home" type="Button" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 415.0
+offset_top = 420.0
+offset_right = 681.0
+offset_bottom = 539.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("5_jyfor")
+theme_override_font_sizes/font_size = 35
+text = "Home"
+icon = ExtResource("6_avvnu")
+clip_text = true
+icon_alignment = 1
+expand_icon = true
+
+[connection signal="pressed" from="Images/LapButton" to="." method="_on_lap_button_pressed"]
 [connection signal="pressed" from="PauseMenu/ResumeButton" to="." method="_on_resume_button_pressed"]
 [connection signal="pressed" from="PauseMenu/Home" to="." method="_on_home_pressed"]
-[connection signal="pressed" from="LapButton" to="." method="_on_lap_button_pressed"]

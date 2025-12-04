@@ -48,10 +48,6 @@ cull_mask = 1047553
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="HUD" parent="CanvasLayer" instance=ExtResource("2_pw4we")]
-offset_left = -10.0
-offset_top = 16.0
-offset_right = -10.0
-offset_bottom = 16.0
 
 [node name="MinimapSystem" type="Node" parent="."]
 

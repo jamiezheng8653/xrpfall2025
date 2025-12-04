@@ -56,7 +56,7 @@ public partial class Item : Node
 		color = new Color("YELLOW");
 
 		OnItemCollision += SelectItem;
-		OnItemCollision += StartTimer;
+		//OnItemCollision += StartTimer;
 		OnItemCollision += HideModel;
 		//node path will need to be updated when we get a formal player car model
 		Position = new Vector3(2, 0, 1);
@@ -86,6 +86,8 @@ public partial class Item : Node
 					//invoke event
 					//if (OnItemCollision != null) OnItemCollision();
 					OnItemCollision?.Invoke(c); //shorthand for above
+				
+					StartTimer(c);
 
 					//have the model be hidden from the scene 
 					//unsubscribe from OnItemCollision Event 
@@ -112,7 +114,9 @@ public partial class Item : Node
 		//will need to manually update should we choose to update the list of items
 		//currently no error checking of if the selected item is valid in the enum list
 		int result = rng.Next(0, 3);
-		/*player*/c.Current = (States)result;
+		//c.Current = (States)result;
+		c.StoreItem((States)result);
+		
 	}
 
 	/// <summary>
@@ -130,9 +134,9 @@ public partial class Item : Node
 
 	private void StartTimer(Car c)
 	{
-		timer.Start();
+		timer.Restart();
 		//unsubscribe from event
-		OnItemCollision -= StartTimer;
+		//OnItemCollision -= StartTimer;
 		OnItemCollision -= SelectItem;
 		OnItemCollision -= HideModel;
 	}
@@ -141,7 +145,7 @@ public partial class Item : Node
 	{
 		timer.Reset();
 		//resubscribe to event
-		OnItemCollision += StartTimer;
+		//OnItemCollision += StartTimer;
 		OnItemCollision += SelectItem;
 		OnItemCollision += HideModel;
 	}
