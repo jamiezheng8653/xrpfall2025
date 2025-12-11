@@ -6,6 +6,7 @@ using System.Collections.Generic;
 /// Custom track generation. Feed a set of vector3 points and a scale to size the track
 /// The first node should ALWAYS be the origin, this will not be checked
 /// </summary>
+
 public partial class Track : Node
 {
 	[Export] private Path3D innerPath;
@@ -57,18 +58,34 @@ public partial class Track : Node
 		checkPoints = new List<Vector3>(); 
 		Random rng = new Random();
 		//Path3D outerPath = new Path3D();
-
+		
+		//radius for round track
+		float radius = 7f;
 		//change in angle
-		double deltaTheta = Mathf.DegToRad(360 / numOfPts);
+		//changed from double to float for circle track
+		float deltaTheta = Mathf.DegToRad(360 / numOfPts);
 
 		//with the origin being the center of generation, we generate numOfPts random lengths. 
 		// then calculate the point from there
 		for (int i = 0; i < numOfPts; i++)
 		{
-			double hypotenus = rng.Next(1, 12); //how far from the origin is the point
-			double x = hypotenus * Mathf.Cos(deltaTheta * i + 1); //find x coord
-			double z = hypotenus * Mathf.Sin(deltaTheta * i + 1); //find z coord
-			pts.Add(new Vector3((float)x, 0, (float)z) * scale); //add and scale the point
+			
+			//commented out random
+			//double hypotenus = rng.Next(1, 12); //how far from the origin is the point
+			//double x = hypotenus * Mathf.Cos(deltaTheta * i + 1); //find x coord
+			//double z = hypotenus * Mathf.Sin(deltaTheta * i + 1); //find z coord
+			
+			
+			
+			//round track logic
+			
+			float angle = deltaTheta * i;
+			float x = radius * Mathf.Cos(angle);
+			float z = radius * Mathf.Sin(angle);
+			
+			
+			//changed middle value from 0 t0 float .03
+			pts.Add(new Vector3((float)x, (float).03, (float)z) * scale); //add and scale the point
 		}
 
 		//get the starting point saved

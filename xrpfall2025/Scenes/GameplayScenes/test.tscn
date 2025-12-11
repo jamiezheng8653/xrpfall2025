@@ -1,0 +1,124 @@
+[gd_scene load_steps=11 format=3 uid="uid://dtqh6lg88aakq"]
+
+[ext_resource type="PackedScene" uid="uid://dnkv3f1fu5fc8" path="res://Scenes/Prefabs/scene_manager.tscn" id="1_4q5du"]
+[ext_resource type="PackedScene" uid="uid://sdm8yxrkofoh" path="res://Scenes/Prefabs/item_manager.tscn" id="2_lqt8t"]
+[ext_resource type="PackedScene" uid="uid://bhdc8up14ky8k" path="res://Scenes/Prefabs/track.tscn" id="3_f8bco"]
+[ext_resource type="PackedScene" uid="uid://dqemkqrkjrxoy" path="res://Scenes/Prefabs/checkpoint_manager.tscn" id="4_kti34"]
+[ext_resource type="PackedScene" uid="uid://b0pyubict3ifh" path="res://Scenes/Prefabs/finishline.tscn" id="5_m84km"]
+[ext_resource type="PackedScene" uid="uid://cbhuwjvyk2t2t" path="res://Scenes/Prefabs/player.tscn" id="6_mb20s"]
+[ext_resource type="PackedScene" uid="uid://dry5xxoksd4yr" path="res://Scenes/Prefabs/kill_plane.tscn" id="7_ao2lu"]
+[ext_resource type="PackedScene" uid="uid://drsnmi4pkc6t5" path="res://Scenes/Prefabs/hud.tscn" id="8_yf77w"]
+[ext_resource type="PackedScene" uid="uid://ddjgdidbf11fk" path="res://Scenes/Prefabs/models/Roady_15L.tscn" id="9_lqt8t"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4q5du"]
+albedo_color = Color(0.321569, 0.454902, 0.180392, 1)
+
+[node name="Node" type="Node"]
+
+[node name="SceneManager" parent="." node_paths=PackedStringArray("player", "track", "itemManager", "killPlane", "finishline", "checkpointManager") instance=ExtResource("1_4q5du")]
+player = NodePath("../Player")
+track = NodePath("../Track")
+itemManager = NodePath("../ItemManager")
+killPlane = NodePath("../killPlane")
+finishline = NodePath("../Finishline")
+checkpointManager = NodePath("../Checkpoint Manager")
+
+[node name="ItemManager" parent="." instance=ExtResource("2_lqt8t")]
+
+[node name="Track" parent="." instance=ExtResource("3_f8bco")]
+
+[node name="Checkpoint Manager" parent="." instance=ExtResource("4_kti34")]
+
+[node name="Finishline" parent="." instance=ExtResource("5_m84km")]
+
+[node name="Player" parent="." instance=ExtResource("6_mb20s")]
+
+[node name="killPlane" parent="." instance=ExtResource("7_ao2lu")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.35981, 0.0243341, 0.932709, -0.667748, -0.691474, 0.275637, 0.65165, -0.721991, -0.23255, 0, 18, 0)
+layers = 3
+shadow_enabled = true
+
+[node name="CameraPivot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.30241, 0, 0)
+visible = false
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, -5.56363e-08, -4.37114e-08, 4.37114e-08, -5.21253e-16, 1, -5.56363e-08, -1, 1.91069e-15, 8, 40, 0)
+visible = false
+cull_mask = 1047553
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="CanvasLayer" instance=ExtResource("8_yf77w")]
+
+[node name="MinimapSystem" type="Node" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="MinimapSystem"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -239.0
+offset_top = -253.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="MinimapSystem/MarginContainer"]
+layout_mode = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MinimapSystem/MarginContainer/SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(239, 253)
+render_target_update_mode = 4
+
+[node name="minimapCamera" type="Camera3D" parent="MinimapSystem/MarginContainer/SubViewportContainer/SubViewport"]
+transform = Transform3D(-4.37114e-08, -1, -4.37114e-08, 0, -4.37114e-08, 1, -1, 4.37114e-08, 1.91069e-15, 0, 200, 0)
+cull_mask = 1047554
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.14801, -0.227952, 0)
+layers = 3
+size = Vector3(400, 0.05, 400)
+material = SubResource("StandardMaterial3D_4q5du")
+
+[node name="Roads" type="Node" parent="."]
+
+[node name="Roady_15L" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(59.7442, 0, 5.53494, 0, 60, 0, -5.53494, 0, 59.7442, 125.815, -0.0418813, -14.2684)
+
+[node name="Roady_15L2" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(48.3811, 0, 35.4862, 0, 60, 0, -35.4862, 0, 48.3811, 102.652, -0.0418813, -75.0156)
+
+[node name="Roady_15L3" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(22.3647, 0, 55.676, 0, 60, 0, -55.676, 0, 22.3647, 51.5323, -0.0418813, -114.93)
+
+[node name="Roady_15L4" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(-9.46984, 0, 59.248, 0, 60, 0, -59.248, 0, -9.46984, -13.0876, -0.0418813, -122.072)
+
+[node name="Roady_15L5" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(-40.7665, 0, 44.0238, 0, 60, 0, -44.0238, 0, -40.7665, -72.2444, -0.0418813, -93.4824)
+
+[node name="Roady_15L6" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(-57.6077, 0, 16.7737, 0, 60, 0, -16.7737, 0, -57.6077, -106.331, -0.0418813, -38.1215)
+
+[node name="Roady_15L7" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(-57.7836, 0, -16.1574, 0, 60, 0, 16.1574, 0, -57.7836, -106.87, -0.0418813, 26.7333)
+
+[node name="Roady_15L8" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(-41.2344, 0, -43.5858, 0, 60, 0, 43.5858, 0, -41.2344, -73.1907, -0.0418813, 82.3429)
+
+[node name="Roady_15L9" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(-1.36124, 0, -59.9845, 0, 60, 0, 59.9846, 0, -1.36124, 10.2563, 0.0269091, 114.899)
+
+[node name="Roady_15L12" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(-18.0423, 0, -57.223, 0, 60, 0, 57.223, 0, -18.0423, -27.5468, 0.0488341, 108.78)
+
+[node name="Roady_15L10" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(32.7661, 0, -50.2631, 0, 60, 0, 50.2631, 0, 32.7661, 72.1715, -0.037116, 97.2654)
+
+[node name="Roady_15L11" parent="Roads" instance=ExtResource("9_lqt8t")]
+transform = Transform3D(54.3785, 0, -25.3571, 0, 60, 0, 25.3571, 0, 54.3785, 114.803, -0.0201998, 48.4185)
