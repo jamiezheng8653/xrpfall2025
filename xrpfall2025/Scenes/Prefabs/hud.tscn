@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://drsnmi4pkc6t5"]
+[gd_scene load_steps=29 format=3 uid="uid://drsnmi4pkc6t5"]
 
 [ext_resource type="Theme" uid="uid://boq5ganfh1ad6" path="res://UI/main_theme.tres" id="1_31rfd"]
 [ext_resource type="Script" uid="uid://cvcplcwtt1s7c" path="res://Scripts/hud.gd" id="1_p8haq"]
@@ -11,7 +11,6 @@
 [ext_resource type="Texture2D" uid="uid://ud0yygbjmm3m" path="res://Assets/Images/FastIcon.png" id="7_h05n4"]
 [ext_resource type="Texture2D" uid="uid://b6831shic5cbr" path="res://Assets/Images/RoundBubbleRed2.png" id="9_jvp40"]
 [ext_resource type="Theme" uid="uid://bee3jtcppvowa" path="res://RedTextTheme.tres" id="10_jvp40"]
-[ext_resource type="Texture2D" uid="uid://bojtpih8vidqa" path="res://Assets/Images/RoundBubbleBlue.png" id="10_wv8s0"]
 
 [sub_resource type="SystemFont" id="SystemFont_yppxs"]
 subpixel_positioning = 0
@@ -100,7 +99,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 theme = ExtResource("4_yppxs")
 
-[node name="ColorRect" type="ColorRect" parent="Stopwatch"]
+[node name="TimerBackground" type="ColorRect" parent="Stopwatch"]
 visible = false
 layout_mode = 0
 offset_left = 490.0
@@ -182,7 +181,7 @@ theme_override_constants/outline_size = 0
 theme_override_constants/shadow_outline_size = 0
 text = "Press E to use"
 
-[node name="ColorRect" type="ColorRect" parent="Images"]
+[node name="ItemBoxBackground" type="ColorRect" parent="Images"]
 visible = false
 layout_mode = 0
 offset_left = 28.0
@@ -191,7 +190,7 @@ offset_right = 136.0
 offset_bottom = 132.0
 color = Color(0.0605, 0.248142, 0.55, 0.541176)
 
-[node name="TextureRect3" type="TextureRect" parent="Images"]
+[node name="LapCircle" type="TextureRect" parent="Images"]
 layout_mode = 0
 offset_left = 1052.0
 offset_top = 14.0
@@ -200,7 +199,7 @@ offset_bottom = 94.0
 texture = ExtResource("9_jvp40")
 expand_mode = 1
 
-[node name="BubbleBox1" type="TextureRect" parent="Images"]
+[node name="ItemBox" type="TextureRect" parent="Images"]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 30.0
@@ -209,53 +208,13 @@ offset_bottom = 132.0
 texture = ExtResource("5_0d6x4")
 expand_mode = 1
 
-[node name="TextureRect2" type="TextureRect" parent="Images"]
-visible = false
-layout_mode = 0
-offset_left = 995.0
-offset_top = 17.0
-offset_right = 1130.0
-offset_bottom = 152.0
-texture = ExtResource("10_wv8s0")
-expand_mode = 1
-
-[node name="TextureRect6" type="TextureRect" parent="Images"]
-visible = false
-layout_mode = 0
-offset_left = 995.0
-offset_top = 17.0
-offset_right = 1130.0
-offset_bottom = 152.0
-texture = ExtResource("10_wv8s0")
-expand_mode = 1
-
-[node name="TextureRect4" type="TextureRect" parent="Images"]
+[node name="PlaceCircle" type="TextureRect" parent="Images"]
 layout_mode = 0
 offset_left = 32.0
 offset_top = 555.0
 offset_right = 182.0
 offset_bottom = 630.0
 texture = ExtResource("9_jvp40")
-expand_mode = 1
-
-[node name="TextureRect" type="TextureRect" parent="Images"]
-visible = false
-layout_mode = 0
-offset_left = 34.0
-offset_top = 557.0
-offset_right = 179.0
-offset_bottom = 628.0
-texture = ExtResource("10_wv8s0")
-expand_mode = 1
-
-[node name="TextureRect7" type="TextureRect" parent="Images"]
-visible = false
-layout_mode = 0
-offset_left = 34.0
-offset_top = 557.0
-offset_right = 178.0
-offset_bottom = 628.0
-texture = ExtResource("10_wv8s0")
 expand_mode = 1
 
 [node name="LapButton" type="Button" parent="Images"]
