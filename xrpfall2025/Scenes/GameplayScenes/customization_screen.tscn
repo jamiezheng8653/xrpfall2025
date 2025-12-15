@@ -44,7 +44,7 @@ texture = ExtResource("3_mntij")
 expand_mode = 1
 stretch_mode = 4
 
-[node name="ColorRect2" type="ColorRect" parent="."]
+[node name="ColorBoxLeft" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -59,13 +59,13 @@ grow_horizontal = 0
 grow_vertical = 2
 color = Color(0.104904, 0.124858, 0.295305, 0.823529)
 
-[node name="ColorRect" type="ColorRect" parent="ColorRect2"]
+[node name="TitleBoxLeft" type="ColorRect" parent="ColorBoxLeft"]
 layout_mode = 0
 offset_right = 528.0
 offset_bottom = 59.0
 color = Color(0.108, 0.1272, 0.3, 1)
 
-[node name="ColorRect3" type="ColorRect" parent="."]
+[node name="ColorBoxRight" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -80,7 +80,7 @@ grow_horizontal = 0
 grow_vertical = 2
 color = Color(0.21, 0.1155, 0.123375, 0.823529)
 
-[node name="ColorRect" type="ColorRect" parent="ColorRect3"]
+[node name="TitleBoxRight" type="ColorRect" parent="ColorBoxRight"]
 layout_mode = 0
 offset_right = 540.0
 offset_bottom = 59.0
