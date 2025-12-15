@@ -110,6 +110,7 @@ offset_bottom = 45.0
 color = Color(0.36, 0.2124, 0.21486, 0.658824)
 
 [node name="LapTimesLabel" type="Label" parent="Stopwatch"]
+visible = false
 layout_mode = 0
 offset_left = 955.0
 offset_top = 241.0
@@ -209,6 +210,15 @@ offset_bottom = 132.0
 texture = ExtResource("5_0d6x4")
 expand_mode = 1
 
+[node name="BubbleBox2" type="TextureRect" parent="Images"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 30.0
+offset_right = 136.0
+offset_bottom = 132.0
+texture = ExtResource("5_0d6x4")
+expand_mode = 1
+
 [node name="TextureRect2" type="TextureRect" parent="Images"]
 visible = false
 layout_mode = 0
@@ -259,6 +269,7 @@ texture = ExtResource("10_wv8s0")
 expand_mode = 1
 
 [node name="LapButton" type="Button" parent="Images"]
+visible = false
 layout_mode = 0
 offset_left = 1008.0
 offset_top = 121.0

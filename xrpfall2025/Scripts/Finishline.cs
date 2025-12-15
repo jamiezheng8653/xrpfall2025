@@ -29,7 +29,7 @@ public partial class Finishline : Node
 		//check for when overlap and the direction of the velocity vector of the player points correctly
 		//this will have to be revamped when enemy ai cars get implemented
 		if (IsOverlapping(player) && HitAllCheckpoints(player)) OnCrossingEvent?.Invoke(); //call event
-		DebugDraw3D.DrawBox(area3D.GlobalPosition, Quaternion.Identity, 2 * halflength, color, true);
+		//DebugDraw3D.DrawBox(area3D.GlobalPosition, Quaternion.Identity, 2 * halflength, color, true);
 	}
 
 	/// <summary>

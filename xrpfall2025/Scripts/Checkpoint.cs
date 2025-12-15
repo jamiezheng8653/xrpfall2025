@@ -27,7 +27,7 @@ public partial class Checkpoint : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		DebugDraw3D.DrawSphere(GlobalPosition, radius, color);
+		//DebugDraw3D.DrawSphere(GlobalPosition, radius, color);
 		if (OnCollision()) OnCheckpointCollision?.Invoke(this);
 	}
 

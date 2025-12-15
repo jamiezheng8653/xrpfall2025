@@ -38,7 +38,7 @@ public partial class KillPlane : Node
 		}
 
 		//draw aabb 
-		DebugDraw3D.DrawAabb(AABB, color);
+		//DebugDraw3D.DrawAabb(AABB, color);
 
 	}
 

@@ -1,0 +1,23 @@
+[gd_resource type="StandardMaterial3D" load_steps=8 format=3 uid="uid://clkrvjqmstxnm"]
+
+[ext_resource type="Texture2D" uid="uid://clo1fmox4igd6" path="res://Assets/3dmodels/textures/metalrail_textures/guardRail_straight_openPBR_shader1_BaseColor.png" id="1_o36mm"]
+[ext_resource type="Texture2D" uid="uid://dbw3ny51lrcfk" path="res://Assets/3dmodels/textures/metalrail_textures/guardRail_straight_openPBR_shader1_AO.png" id="2_cvsxl"]
+[ext_resource type="Texture2D" uid="uid://5aqtvabuunog" path="res://Assets/3dmodels/textures/metalrail_textures/guardRail_straight_openPBR_shader1_Emission.png" id="3_o4kab"]
+[ext_resource type="Texture2D" uid="uid://dslsr22vs6ski" path="res://Assets/3dmodels/textures/metalrail_textures/guardRail_straight_openPBR_shader1_height.png" id="4_82mau"]
+[ext_resource type="Texture2D" uid="uid://bax3w1kntl6jv" path="res://Assets/3dmodels/textures/metalrail_textures/guardRail_straight_openPBR_shader1_Metallic.png" id="5_un1oa"]
+[ext_resource type="Texture2D" uid="uid://cj5e1udn65qth" path="res://Assets/3dmodels/textures/metalrail_textures/guardRail_straight_openPBR_shader1_Normal.png" id="6_tedl2"]
+[ext_resource type="Texture2D" uid="uid://crlxc75qfmjd8" path="res://Assets/3dmodels/textures/metalrail_textures/guardRail_straight_openPBR_shader1_Roughness.png" id="7_msf7n"]
+
+[resource]
+albedo_texture = ExtResource("1_o36mm")
+metallic = 1.0
+metallic_texture = ExtResource("5_un1oa")
+roughness_texture = ExtResource("7_msf7n")
+emission_enabled = true
+emission_texture = ExtResource("3_o4kab")
+normal_enabled = true
+normal_texture = ExtResource("6_tedl2")
+ao_enabled = true
+ao_texture = ExtResource("2_cvsxl")
+heightmap_enabled = true
+heightmap_texture = ExtResource("4_82mau")
