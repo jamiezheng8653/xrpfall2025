@@ -1,8 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Numerics;
 using Vector3 = Godot.Vector3;
 
 /// <summary>
@@ -13,7 +11,9 @@ public partial class Track : Node
 {
 	#region Fields
 	[Export] private Path3D innerPath;
+	[Export] private PathFollow3D innerFollow;
 	[Export] private Path3D outerPath;
+	[Export] private PathFollow3D outerFollow;
 	[Export] private int scale = 1;
 	[Export] private int numOfPts = 0;
 	private Vector3 startPoint;
@@ -31,6 +31,14 @@ public partial class Track : Node
 	}
 
 	/// <summary>
+	/// Reference to a follow path for enemy ai to path along
+	/// </summary>
+	public PathFollow3D PathFollow3D
+	{
+		get { return innerFollow; }
+	}
+
+	/// <summary>
 	/// First point where the track generates. The finish line will spawn here
 	/// </summary>
 	public Vector3 StartingPoint
@@ -45,7 +53,13 @@ public partial class Track : Node
 	{
 		get { return checkPoints; }
 	}
-	#endregion
+    #endregion
+
+    public override void _Process(double delta)
+    {
+        //innerFollow.Progress += 10 * (float)delta;
+    }
+
 
 	/// <summary>
 	/// Initializes the track curve and generates the trash mesh along it
@@ -59,7 +73,7 @@ public partial class Track : Node
 			//get the starting point saved
 			startPoint = points[0];
 			//ensure the loop is closed
-			innerPath.Curve.Closed = true;
+			innerPath.Curve.Closed = false;
 			outerPath.Curve.Closed = true;
 		} 
 		
@@ -175,7 +189,7 @@ public partial class Track : Node
 	/// <param name="chckpts">A list to record where checkpoints will be on the track</param>
 	/// <param name="pts">Pre generated points</param>
 	/// <param name="path">Where the path will be generated on</param>
-	public void GenerateTrackMeshBezier(List<Vector3> chckpts, List<Vector3> pts, Path3D path)
+	public void GenerateTrackMeshBezier(List<Vector3> chckpts, List<Vector3> pts, Path3D pathA)
 	{
 		//bezier curve calculation weight, sum will have to remain under zero
 		float t = 0; 
@@ -191,34 +205,37 @@ public partial class Track : Node
 			//special case for the last point to ensure no index errors
 			if(i == pts.Count - 2)
 			{
-				path.Curve.AddPoint(QuadraticBezier(
+				pathA.Curve.AddPoint(QuadraticBezier(
 					lastPoint,
 					//pts[i], 
 					pts[0], 
 					pts[1], 
 					t
 				));
-			}
 
-			path.Curve.AddPoint(QuadraticBezier(
-				lastPoint,
-				//pts[i], 
-				pts[i + 1], 
-				pts[i + 2], 
-				t
-			));
+			}
+			else
+			{
+				pathA.Curve.AddPoint(QuadraticBezier(
+					lastPoint,
+					//pts[i], 
+					pts[i + 1], 
+					pts[i + 2], 
+					t
+				));
+			}			
 
 			//increment t
 			t += tI;
 
 			//t has to remain under one for the bezier calculations work
-			if (t > 1) 
+			if (t >= 1) 
 			{
 				//add every other last point to be a checkpoint
 				if(i % 2 == 0) chckpts.Add(lastPoint); 
 				t = 0;
 				i += 2;
-				lastPoint = path.Curve.GetPointPosition(path.Curve.PointCount - 1);
+				lastPoint = pathA.Curve.GetPointPosition(pathA.Curve.PointCount - 1);
 			}
 		}
 		

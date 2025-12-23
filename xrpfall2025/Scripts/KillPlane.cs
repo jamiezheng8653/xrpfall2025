@@ -1,11 +1,13 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
-public delegate void OnKillPlaneDelegate();
+public delegate void OnKillPlaneDelegate(Car c);
 public partial class KillPlane : Node
 {
 	public event OnKillPlaneDelegate IsCollidingKillPlane;
-	private Player playerP = null;
+	//private Player playerP = null;
+	private List<Car> cars;
 	[Export] private CsgBox3D planeBox = null;
 	private Color color;
 
@@ -30,12 +32,16 @@ public partial class KillPlane : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (IsColliding())
+		foreach(Car c in cars)
 		{
-			//GD.Print("I'm colliding!");
-			//fire event
-			IsCollidingKillPlane?.Invoke();
+			if (IsColliding(c))
+			{
+				//GD.Print("I'm colliding!");
+				//fire event
+				IsCollidingKillPlane?.Invoke(c);
+			}
 		}
+		
 
 		//draw aabb 
 		DebugDraw3D.DrawAabb(AABB, color);
@@ -46,19 +52,20 @@ public partial class KillPlane : Node
 	/// Initializes the object. Associates any external references that this object needs
 	/// </summary>
 	/// <param name="player"></param>
-	public void Init(Player player)
+	public void Init(/*Player player*/List<Car> cars)
 	{
-		playerP = player;
+		//playerP = player;
+		this.cars = cars;
 	}
 
 	/// <summary>
 	/// Checks if the player is colliding with the kill plane
 	/// </summary>
 	/// <returns>True if the player is colliding with the kill plane</returns>
-	private bool IsColliding()
+	private bool IsColliding(Car c)
 	{
 		// we don't need to adjust the position of the kill plane's aabb 
 		// because the kill plane is never going to move while the game is running
-		return playerP.AABB.Intersects(AABB);
+		return /*playerP*/c.AABB.Intersects(AABB);
 	}
 }

@@ -18,7 +18,7 @@ public static class Utils
 	public static Vector3 ProjUOntoV(Vector3 u, Vector3 v)
 	{
 		//Projection of vector v onto vector u = v(v * u)/||v||^2
-		return (v.Dot(u) / Mathf.Pow(v.Length(), 2)) * v;
+		return v.Dot(u) / Mathf.Pow(v.Length(), 2) * v;
 	}
 
 	/// <summary>
@@ -291,19 +291,5 @@ public static class Utils
 		}
 
 		return result;
-	}
-
-	/// <summary>
-	/// Calculates the angle between two vectors in R^3
-	/// Expanded on C# .NET implementation in R^2
-	/// </summary>
-	/// <param name="v">Vector 1</param>
-	/// <param name="u">Vector 2</param>
-	/// <returns></returns>
-	public static float AngleBetween(Vector3 v, Vector3 u)
-	{
-		float sin = v.X + v.Y + v.Z - u.X - u.Y - u.Z;
-		float cos = (v.X * u.X) + (v.Y * u.Y) + (v.Z * u.Z);
-		return (float)Math.Atan2(sin, cos);
 	}
 }

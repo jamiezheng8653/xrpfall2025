@@ -3,14 +3,15 @@ using System;
 using System.Collections.Generic;
 
 //delegate declaration
-public delegate void ItemCollisionDelegate();
+public delegate void ItemCollisionDelegate(Car c);
 
 public partial class ItemManager : Node
 {
 	//grab a reference to the player
 	//Every item generated will get a reference to the player's bounds 
 	//Used in collision detection & item event declaration
-	private Player player = null;
+	//private Player player = null;
+	private List<Car> cars;
 	private PackedScene itemPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/item.tscn");
 
 	//list of all items generated
@@ -27,7 +28,7 @@ public partial class ItemManager : Node
 		items = new List<Node>();
 		itemLocations = track.Path3D.Curve.PointCount;
 
-		GenerateItems(player);
+		GenerateItems(/*player*/cars);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -40,9 +41,10 @@ public partial class ItemManager : Node
 	/// </summary>
 	/// <param name="p">Reference to the player</param>
 	/// <param name="t">Reference to the track</param>
-	public void Init(Player p, Track t)
+	public void Init(/*Player p*/List<Car> cars, Track t)
 	{
-		player = p;
+		//player = p;
+		this.cars = cars;
 		track = t;
 
 	}
@@ -52,9 +54,9 @@ public partial class ItemManager : Node
 	/// </summary>
 	/// <param name="player">Necessary for each player to be hooked 
 	/// up to a collision event with each item spawned </param>
-	public void GenerateItems(Player player)
+	public void GenerateItems(/*Player player*/ List<Car> cars)
 	{
-		for (int i = 0; i < itemLocations; i++)
+		for (int i = 0; i < itemLocations-1; i++)
 		{
 			//calculate where on the track we want to generate this row of items
 			//double theta = Mathf.DegToRad(i * 360 / itemLocations);
@@ -69,9 +71,13 @@ public partial class ItemManager : Node
 				items.Add(itemPrefab.Instantiate()); //create the new item
 				AddChild(items[^1]); //add to the scene tree
 				temp = (Item)items[i]; //grab reference to call its init()
-				temp.CustomInit(player, spawnPos + (5 * dir));
+				temp.CustomInit(/*player*/cars, spawnPos + (5 * dir));
 				//player subscribes to each item individually
-				temp.OnItemCollision += player.StartTimer;
+				foreach(Car c in cars)
+				{
+					temp.OnItemCollision += /*player*/c.StartTimer;
+				}
+				
 			}			
 		}
 	}

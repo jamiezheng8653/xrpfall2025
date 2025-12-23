@@ -12,15 +12,17 @@ albedo_color = Color(0.520673, 0.458974, 0.658289, 1)
 
 [node name="killPlane" type="Node" node_paths=PackedStringArray("planeBox")]
 script = ExtResource("1_xxqnq")
-planeBox = NodePath("ground/CollisionShape3D/CSGBox3D")
+planeBox = NodePath("Area3D/ground/CollisionShape3D/CSGBox3D")
 
-[node name="ground" type="StaticBody3D" parent="."]
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="ground" type="StaticBody3D" parent="Area3D"]
 disable_mode = 1
 collision_layer = 3
 collision_mask = 3
 physics_material_override = SubResource("PhysicsMaterial_wok52")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D/ground"]
 process_physics_priority = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 top_level = true
@@ -28,8 +30,24 @@ shape = SubResource("BoxShape3D_toyea")
 disabled = true
 debug_color = Color(0.946025, 0.188105, 0.356576, 0.42)
 
-[node name="CSGBox3D" type="CSGBox3D" parent="ground/CollisionShape3D"]
+[node name="CSGBox3D" type="CSGBox3D" parent="Area3D/ground/CollisionShape3D"]
 transform = Transform3D(400, 0, 0, 0, 1, 0, 0, 0, 400, 0.236542, 0, 0.000190735)
+layers = 3
+custom_aabb = AABB(-0.5, 0, -0.5, 1, 2, 1)
+flip_faces = true
+material = SubResource("StandardMaterial3D_xxqnq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+process_physics_priority = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+top_level = true
+shape = SubResource("BoxShape3D_toyea")
+disabled = true
+debug_color = Color(0.946025, 0.188105, 0.356576, 0.42)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Area3D/CollisionShape3D"]
+transform = Transform3D(400, 0, 0, 0, 1, 0, 0, 0, 400, 0.236542, 0, 0.000190735)
+visible = false
 layers = 3
 custom_aabb = AABB(-0.5, 0, -0.5, 1, 2, 1)
 flip_faces = true

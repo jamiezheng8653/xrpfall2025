@@ -183,6 +183,7 @@ public partial class Car : Node
 			//keep adding position before gravity is implemented until impact with kill plane
 			pathOfFalling.Add(charbody3d.GlobalPosition);
 			charbody3d.Position -= charbody3d.GetTransform().Basis.Y * (float)(delta * fallAcceleration);
+			speed = 0;
 		}
 		else
 		{
@@ -314,8 +315,9 @@ public partial class Car : Node
 	/// Starts the timer associated with the state transition logic
 	/// Unsubscribes this method from the OnItemCollision event once called
 	/// </summary>
-	public void StartTimer()
+	public void StartTimer(Car c)
 	{
+		if (c != this) return;
 		timer.Restart();
 	}
 
@@ -336,8 +338,9 @@ public partial class Car : Node
 	/// car's list of passed checkpoints this lap
 	/// </summary>
 	/// <param name="chpt">The current checkpoint passed</param>
-	public void AddCheckpoint(Checkpoint chpt)
+	public void AddCheckpoint(Checkpoint chpt, Car c)
 	{
+		if (c != this) return;
 		//ensure the checkpoint does not exist in the list before adding 
 		if (!passedCheckpoints.Contains(chpt)) 
 		{
@@ -359,8 +362,9 @@ public partial class Car : Node
 	/// <summary>
 	/// Clears the list of checkpoints passed. Called after CheckCheckpoints() returns true
 	/// </summary>
-	public void ClearCheckpoints()
+	public void ClearCheckpoints(Car c)
 	{
+		if(c != this) return;
 		passedCheckpoints.Clear();
 		GD.Print("Clearing Checkpoints");
 	}
@@ -370,8 +374,9 @@ public partial class Car : Node
 	/// Increment the lap counter. This is called upon
 	/// passing the finishline collision check
 	/// </summary>
-	public void IncrementLap()
+	public void IncrementLap(Car c)
 	{
+		if (c != this) return;
 		if (lap + 1 > 3) finishedRace = true;
 		else lap++;
 
@@ -382,8 +387,9 @@ public partial class Car : Node
 	/// </summary>
 	/// <param name="prevPosition">the position of the car just before falling</param>
 	/// <param name="currentPosition">the position of the car upon impact with the kill plane</param>
-	public void ReturnToTrack()
+	public void ReturnToTrack(Car c)
 	{
+		if (c != this) return;
 		if (pathOfFalling?.Any() == true)
 		{
 			//GD.Print("Getting back on track!");
@@ -419,8 +425,9 @@ public partial class Car : Node
 	/// Returns the car to the last point in the bezier curve 
 	/// they passed in the event they fall off the track and hit the kill plane
 	/// </summary>
-	public void ToPreviousCheckpoint()
+	public void ToPreviousCheckpoint(Car c)
 	{
+		if (c != this) return;
 		charbody3d.GlobalPosition = passedCheckpoints[^1].Position + new Vector3(0, 1, 0);
 	}
 

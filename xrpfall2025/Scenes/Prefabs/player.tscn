@@ -39,6 +39,7 @@ texture = ExtResource("3_btcbx")
 [node name="fpsCamera" type="Camera3D" parent="Node3D/Player/CollisionShape3D/XRP_Car"]
 transform = Transform3D(-0.2, -6.54983e-09, 1.62114e-08, 0, 0.185437, 0.0749214, -1.74846e-08, 0.0749214, -0.185437, -2.01605e-08, 0.2, 0.230609)
 cull_mask = 1047553
+current = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="Node3D/Player/CollisionShape3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00164795, -0.124939, -0.00753784)
