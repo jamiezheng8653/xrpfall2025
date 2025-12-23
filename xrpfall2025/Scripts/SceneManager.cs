@@ -28,7 +28,7 @@ public partial class SceneManager : Node
 		carManagerCM.Init(trackT.StartingPoint, trackT.Path3D, checkpointManagerCM.TotalCheckpoints);
 		checkpointManagerCM.Init(carManagerCM.Cars, trackT.Checkpoints);
 		finishlineFL.Init(carManagerCM.Cars, trackT.StartingPoint); 
-		//itemManagerIM.Init(carManagerCM.Cars, trackT);
+		itemManagerIM.Init(carManagerCM.Cars, trackT);
 
 		//subscribe Player and Killplane Events
 		foreach (Car c in carManagerCM.Cars)

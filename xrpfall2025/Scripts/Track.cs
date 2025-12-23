@@ -73,7 +73,7 @@ public partial class Track : Node
 			//get the starting point saved
 			startPoint = points[0];
 			//ensure the loop is closed
-			innerPath.Curve.Closed = false;
+			innerPath.Curve.Closed = true;
 			outerPath.Curve.Closed = true;
 		} 
 		

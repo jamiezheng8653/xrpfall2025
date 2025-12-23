@@ -113,6 +113,14 @@ public partial class Car : Node
 	}
 
 	/// <summary>
+	/// How many checkpoints has this car passed this lap?
+	/// </summary>
+	public int NumPassedCheckpoints
+	{
+		get { return passedCheckpoints.Count; }
+	}
+
+	/// <summary>
 	/// Property to give the car's aabb centered on the car,
 	/// used for collision calculations happening in the collided item
 	/// </summary>
@@ -368,6 +376,16 @@ public partial class Car : Node
 		passedCheckpoints.Clear();
 		GD.Print("Clearing Checkpoints");
 	}
+
+	/// <summary>
+	/// Calculate how far this car is from the last checkpoint they pressed
+	/// Use in placement tracking logic
+	/// </summary>
+	/// <returns>The distance squared from the last checkpoint</returns>
+	public float DistanceFromLastCheckpoint()
+	{
+		return passedCheckpoints[^1].GlobalPosition.DistanceSquaredTo(GlobalPosition);
+	}
 	#endregion
 
 	/// <summary>
@@ -380,6 +398,15 @@ public partial class Car : Node
 		if (lap + 1 > 3) finishedRace = true;
 		else lap++;
 
+	}
+
+	/// <summary>
+	/// Changes the placement of the car given a int
+	/// </summary>
+	/// <param name="i">What place is the car in overall</param>
+	public void PlacementChanged(int i)
+	{
+		place = i;
 	}
 
 	/// <summary>
