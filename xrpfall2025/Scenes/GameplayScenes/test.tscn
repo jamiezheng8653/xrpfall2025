@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3 uid="uid://dtqh6lg88aakq"]
+[gd_scene load_steps=40 format=3 uid="uid://dtqh6lg88aakq"]
 
 [ext_resource type="PackedScene" uid="uid://dnkv3f1fu5fc8" path="res://Scenes/Prefabs/scene_manager.tscn" id="1_4q5du"]
 [ext_resource type="PackedScene" uid="uid://sdm8yxrkofoh" path="res://Scenes/Prefabs/item_manager.tscn" id="2_lqt8t"]
@@ -51,6 +51,11 @@ volumetric_fog_albedo = Color(0.00784314, 1, 1, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4q5du"]
 albedo_color = Color(0.321569, 0.454902, 0.180392, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6cxrt"]
+transparency = 1
+depth_draw_mode = 2
+albedo_color = Color(0.2193, 0.275487, 0.43, 0.65098)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7r8ed"]
 
@@ -148,9 +153,14 @@ cull_mask = 1047554
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
 transform = Transform3D(0.999982, 0, 0.00596896, 0, 1, 0, -0.00596896, 0, 0.999982, -1.10397, -0.227952, 2.41924)
-layers = 3
 size = Vector3(700, 0.05, 700)
 material = SubResource("StandardMaterial3D_4q5du")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="."]
+transform = Transform3D(0.999982, 0, 0.00596896, 0, 1, 0, -0.00596896, 0, 0.999982, -1.10397, -0.227952, 2.41924)
+layers = 2
+size = Vector3(700, 0.05, 700)
+material = SubResource("StandardMaterial3D_6cxrt")
 
 [node name="3DModels" type="Node" parent="."]
 
@@ -1098,14 +1108,11 @@ transform = Transform3D(7.11329, 3.66075, -0.00619743, -3.79186e-10, -0.0135435,
 [node name="Wooden_box49" parent="3DModels/Node2" instance=ExtResource("12_yf77w")]
 transform = Transform3D(-9.97965, 0, -0.637662, 0, 10, 0, 0.637662, 0, -9.97965, 89.5899, -0.213462, -3.73393)
 
-[node name="Wooden_box50" parent="3DModels/Node2" instance=ExtResource("12_yf77w")]
-transform = Transform3D(-4.59647, 0, -5.27944, 0, 7, 0, 5.27944, 0, -4.59647, 89.6294, -0.213462, -6.22468)
-
-[node name="Barrel53" parent="3DModels/Node2" instance=ExtResource("14_4fxth")]
-transform = Transform3D(7.98671, 0, -0.460927, 0, 8, 0, 0.460927, 0, 7.98671, 89.7237, -0.148243, -1.45662)
-
 [node name="guardRail_straight13" parent="3DModels/Node2" instance=ExtResource("16_hudo0")]
 transform = Transform3D(29.9858, 0, -33.5538, 0, 45, 0, 33.5538, 0, 29.9858, 67.1019, -0.376456, 64.166)
+
+[node name="Wooden_box50" parent="3DModels/Node2/guardRail_straight13" instance=ExtResource("12_yf77w")]
+transform = Transform3D(0.0194155, 0, -0.154339, 0, 0.155556, 0, 0.154339, 0, 0.0194155, -0.832773, 0.00362209, -1.4156)
 
 [node name="guardRail_straight14" parent="3DModels/Node2" instance=ExtResource("16_hudo0")]
 transform = Transform3D(-41.2064, 0, 18.084, 0, 45, 0, -18.084, 0, -41.2064, 101.185, -0.376457, 36.1667)
@@ -1124,6 +1131,9 @@ transform = Transform3D(0.309957, 0, -1.15928, 0, 1.2, 0, 1.15928, 0, 0.309957, 
 
 [node name="PP_Tree_winding_20" parent="3DModels/Node2" instance=ExtResource("19_7r8ed")]
 transform = Transform3D(0.309957, 0, -1.15928, 0, 1.2, 0, 1.15928, 0, 0.309957, 114.123, 5.04541, 8.71544)
+
+[node name="Barrel53" parent="3DModels/Node2" instance=ExtResource("14_4fxth")]
+transform = Transform3D(7.98671, 0, -0.460927, 0, 8, 0, 0.460927, 0, 7.98671, 89.7237, -0.148243, -1.45662)
 
 [node name="WoodRail_straight9" parent="3DModels/Node2" instance=ExtResource("20_54tat")]
 transform = Transform3D(21.1114, 0, -16.8319, 0, 27, 0, 16.8319, 0, 21.1114, 90.881, -0.297346, 64.338)

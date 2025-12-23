@@ -6,9 +6,9 @@ extends Control
 var selected_color: Color = Color.AQUA
 
 func _ready():
-	$CarOptions/Car1.pressed.connect(_on_car_pressed.bind(Color.AQUA))
+	$CarOptions/Car1.pressed.connect(_on_car_pressed.bind(Color.BLACK))
 	$CarOptions/Car2.pressed.connect(_on_car_pressed.bind(Color.RED))
-	$CarOptions/Car3.pressed.connect(_on_car_pressed.bind(Color.GREEN))
+	$CarOptions/Car3.pressed.connect(_on_car_pressed.bind(Color.NAVY_BLUE))
 
 func _on_back_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/GameplayScenes/title_screen.tscn")
