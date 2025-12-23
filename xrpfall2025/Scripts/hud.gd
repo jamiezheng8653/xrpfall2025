@@ -95,7 +95,7 @@ func _process(delta: float) -> void:
 			last_item_type = current_state_name
 			
 			# Update stored item icon
-		var stored_state_name = state_name(player_node.storedItem)  # Assuming you exposed this as public in C#
+		var stored_state_name = state_name(player_node.storedItem)  
 		update_stored_item_icon(stored_state_name)
 		
 		# Stopwatch
