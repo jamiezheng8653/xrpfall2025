@@ -1,9 +1,11 @@
 using Godot;
 
+/// <summary>
+/// Sets us the race scene
+/// </summary>
 public partial class SceneManager : Node
 {
 	//parts involved in the scene.
-	//[Export] private Node player;
 	[Export] private Node carManager;
 	[Export] private Node track;
 	[Export] private Node itemManager;
@@ -33,7 +35,7 @@ public partial class SceneManager : Node
 		//subscribe Player and Killplane Events
 		foreach (Car c in carManagerCM.Cars)
 		{
-			GD.Print("Car: ", c, ", Type of c: ", c.GetType());
+			//GD.Print("Car: ", c, ", Type of c: ", c.GetType());
 			//killPlaneKP.IsCollidingKillPlane += c.ReturnToTrack;
 			killPlaneKP.IsCollidingKillPlane += c.ToPreviousCheckpoint;
 

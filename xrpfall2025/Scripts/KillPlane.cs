@@ -3,14 +3,24 @@ using System;
 using System.Collections.Generic;
 
 public delegate void OnKillPlaneDelegate(Car c);
+
+/// <summary>
+/// Handles what happens when a car falls off the track.
+/// When the game is integrated with a the real XRP robot,
+/// the use of the killplane will be unnecessary as recalibrating 
+/// a off road car takes more time than is fun.
+/// However for strictly game purposes, ensures a car will only be on the track
+/// </summary>
 public partial class KillPlane : Node
 {
 	public event OnKillPlaneDelegate IsCollidingKillPlane;
-	//private Player playerP = null;
 	private List<Car> cars;
 	[Export] private CsgBox3D planeBox = null;
 	private Color color;
 
+	/// <summary>
+	/// Axis aligned bounding box of the killing plane for collision detection
+	/// </summary>
 	public Aabb AABB
 	{
 		get
@@ -32,6 +42,8 @@ public partial class KillPlane : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		//check to see if a car is colliding with a kill plane every frame
+		//keeping in mind to consider more optimal checking times
 		foreach(Car c in cars)
 		{
 			if (IsColliding(c))
@@ -51,21 +63,21 @@ public partial class KillPlane : Node
 	/// <summary>
 	/// Initializes the object. Associates any external references that this object needs
 	/// </summary>
-	/// <param name="player"></param>
-	public void Init(/*Player player*/List<Car> cars)
+	/// <param name="cars">List of all cars in the race</param>
+	public void Init(List<Car> cars)
 	{
-		//playerP = player;
 		this.cars = cars;
 	}
 
 	/// <summary>
-	/// Checks if the player is colliding with the kill plane
+	/// Checks if the car is colliding with the kill plane
 	/// </summary>
-	/// <returns>True if the player is colliding with the kill plane</returns>
+	/// <param name="c">Which car are we checking for collision</param>
+	/// <returns>True if the car is colliding with the kill plane</returns>
 	private bool IsColliding(Car c)
 	{
 		// we don't need to adjust the position of the kill plane's aabb 
 		// because the kill plane is never going to move while the game is running
-		return /*playerP*/c.AABB.Intersects(AABB);
+		return c.AABB.Intersects(AABB);
 	}
 }

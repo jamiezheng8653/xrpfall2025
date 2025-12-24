@@ -3,7 +3,9 @@ using Vector3 = Godot.Vector3;
 using System.IO;
 using System.Text.Json;
 
-
+/// <summary>
+/// Blueprint for a player controlled car. Handles inputs
+/// </summary>
 public partial class Player : Car
 {
 	/// <summary>
@@ -14,8 +16,6 @@ public partial class Player : Car
 		base._Ready();
 		
 		// For customization, not yet applied
-		//path has changed, had carMesh be assigned via [Export]
-		//carMesh = GetNode<MeshInstance3D>("CollisionShape3D/XRP_Car/SM_Car");
 		ApplySavedCarColor();
 		
 	}

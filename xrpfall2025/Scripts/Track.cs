@@ -11,9 +11,9 @@ public partial class Track : Node
 {
 	#region Fields
 	[Export] private Path3D innerPath;
-	[Export] private PathFollow3D innerFollow;
+	//[Export] private PathFollow3D innerFollow;
 	[Export] private Path3D outerPath;
-	[Export] private PathFollow3D outerFollow;
+	//[Export] private PathFollow3D outerFollow;
 	[Export] private int scale = 1;
 	[Export] private int numOfPts = 0;
 	private Vector3 startPoint;
@@ -28,14 +28,6 @@ public partial class Track : Node
 	public Path3D Path3D
 	{
 		get { return innerPath; }
-	}
-
-	/// <summary>
-	/// Reference to a follow path for enemy ai to path along
-	/// </summary>
-	public PathFollow3D PathFollow3D
-	{
-		get { return innerFollow; }
 	}
 
 	/// <summary>
@@ -54,11 +46,6 @@ public partial class Track : Node
 		get { return checkPoints; }
 	}
     #endregion
-
-    public override void _Process(double delta)
-    {
-        //innerFollow.Progress += 10 * (float)delta;
-    }
 
 
 	/// <summary>
@@ -79,18 +66,18 @@ public partial class Track : Node
 		
 		//GenerateTrackMeshStraight(Checkpoints, points, outerPath);
 		GenerateTrackMeshBezier(checkPoints, points, innerPath);
-		GD.Print("Track point count: ", innerPath.Curve.PointCount);
+		//GD.Print("Track point count: ", innerPath.Curve.PointCount);
 	}
 
 	#region Math + Bezier curve calculations
 	/// <summary>
-	/// Interpolate point of a quadratic bezier 
+	/// Interpolate a point of a quadratic bezier 
 	/// </summary>
-	/// <param name="p0"></param>
-	/// <param name="p1"></param>
-	/// <param name="p2"></param>
+	/// <param name="p0">Point one to interpolate from</param>
+	/// <param name="p1">Point two to interpolate from</param>
+	/// <param name="p2">Point three to interpolate from</param>
 	/// <param name="t">Weight (must be less than one)</param>
-	/// <returns></returns>
+	/// <returns>A point on the bezier curve</returns>
 	private Vector3 QuadraticBezier(Vector3 p0, Vector3 p1, Vector3 p2, float t)
 	{
 		Vector3 q0 = p0.Lerp(p1, t);
@@ -100,14 +87,14 @@ public partial class Track : Node
 	}
 
 	/// <summary>
-	/// Interpolate point of a cubic bezier
+	/// Interpolate a point of a cubic bezier
 	/// </summary>
-	/// <param name="p0"></param>
-	/// <param name="p1"></param>
-	/// <param name="p2"></param>
-	/// <param name="p3"></param>
+	/// <param name="p0">Point one to interpolate from</param>
+	/// <param name="p1">Point two to interpolate from</param>
+	/// <param name="p2">Point three to interpolate from</param>
+	/// <param name="p3">Point four to interpolate from</param>
 	/// <param name="t">Weight (must be less than one)</param>
-	/// <returns></returns>
+	/// <returns>A point on the bezier curve</returns>
 	private Vector3 CubicBezier (Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
 	{
 		Vector3 q0 = p0.Lerp(p1, t);
@@ -119,16 +106,16 @@ public partial class Track : Node
 		return s;
 	}
 
-	/// <summary>
-	/// Get the direction of flow at a specific point on the track curve
-	/// </summary>
-	/// <returns></returns>
-	private Transform3D GetTangentOfPoint()
-	{
-		Transform3D result  = new Transform3D();
+	// /// <summary>
+	// /// Get the direction of flow at a specific point on the track curve
+	// /// </summary>
+	// /// <returns></returns>
+	// private Transform3D GetTangentOfPoint()
+	// {
+	// 	Transform3D result  = new Transform3D();
 
-		return result;
-	}
+	// 	return result;
+	// }
 	#endregion
 
 	#region Related track generation functions

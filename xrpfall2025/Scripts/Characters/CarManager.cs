@@ -32,7 +32,12 @@ public partial class CarManager : Node
         PlacementTracker();
     }
 
-
+	/// <summary>
+	/// Initializes all cars for the new track
+	/// </summary>
+	/// <param name="startingPosition">Where will the cars be spawning</param>
+	/// <param name="track">Reference to the path underlying the current track</param>
+	/// <param name="totalCheckpoints">How many checkpoints exist on the current track</param>
 	public void Init(Vector3 startingPosition, Path3D track, int totalCheckpoints)
 	{
 		numberOfEnemies = TOTALCARS - numberOfPlayers;

@@ -4,10 +4,12 @@ using System.Collections.Generic;
 
 public delegate void CheckpointCollisionDelegate(Checkpoint chpt, Car car);
 
+/// <summary>
+/// Handles creating and deleting all checkpoints on a track
+/// </summary>
 public partial class CheckpointManager : Node
 {
 	private PackedScene checkpointPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/checkpoint.tscn");
-	//private Player player;
 	private List<Car> cars;
 	private List<Checkpoint> checkpointList = new List<Checkpoint>();
 

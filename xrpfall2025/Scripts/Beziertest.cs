@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using Vector3 = Godot.Vector3;
 
+/// <summary>
+/// Class to test the feasibility to create a curved track based on bezier curves.
+/// </summary>
 public partial class Beziertest : Node
 {
 	private float _t = 0f;
@@ -87,6 +90,10 @@ public partial class Beziertest : Node
 
 	}
 
+	/// <summary>
+	/// Generates points for the pts list that travel in a loop. 
+	/// If you are creating a curved track, pts will be used to interpolate a track. 
+	/// </summary>
 	private void PopulateList()
 	{
 		//list of points that will generate track loop
@@ -115,6 +122,14 @@ public partial class Beziertest : Node
 		norm.Curve.Closed = true;
 	}
 
+	/// <summary>
+	/// Calculates a point on a quadratic bezier curve
+	/// </summary>
+	/// <param name="p0">Point one to interpolate</param>
+	/// <param name="p1">Point two to interpolate</param>
+	/// <param name="p2">Point three to interpolate</param>
+	/// <param name="t">A value between 0 and 1 of which point of the overall curve we are calculating</param>
+	/// <returns>A point on a quadratic curve at t</returns>
 	private Vector3 QuadraticBezier(Vector3 p0, Vector3 p1, Vector3 p2, float t)
 	{
 		Vector3 q0 = p0.Lerp(p1, t);
@@ -123,6 +138,15 @@ public partial class Beziertest : Node
 		return r;
 	}
 
+	/// <summary>
+	/// Calculates a point on a cubic bezier curve
+	/// </summary>
+	/// <param name="p0">Point 1 to interpolate</param>
+	/// <param name="p1">Point 2 to interpolate</param>
+	/// <param name="p2">Point 3 to interpolate</param>
+	/// <param name="p3">Point 4 to interpolate</param>
+	/// <param name="t">A value between 0 and 1. The smaller the t increment, the more percise the curve will be</param>
+	/// <returns>A point on the bezier curve based on the t</returns>
 	private Vector3 CubicBezier (Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
 	{
 		Vector3 q0 = p0.Lerp(p1, t);

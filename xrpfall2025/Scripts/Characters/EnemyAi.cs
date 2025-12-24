@@ -22,12 +22,15 @@ public partial class EnemyAi : Car
 
 	}
 
+	//will be used to simulate vision for more sophisticated driving behaviors
 	[Export] RayCast3D raycast3d;
 	private RacingState racingState = RacingState.NormalDriving;
+	//the last node the ai was tracking
 	private Vector3 prevPoint;
+	//the current node the ai is tracking
 	private Vector3 seekPoint;
+	//number cooresponds with the index of the point on the track the ai is tracking
 	private int trackPointIndex = 1;
-	private float mass = 10;
 
 	/// <summary>
 	/// Initialize a Enemy AI 
@@ -88,7 +91,7 @@ public partial class EnemyAi : Car
 		//need to get the correct angle for the car to turn
 		Vector3 targetVector = (seekPoint - GlobalPosition).Normalized();
 		float angle = -charbody3d.Transform.Basis.Z.SignedAngleTo(targetVector, Vector3.Up);
-		GD.Print("EnemyAI angle: ", angle);
+		//GD.Print("EnemyAI angle: ", angle);
 		rotationIncrement = angle/45;
 		rotationIncrement = Mathf.Clamp(rotationIncrement, -1, 1);
 

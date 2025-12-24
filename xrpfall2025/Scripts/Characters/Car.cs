@@ -67,7 +67,7 @@ public partial class Car : Node
 
 	#region car mesh and size related fields
 	//Gizmos for debugging
-	protected Godot.Color color;
+	protected Color color;
 	[Export] protected CsgBox3D csgBox3D = null;
 	[Export] protected CharacterBody3D charbody3d = null;
 	// Used for customization of car mesh color
@@ -114,7 +114,9 @@ public partial class Car : Node
 		}
 	}
 
-	// Makes the current stored item publc to be able to access in hud.gd
+	/// <summary>
+	/// Makes the current stored item publc to be able to access in hud.gd
+	/// </summary>
 	public States StoredItem
 	{
 		get { return storedItem; }
@@ -225,7 +227,8 @@ public partial class Car : Node
 	/// and set the reference to the stage's track
 	/// </summary>
 	/// <param name="startingPosition">Where is the car going to spawn on the track</param>
-	/// <param name="facingDirection">which way should the car be facing</param>
+	/// <param name="track">Reference to the underlying path for the current stage's track</param>
+	/// <param name="totalCheckpoints">How many checkpoints exist in the current track</param>
 	public virtual void Init(Vector3 startingPosition, Path3D track, int totalCheckpoints/*, Vector3 facingDirection*/)
 	{
 		charbody3d.GlobalPosition = startingPosition + new Vector3(0, 5, 0);

@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Numerics;
 
+/// <summary>
+/// Will be used to handle decision making for the enemy ai.
+/// </summary>
 public partial class MarkovStateMachine : Node
 {
     //state vector
@@ -72,6 +75,9 @@ public partial class MarkovStateMachine : Node
     }
 }
 
+/// <summary>
+/// A specific conditional to transition from one state to another
+/// </summary>
 public class MarkovTransition
 {
     /// <summary>

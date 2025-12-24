@@ -124,14 +124,20 @@ public partial class Item : Node
 	/// this function will be called immediately after initializing 
 	/// this instance in a different scene
 	/// </summary>
-	/// <param name="player">Reference to the Player instance in scene</param>
-	public void CustomInit(/*Player player*/ List<Car> cars, Vector3 position)
+	/// <param name="cars">Reference to all car instances in scene</param>
+	/// <param name="position">Where do we spawn this item</param>
+	public void CustomInit(List<Car> cars, Vector3 position)
 	{
 		//this.player = player;
 		this.cars = cars;
 		Position = position;
 	}
 
+	/// <summary>
+	/// The time which the item stays hidden before respawning
+	/// </summary>
+	/// <param name="c">Unused param, however associated event 
+	/// requires reference to a specific car which collided with the item</param>
 	private void StartTimer(Car c)
 	{
 		timer.Restart();
@@ -141,6 +147,9 @@ public partial class Item : Node
 		OnItemCollision -= HideModel;
 	}
 
+	/// <summary>
+	/// Resets the timer
+	/// </summary>
 	private void ClearTimer()
 	{
 		timer.Reset();
@@ -150,11 +159,19 @@ public partial class Item : Node
 		OnItemCollision += HideModel;
 	}
 
+	/// <summary>
+	/// Hides the item box from the scene temporarily
+	/// </summary>
+	/// <param name="c">Associated event requires reference 
+	/// to the car that passed the item box</param>
 	private void HideModel(Car c)
 	{
 		cylinder.Hide();
 	}
 
+	/// <summary>
+	/// Unhides the item box if it was hidden
+	/// </summary>
 	private void ShowModel()
 	{
 		cylinder.Show();

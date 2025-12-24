@@ -6,12 +6,15 @@ using System.Collections.Generic;
 public delegate void OnCrossing(Car c);
 public delegate void OnRaceFinished();
 
+/// <summary>
+/// Handles when cars cross the finish line,
+///  verifies the car made valid laps 
+/// </summary>
 public partial class Finishline : Node
 {
 	public event OnCrossing OnCrossingEvent;
 	public event OnRaceFinished OnRaceFinishedEvent;
 	[Export] private Area3D area3D;
-	//private Player player;
 	private List<Car> cars;
 	private int numPlayersFinished = 0;
 	private int numPlayers = 0;
@@ -44,7 +47,7 @@ public partial class Finishline : Node
 		if (numPlayersFinished >= numPlayers) OnRaceFinishedEvent?.Invoke();
 
 		
-		DebugDraw3D.DrawBox(area3D.GlobalPosition, Quaternion.Identity, 2 * halflength, color, true);
+		//DebugDraw3D.DrawBox(area3D.GlobalPosition, Quaternion.Identity, 2 * halflength, color, true);
 	}
 
 	/// <summary>
@@ -66,6 +69,7 @@ public partial class Finishline : Node
 	/// <summary>
 	/// Checks if the player is crossing the finish line with an aabb check
 	/// </summary>
+	/// <param name="c">Which car are we checking that passed the finished line</param>
 	/// <returns>If the car is going over the finishline, return true</returns>
 	private bool IsOverlapping(Car c)
 	{

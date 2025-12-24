@@ -1,12 +1,19 @@
 using Godot;
 using System.Collections.Generic;
 
+/// <summary>
+/// Class to define a singular checkpoint
+/// Checkpoint manager is in charge of instantiating all checkpoints
+/// </summary>
 public partial class Checkpoint : Node
 {
 	public event CheckpointCollisionDelegate OnCheckpointCollision;
+	//roughly the distance a car has to be within this checkpoint to be marked as passed
 	private float radius;
 	[Export] private Area3D area3d;
+	//reference to all cars so a checkpoint will know which car passed them
 	private List<Car> cars;
+	//used to pass information along to the car of which checkpoint the car passed
 	private Checkpoint self;
 	private Color color;
 
@@ -21,7 +28,7 @@ public partial class Checkpoint : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		DebugDraw3D.DrawSphere(GlobalPosition, radius, color);
+		//DebugDraw3D.DrawSphere(GlobalPosition, radius, color);
 		foreach (Car c in cars)
 		{
 			if (OnCollision(c)) 
