@@ -14,8 +14,7 @@ albedo_color = Color(0.321569, 0.454902, 0.180392, 1)
 
 [node name="Node" type="Node"]
 
-[node name="SceneManager" parent="." node_paths=PackedStringArray("player", "track", "itemManager", "killPlane", "finishline", "checkpointManager") instance=ExtResource("1_d2rn5")]
-player = NodePath("../Player")
+[node name="SceneManager" parent="." node_paths=PackedStringArray("track", "itemManager", "killPlane", "finishline", "checkpointManager") instance=ExtResource("1_d2rn5")]
 track = NodePath("../Track")
 itemManager = NodePath("../ItemManager")
 killPlane = NodePath("../killPlane")
