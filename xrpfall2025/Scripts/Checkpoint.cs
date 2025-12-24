@@ -1,23 +1,17 @@
 using Godot;
-using System;
+using System.Collections.Generic;
 
 public partial class Checkpoint : Node
 {
 	public event CheckpointCollisionDelegate OnCheckpointCollision;
 	private float radius;
 	[Export] private Area3D area3d;
-	private Player player;
+	private List<Car> cars;
 	private Checkpoint self;
 	private Color color;
 
 	public Vector3 Position { get { return area3d.Position; } }
 	public Vector3 GlobalPosition {get { return area3d.GlobalPosition; }}
-
-	public Checkpoint()
-	{
-		player = null;
-		self = this;
-	}
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -28,7 +22,17 @@ public partial class Checkpoint : Node
 	public override void _Process(double delta)
 	{
 		DebugDraw3D.DrawSphere(GlobalPosition, radius, color);
-		if (OnCollision()) OnCheckpointCollision?.Invoke(this);
+		foreach (Car c in cars)
+		{
+			if (OnCollision(c)) 
+			{
+				//if (c is Player p) OnCheckpointCollision?.Invoke(this, p);
+				//else if (c is EnemyAi e) OnCheckpointCollision?.Invoke(this,e);
+				//else OnCheckpointCollision?.Invoke(this,c);
+				OnCheckpointCollision?.Invoke(this,c);
+			}
+		}
+		
 	}
 
 	/// <summary>
@@ -37,21 +41,22 @@ public partial class Checkpoint : Node
 	/// <param name="spawnPos">where the checkpoint is located, should be in the middle of the track</param>
 	/// <param name="player">Reference to the player for collision checks</param>
 	/// <param name="radius">Should be at least the half length of the track's width</param>
-	public void Init(Vector3 spawnPos, Player player, float radius = 1)
+	public void Init(Vector3 spawnPos, List<Car> cars, float radius = 1)
 	{
 		color = new Color("YELLOW");
 		area3d.Position = spawnPos;
 		this.radius = radius;
-		this.player = player;
+		this.cars = cars;
+		self = this;
 	}
 
 	/// <summary>
 	/// Performs a circle collision check on if the player is overlapping with the checkpoint
 	/// </summary>
 	/// <returns>If the player is colliding with the checkpoint, return true. Otherwise false</returns>
-	public bool OnCollision()
+	public bool OnCollision(Car c)
 	{
-		if (Utils.CircleCollision(GlobalPosition, radius, player.GlobalPosition, player.Radius)) return true;
+		if (Utils.CircleCollision(GlobalPosition, radius, c.GlobalPosition, c.Radius)) return true;
 		else return false;
 	}
 }

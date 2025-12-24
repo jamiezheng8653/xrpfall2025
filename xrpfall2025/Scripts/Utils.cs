@@ -4,7 +4,7 @@ using Vector3 = Godot.Vector3;
 using Plane = Godot.Plane;
 
 /// <summary>
-/// Class to store any universal functions that may be used throughout the project
+/// Class to store any universal math functions that may be used throughout the project
 /// </summary>
 public static class Utils
 {
@@ -18,7 +18,7 @@ public static class Utils
 	public static Vector3 ProjUOntoV(Vector3 u, Vector3 v)
 	{
 		//Projection of vector v onto vector u = v(v * u)/||v||^2
-		return (v.Dot(u) / Mathf.Pow(v.Length(), 2)) * v;
+		return v.Dot(u) / Mathf.Pow(v.Length(), 2) * v;
 	}
 
 	/// <summary>
@@ -119,7 +119,7 @@ public static class Utils
 	/// </summary>
 	/// <param name="aabb">And array of vector3s with at least the min and max points of the aabb</param>
 	/// <param name="plane">What plane are you testing against the aabb</param>
-	/// <returns></returns>
+	/// <returns>true if intersects, else false</returns>
 	public static bool AABBPlaneIntersect(Vector3[] aabb, Plane plane)
 	{
 		//these two lines not necessary with a (center, extents) AABB representation
@@ -230,13 +230,13 @@ public static class Utils
 	/// <param name="r1">radius of object one</param>
 	/// <param name="p2">origin of object 2</param>
 	/// <param name="r2">radius of object 2</param>
-	/// <returns></returns>
+	/// <returns>true if intersects, else false</returns>
 	public static bool CircleCollision(Vector3 p1, double r1, Vector3 p2, double r2)
 	{
 		if (p1.DistanceSquaredTo(p2) <= Mathf.Pow(r1 + r2, 2)) return true;
 		else return false;
 	}
-	
+
 	/// <summary>
 	/// Checks if two objects are overlapping by drawing 
 	/// a box around them on the x-z plane. Ignores the y-axis
@@ -245,7 +245,7 @@ public static class Utils
 	/// <param name="halflength1">halflength of x, y, and z components of object one</param>
 	/// <param name="p2">origin of object two</param>
 	/// <param name="halflength2">halflength of x, y, and z components of object two</param>
-	/// <returns></returns>
+	/// <returns>true if intersects, else false</returns>
 	public static bool AABBCollision(Vector3 p1, Vector3 halflength1, Vector3 p2, Vector3 halflength2)
 	{
 		Godot.Rect2 aabb1 = new Rect2(p1.X, p1.Z, halflength1.X * 2, halflength1.Z * 2);
@@ -253,4 +253,44 @@ public static class Utils
 		if (aabb1.Intersects(aabb2)) return true;
 		else return false;
 	}
+	
+	/// <summary>
+	/// Calculating the Axis Realigned Bounding Box (ARBB) of this object
+	/// </summary>
+	public static void CalculateARBB()
+	{
+		//find 8 corners of oriented bounding box
+
+		//will need to globalize the vectors vector3(matrix4 * vector4(vector, 1))
+
+		//find min and max of the 8 corners
+
+		//find size of the box
+
+	}
+
+	/// <summary>
+	/// Performs Matrix multiplication on a matrix and vector
+	/// Assumes Matrix x Vector, not Vector x Matrix
+	/// </summary>
+	/// <param name="m1">matrix of dimension n x n</param>
+	/// <param name="v1">vector of size n</param>
+	/// <returns>resulting vector from multiplication</returns>
+	public static float[] MatrixMultiplication(float[,] m1, float[] v1)
+	{
+		float[] result = new float[v1.Length];
+
+		for(int i = 0; i < v1.Length; i++)
+		{
+			float component = 0;
+			for (int j = 0; j < v1.Length; j++)
+			{
+				component += m1[i,j] * v1[j];
+			}
+			result[i] = component;
+		}
+
+		return result;
+	}
+
 }

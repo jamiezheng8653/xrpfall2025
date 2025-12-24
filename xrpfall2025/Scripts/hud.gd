@@ -2,7 +2,7 @@ extends Control
 
 # Connecting player node with player script
 # There are possibly better solutions for this connection but it does work for now
-@onready var player_node = get_node("../../Player/Node3D/Player")
+@onready var player_node = get_node("../../CarManager/Player")
 
 # Speed bar variables
 var thresholds = [25.0, 20.0, 15.0, 10.0, 5.0, 0.1]

@@ -1,10 +1,10 @@
 using Godot;
-using System;
 
 public partial class SceneManager : Node
 {
 	//parts involved in the scene.
-	[Export] private Node player;
+	//[Export] private Node player;
+	[Export] private Node carManager;
 	[Export] private Node track;
 	[Export] private Node itemManager;
 	[Export] private Node killPlane;
@@ -14,7 +14,7 @@ public partial class SceneManager : Node
 	public override void _Ready()
 	{
 		//get the correct cooresponding child of each node
-		Player playerP = (Player)player.GetNode<CharacterBody3D>("Node3D/Player");
+		CarManager carManagerCM = (CarManager)carManager;
 		Track trackT = (Track)track;
 		ItemManager itemManagerIM = (ItemManager)itemManager;
 		KillPlane killPlaneKP = (KillPlane)killPlane;
@@ -22,19 +22,24 @@ public partial class SceneManager : Node
 		CheckpointManager checkpointManagerCM = (CheckpointManager)checkpointManager;
 
 		//initialize everyone
-		killPlaneKP.Init(playerP);
+		killPlaneKP.Init(carManagerCM.Cars);
 		trackT.Init();
-		checkpointManagerCM.Init(playerP, trackT.Checkpoints);
-		playerP.Init(trackT.StartingPoint, trackT.Path3D, checkpointManagerCM.TotalCheckpoints);
-		finishlineFL.Init(playerP, trackT.StartingPoint); 
-		itemManagerIM.Init(playerP, trackT);
+		checkpointManagerCM.SpawnCheckpoints(trackT.Checkpoints);
+		carManagerCM.Init(trackT.StartingPoint, trackT.Path3D, checkpointManagerCM.TotalCheckpoints);
+		checkpointManagerCM.Init(carManagerCM.Cars, trackT.Checkpoints);
+		finishlineFL.Init(carManagerCM.Cars, trackT.StartingPoint); 
+		itemManagerIM.Init(carManagerCM.Cars, trackT);
 
 		//subscribe Player and Killplane Events
-		//killPlaneKP.IsCollidingKillPlane += playerP.ReturnToTrack;
-		killPlaneKP.IsCollidingKillPlane += playerP.ToPreviousCheckpoint;
+		foreach (Car c in carManagerCM.Cars)
+		{
+			GD.Print("Car: ", c, ", Type of c: ", c.GetType());
+			//killPlaneKP.IsCollidingKillPlane += c.ReturnToTrack;
+			killPlaneKP.IsCollidingKillPlane += c.ToPreviousCheckpoint;
 
-		finishlineFL.OnCrossingEvent += playerP.IncrementLap;
-		finishlineFL.OnCrossingEvent += playerP.ClearCheckpoints;
+			finishlineFL.OnCrossingEvent += c.IncrementLap;
+			finishlineFL.OnCrossingEvent += c.ClearCheckpoints;
+		}
 	}
 
 }

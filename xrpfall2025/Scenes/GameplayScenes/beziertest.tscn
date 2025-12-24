@@ -1,0 +1,71 @@
+[gd_scene load_steps=7 format=3 uid="uid://fgosslen4806"]
+
+[ext_resource type="Script" uid="uid://bv7n6dysf1lm6" path="res://Scripts/Beziertest.cs" id="1_256o4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ti33d"]
+albedo_color = Color(0.632935, 0.43802, 0.989314, 1)
+
+[sub_resource type="Curve3D" id="Curve3D_ti33d"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_256o4"]
+albedo_color = Color(1, 0.287307, 0.225237, 1)
+
+[sub_resource type="Curve3D" id="Curve3D_256o4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hw2fk"]
+albedo_color = Color(0.188235, 0.470588, 0.211765, 1)
+
+[node name="beziertest" type="Node" node_paths=PackedStringArray("path3d", "norm")]
+script = ExtResource("1_256o4")
+path3d = NodePath("bezier/bezierPath3d")
+norm = NodePath("norm/normPath3d")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.960022, 0)
+light_angular_distance = 60.0
+
+[node name="bezier" type="Node3D" parent="."]
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="bezier"]
+mode = 2
+path_node = NodePath("../bezierPath3d")
+path_interval_type = 0
+path_interval = 1.0
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = false
+path_local = false
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+material = SubResource("StandardMaterial3D_ti33d")
+
+[node name="bezierPath3d" type="Path3D" parent="bezier"]
+curve = SubResource("Curve3D_ti33d")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 50, 0)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -20, 0)
+size = Vector3(50, 1, 50)
+material = SubResource("StandardMaterial3D_256o4")
+
+[node name="norm" type="Node3D" parent="."]
+
+[node name="normPath3d" type="Path3D" parent="norm"]
+curve = SubResource("Curve3D_256o4")
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="norm"]
+mode = 2
+path_node = NodePath("../normPath3d")
+path_interval_type = 0
+path_interval = 1.0
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = false
+path_local = false
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+material = SubResource("StandardMaterial3D_hw2fk")

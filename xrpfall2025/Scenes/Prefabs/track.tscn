@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bhdc8up14ky8k"]
+[gd_scene load_steps=6 format=3 uid="uid://bhdc8up14ky8k"]
 
 [ext_resource type="Script" uid="uid://dydu1dl18474i" path="res://Scripts/Track.cs" id="1_mutsl"]
 
@@ -8,12 +8,20 @@
 closed = true
 bake_interval = 20.0
 
-[node name="Track" type="Node" node_paths=PackedStringArray("innerPath", "outerPath")]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mutsl"]
+albedo_color = Color(0.0117647, 0.447059, 0.698039, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5eegi"]
+albedo_color = Color(0.137921, 0.612636, 0.464006, 1)
+
+[node name="Track" type="Node" node_paths=PackedStringArray("innerPath", "innerFollow", "outerPath", "outerFollow")]
 script = ExtResource("1_mutsl")
 innerPath = NodePath("innerPath3D")
+innerFollow = NodePath("innerPath3D/PathFollow3D")
 outerPath = NodePath("outerPath3D")
+outerFollow = NodePath("outerPath3D/PathFollow3D")
 scale = 15
-numOfPts = 10
+numOfPts = 15
 
 [node name="outerPath3D" type="Path3D" parent="."]
 curve = SubResource("Curve3D_5eegi")
@@ -26,22 +34,24 @@ curve = SubResource("Curve3D_mutsl")
 [node name="PathFollow3D" type="PathFollow3D" parent="innerPath3D"]
 
 [node name="innerpathMesh" type="CSGPolygon3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00780189, 0.0034852, -0.00992584)
 layers = 3
 use_collision = true
 collision_layer = 3
 collision_mask = 3
-polygon = PackedVector2Array(0, 0, 0, 0.075, 15, 0.075, 15, 0)
+polygon = PackedVector2Array(-10, 0, -10, 0.075, 10, 0.075, 10, 0)
 mode = 2
 path_node = NodePath("../innerPath3D")
 path_interval_type = 0
 path_interval = 1.0
-path_simplify_angle = 0.0
-path_rotation = 2
+path_simplify_angle = 10.0
+path_rotation = 1
 path_rotation_accurate = false
 path_local = false
 path_continuous_u = true
-path_u_distance = 1.0
+path_u_distance = 0.0
 path_joined = true
+material = SubResource("StandardMaterial3D_mutsl")
 
 [node name="outpathMesh" type="CSGPolygon3D" parent="."]
 layers = 3
@@ -60,3 +70,4 @@ path_local = false
 path_continuous_u = true
 path_u_distance = 1.0
 path_joined = true
+material = SubResource("StandardMaterial3D_5eegi")
