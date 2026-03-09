@@ -27,10 +27,10 @@ public partial class CarManager : Node
 		get {return numberOfPlayers;}
 	}
 
-    public override void _Process(double delta)
-    {
-        PlacementTracker();
-    }
+	public override void _Process(double delta)
+	{
+		PlacementTracker();
+	}
 
 	/// <summary>
 	/// Initializes all cars for the new track

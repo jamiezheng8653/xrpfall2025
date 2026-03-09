@@ -11,6 +11,15 @@ public partial class Player : Car
 	/// <summary>
 	/// Any additional set up logic here outside of Init and parent field set up
 	/// </summary>
+	private Vector3 xrpOffset = Vector3.Zero;
+
+	public override void Init(Vector3 startingPosition, Path3D track, int totalCheckpoints)
+	{
+		base.Init(startingPosition, track, totalCheckpoints);
+		// Save where the car spawns — XRP (0,0) maps to this position
+		xrpOffset = startingPosition + new Vector3(0, 5, 0);
+	}
+	
 	public override void _Ready()
 	{
 		base._Ready();
@@ -63,37 +72,74 @@ public partial class Player : Car
 	/// <param name="delta">delta time</param>
 	public override void _PhysicsProcess(double delta)
 	{
-		#region handle player input
-		//Adjust left and right steering
-		if (((Input.IsActionPressed("right") && current != States.Inverted)
-			|| (Input.IsActionPressed("left") && current == States.Inverted)) && charbody3d.IsOnFloor())
-		{
-			charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
-		}
-		else if (((Input.IsActionPressed("left") && current != States.Inverted)
-			|| (Input.IsActionPressed("right") && current == States.Inverted)) && charbody3d.IsOnFloor())
-		{
-			charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
-		}
+		// ---- Try XRP control ----
+		var receiver = GetNode("/root/NetworkReceiver");
+		bool xrpActive = receiver != null && (bool)receiver.Get("xrp_connected");
 
-		//accelerate in forward or backward direction
-		if (Input.IsActionPressed("back") && charbody3d.IsOnFloor())
+		if (xrpActive)
 		{
-			if (speed > -maxSpeed) speed -= acceleration * delta;
-		}
-		else if (Input.IsActionPressed("forward") && charbody3d.IsOnFloor())
-		{
-			if (speed < maxSpeed) speed += acceleration * delta;
+			float xrpX = (float)receiver.Get("xrp_x");
+			float xrpY = (float)receiver.Get("xrp_y");
+			float xrpAngle = (float)receiver.Get("xrp_angle");
+
+			// Map XRP cm to Godot world units — adjust this to match your track
+			float scale = 0.5f;
+
+			// XRP x,y (2D floor) → Godot x,z (3D floor)
+			float currentY = charbody3d.GlobalPosition.Y;
+			Vector3 targetPos = new Vector3(
+				xrpOffset.X + xrpX * scale,
+				charbody3d.GlobalPosition.Y,
+				xrpOffset.Z + (-xrpY * scale)
+			);
+
+			// Smooth position
+			charbody3d.GlobalPosition = charbody3d.GlobalPosition.Lerp(targetPos, 0.3f);
+
+			// Apply angle: XRP 0° = forward, Godot Y-rotation 0° = -Z
+			float targetRotY = Mathf.DegToRad(-xrpAngle);
+			charbody3d.Rotation = new Vector3(
+				charbody3d.Rotation.X,
+				Mathf.LerpAngle(charbody3d.Rotation.Y, targetRotY, 0.3f),
+				charbody3d.Rotation.Z
+			);
+
+			// Set speed for HUD display
+			speed = 10;
+			base._PhysicsProcess(delta);
+			return;
 		}
 		else
 		{
-			//will eventually add friction to come to a gradual stop
-			speed *= 0.9 * delta;
-		}
-		#endregion
+			// ---- Fallback: keyboard ----
+			if (((Input.IsActionPressed("right") && current != States.Inverted)
+				|| (Input.IsActionPressed("left") && current == States.Inverted)) && charbody3d.IsOnFloor())
+			{
+				charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), -(float)rotationIncrement);
+			}
+			else if (((Input.IsActionPressed("left") && current != States.Inverted)
+				|| (Input.IsActionPressed("right") && current == States.Inverted)) && charbody3d.IsOnFloor())
+			{
+				charbody3d.RotateObjectLocal(new Vector3(0, 1, 0), (float)rotationIncrement);
+			}
 
-		//Process input to reflect appropriate movement
-		base._PhysicsProcess(delta);
+			if (Input.IsActionPressed("back") && charbody3d.IsOnFloor())
+			{
+				if (speed > -maxSpeed) speed -= acceleration * delta;
+			}
+			else if (Input.IsActionPressed("forward") && charbody3d.IsOnFloor())
+			{
+				if (speed < maxSpeed) speed += acceleration * delta;
+			}
+			else
+			{
+				speed *= 0.9 * delta;
+			}
+			// Process movement (gravity, state speed, move-and-slide)
+			base._PhysicsProcess(delta);
+		}
+
+		
 	}
 	
 	//Customization file reading, saves the color to be applied to the car
