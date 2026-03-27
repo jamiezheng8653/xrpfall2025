@@ -3,11 +3,12 @@ extends Node
 #@export
 var player_count : int = 0
 
-var player_scene = preload("res://Scenes/Prefabs/test_player.tscn")
+@export
+var player_scene : PackedScene = preload("res://Scenes/Prefabs/test_player.tscn")
 
 func _ready() -> void:
-	player_count = len(Input.get_connected_joypads())
-	#player_count = 4
+	#player_count = len(Input.get_connected_joypads())
+	player_count = 3
 	for joy in Input.get_connected_joypads():
 		print(Input.get_joy_info(joy))
 	add_all_controls()

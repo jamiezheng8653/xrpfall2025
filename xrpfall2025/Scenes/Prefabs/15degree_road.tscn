@@ -1,0 +1,43 @@
+[gd_scene load_steps=6 format=3 uid="uid://s6s8vell18yd"]
+
+[ext_resource type="Script" uid="uid://bkj7k1i45vvp0" path="res://Scripts/track builder piece.gd" id="1_08qu3"]
+[ext_resource type="ArrayMesh" uid="uid://bam07gwnduf55" path="res://Assets/3dmodels/Roady_15L.tres" id="2_08qu3"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_83sha"]
+size = Vector3(1.34717, 0.1, 2.3642)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ft2qa"]
+radius = 0.15
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_231pb"]
+radius = 0.15
+
+[node name="15deg Road" type="Node3D"]
+script = ExtResource("1_08qu3")
+
+[node name="15deg Road Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -0.0605973, 0, -0.44058)
+mesh = ExtResource("2_08qu3")
+skeleton = NodePath("../Drag Box")
+
+[node name="Drag Box" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.0605973, 0, -0.44058)
+
+[node name="Drag shape" type="CollisionShape3D" parent="Drag Box"]
+transform = Transform3D(0.395228, 0, 0, 0, -1.7276e-08, -0.395228, 0, 0.395228, -1.7276e-08, -0.0423114, 0.0248992, 0.034999)
+shape = SubResource("BoxShape3D_83sha")
+
+[node name="Snap Point 1" type="StaticBody3D" parent="."]
+transform = Transform3D(0.866026, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866026, -0.228739, 0, -0.852744)
+collision_layer = 4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Snap Point 1"]
+shape = SubResource("SphereShape3D_ft2qa")
+
+[node name="Snap Point 2" type="StaticBody3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+collision_layer = 4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Snap Point 2"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+shape = SubResource("SphereShape3D_231pb")

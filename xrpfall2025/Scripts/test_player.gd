@@ -11,46 +11,43 @@ var svc = $SubViewportContainer
 @onready
 var vp = $SubViewportContainer/SubViewport
 
-
 var WIDTH = 1920
 var HEIGHT = 1080
 
+func _ready() -> void:
+	var res = get_tree().root.size
+	WIDTH = res.x
+	HEIGHT = res.y
+
 func init(p_num,total_player) -> void:
 	player_num = p_num
-	# there's no tuple so using array
-	# TODO: make these dynamic to resolution, currently assumes 1080p
-	match [player_num,total_player]:
-		[0,1]:
-			svc.position = Vector2(0,0)
+	match total_player:
+		1:
 			svc.size = Vector2(WIDTH,HEIGHT)
 			vp.size = Vector2(WIDTH,HEIGHT)
-		[0,2]:
-			svc.position = Vector2(0,0)
+		2:
 			svc.size = Vector2(WIDTH/2,HEIGHT)
 			vp.size = Vector2(WIDTH/2,HEIGHT)
-		[1,2]:
-			svc.position = Vector2(WIDTH/2,0)
-			svc.size = Vector2(WIDTH/2,HEIGHT)
-			vp.size = Vector2(WIDTH/2,HEIGHT)
-		[0,3],[0,4]: # same for 3 and 4 players
-			svc.position = Vector2(0,0)
-			svc.size = Vector2(WIDTH/2,HEIGHT/2)
-			vp.size = Vector2(WIDTH/2,HEIGHT/2)
-		[1,3],[1,4]:
-			svc.position = Vector2(WIDTH/2,0)
-			svc.size = Vector2(WIDTH/2,HEIGHT/2)
-			vp.size = Vector2(WIDTH/2,HEIGHT/2)
-		[2,3],[2,4]:
-			svc.position = Vector2(0,HEIGHT/2)
-			svc.size = Vector2(WIDTH/2,HEIGHT/2)
-			vp.size = Vector2(WIDTH/2,HEIGHT/2)
-		[3,4]:
-			svc.position = Vector2(WIDTH/2,HEIGHT/2)
+		3,4: # 3 and 4 players are both 2x2 grids
 			svc.size = Vector2(WIDTH/2,HEIGHT/2)
 			vp.size = Vector2(WIDTH/2,HEIGHT/2)
 		_:
-			print("invalid player num/count combination")
-			pass
+			print("invalid player count")
+	# for going left to right, the top left corners will always be the same
+	# only size will change
+	match player_num:
+		0:
+			svc.position = Vector2(0,0)
+		1:
+			svc.position = Vector2(WIDTH/2,0)
+		2:
+			svc.position = Vector2(0,HEIGHT/2)
+		3:
+			svc.position = Vector2(WIDTH/2,HEIGHT/2)
+		_:
+			print("invalid player num")
+
+	# randomize color for testing
 	var mat : StandardMaterial3D = $SubViewportContainer/SubViewport/MeshInstance3D.get_active_material(0).duplicate()
 	mat.albedo_color = Color(randf(),randf(),randf())
 	$SubViewportContainer/SubViewport/MeshInstance3D.set_surface_override_material(0,mat)

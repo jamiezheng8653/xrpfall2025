@@ -1,0 +1,126 @@
+[gd_scene load_steps=10 format=3 uid="uid://by4tp8ngpb2ux"]
+
+[ext_resource type="Script" uid="uid://bo5v8cr2ptpos" path="res://Scripts/track_builder.gd" id="1_qc0ov"]
+[ext_resource type="PackedScene" uid="uid://dmtk2kn15ygii" path="res://Scenes/Prefabs/straight_road.tscn" id="2_dthog"]
+[ext_resource type="Script" uid="uid://djacw0g0r3hpt" path="res://Scenes/GameplayScenes/track_part_spawner.gd" id="3_2u0tw"]
+[ext_resource type="PackedScene" uid="uid://s6s8vell18yd" path="res://Scenes/Prefabs/15degree_road.tscn" id="4_buuhq"]
+[ext_resource type="PackedScene" uid="uid://drhckipbmuqft" path="res://Scenes/Prefabs/30degree_road.tscn" id="5_ypxti"]
+[ext_resource type="PackedScene" uid="uid://dsqso75yke0oa" path="res://Scenes/Prefabs/45degree_road.tscn" id="6_i2bqm"]
+[ext_resource type="PackedScene" uid="uid://cfpm5bhi22tle" path="res://Scenes/Prefabs/60degree_road.tscn" id="7_sqw8x"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_i2bqm"]
+font_size = 41
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2u0tw"]
+size = Vector3(32.1033, 0.1, 31.8472)
+
+[node name="BuilderRoot" type="Node3D" node_paths=PackedStringArray("camera")]
+script = ExtResource("1_qc0ov")
+camera = NodePath("Camera3D")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 359.0
+offset_bottom = 1080.0
+
+[node name="Straight Button" type="Button" parent="Control"]
+layout_mode = 0
+offset_right = 126.0
+offset_bottom = 59.0
+theme_override_font_sizes/font_size = 46
+action_mode = 0
+text = "Straight"
+script = ExtResource("3_2u0tw")
+spawned_piece = ExtResource("2_dthog")
+
+[node name="15 Button" type="Button" parent="Control"]
+layout_mode = 0
+offset_top = 72.0
+offset_right = 184.0
+offset_bottom = 144.0
+theme_override_font_sizes/font_size = 46
+action_mode = 0
+text = "15 Degrees"
+script = ExtResource("3_2u0tw")
+spawned_piece = ExtResource("4_buuhq")
+
+[node name="30 Button" type="Button" parent="Control"]
+layout_mode = 0
+offset_top = 144.0
+offset_right = 184.0
+offset_bottom = 216.0
+theme_override_font_sizes/font_size = 46
+action_mode = 0
+text = "30 Degrees"
+script = ExtResource("3_2u0tw")
+spawned_piece = ExtResource("5_ypxti")
+
+[node name="45 Button" type="Button" parent="Control"]
+layout_mode = 0
+offset_top = 216.0
+offset_right = 184.0
+offset_bottom = 288.0
+theme_override_font_sizes/font_size = 46
+action_mode = 0
+text = "45 Degrees"
+script = ExtResource("3_2u0tw")
+spawned_piece = ExtResource("6_i2bqm")
+
+[node name="60 Button" type="Button" parent="Control"]
+layout_mode = 0
+offset_top = 288.0
+offset_right = 184.0
+offset_bottom = 360.0
+theme_override_font_sizes/font_size = 46
+action_mode = 0
+text = "60 Degrees"
+script = ExtResource("3_2u0tw")
+spawned_piece = ExtResource("7_sqw8x")
+
+[node name="Label" type="Label" parent="Control"]
+layout_mode = 0
+offset_top = 783.0
+offset_right = 442.0
+offset_bottom = 1080.0
+text = "Left click to drag piece
+Right click to pan
+F to flip piece
+D to delete piece
+S to save"
+label_settings = SubResource("LabelSettings_i2bqm")
+
+[node name="Backdrop" type="StaticBody3D" parent="."]
+collision_layer = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Backdrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00524902, 0, 0.0964394)
+shape = SubResource("BoxShape3D_2u0tw")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 3.7428, 0)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.355303, 0.934751, 0, -0.934751, 0.355303, 0, 3.19429, 1.67167)
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Save Track"
+position = Vector2i(520, 335)
+size = Vector2i(756, 360)
+dialog_hide_on_ok = true
+filters = PackedStringArray(".tscn")
+
+[node name="Track" type="Node3D" parent="."]
+
+[node name="StraightRoad" parent="Track" instance=ExtResource("2_dthog")]
+placed = true
+
+[node name="Straight Road" parent="Track" instance=ExtResource("2_dthog")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0971611, 0.0545238, -1.46099)
+
+[connection signal="button_down" from="Control/Straight Button" to="Control/Straight Button" method="_on_button_down"]
+[connection signal="button_down" from="Control/15 Button" to="Control/15 Button" method="_on_button_down"]
+[connection signal="button_down" from="Control/30 Button" to="Control/30 Button" method="_on_button_down"]
+[connection signal="button_down" from="Control/45 Button" to="Control/45 Button" method="_on_button_down"]
+[connection signal="button_down" from="Control/60 Button" to="Control/60 Button" method="_on_button_down"]
