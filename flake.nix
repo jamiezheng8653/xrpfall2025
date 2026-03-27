@@ -16,6 +16,7 @@
       devShell = pkgs.mkShell { # nix shell
       packages = with pkgs; [
         godotPackages_4_4.godot-mono
+        godotPackages_4_5.godot-mono
         ];
         buildInputs = with pkgs; [
         ];
