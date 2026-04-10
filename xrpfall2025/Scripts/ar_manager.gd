@@ -23,6 +23,12 @@ var process_count := 0
 var ar_enabled := false
 var python_pid := -1
 
+# Gate overlay
+var gate_banner: Label3D = null
+var gate_sub_label: Label3D = null
+var gate_visible := false
+var gate_fade_timer := 0.0
+
 
 func _ready() -> void:
 	_detect_paths()
@@ -32,10 +38,9 @@ func _ready() -> void:
 func _detect_paths() -> void:
 	var project_dir = ProjectSettings.globalize_path("res://")
 
-	# Python: project venv first, then system python
 	for p in [
-		project_dir + "../venv/bin/python3",   # <repo>/venv/
-		project_dir + "venv/bin/python3",       # <repo>/xrpfall2025/venv/
+		project_dir + "../venv/bin/python3",
+		project_dir + "venv/bin/python3",
 		"/usr/bin/python3",
 		"/usr/local/bin/python3",
 	]:
@@ -43,15 +48,12 @@ func _detect_paths() -> void:
 			python_path = p
 			break
 
-	# ar_stream.py: relative to project
 	var s = project_dir + "Scripts/ar_stream.py"
 	if FileAccess.file_exists(s):
 		script_path = s
 
 	print("[AR] Python: %s | Script: %s" % [python_path, script_path])
 
-
-# -- Dialog --
 
 func _show_camera_dialog() -> void:
 	var dialog = ConfirmationDialog.new()
@@ -81,6 +83,7 @@ func _on_camera_yes() -> void:
 	udp_tags.bind(6002, "0.0.0.0")
 	_connect_tcp()
 	_setup_camera_backdrop()
+	_setup_gate_overlay()
 	_hide_world()
 
 	await get_tree().create_timer(1.0).timeout
@@ -95,21 +98,16 @@ func _on_camera_no() -> void:
 	print("[AR] Normal game mode")
 
 
-# -- Launch Python --
-
 func _launch_python() -> void:
 	if python_path == "" or script_path == "":
 		print("[AR] ERROR: Python/script not found. Run manually:")
 		print("  python3 Scripts/ar_stream.py --webcam")
 		return
 
-	# bash -c so OPENCV_AVFOUNDATION_SKIP_AUTH=1 works on macOS
 	var cmd = "OPENCV_AVFOUNDATION_SKIP_AUTH=1 '%s' '%s' --webcam --headless" % [python_path, script_path]
 	python_pid = OS.create_process("/bin/bash", ["-c", cmd])
 	print("[AR] Python PID: %d" % python_pid if python_pid > 0 else "[AR] ERROR: Python failed to start")
 
-
-# -- Camera backdrop --
 
 func _setup_camera_backdrop() -> void:
 	var cam = _find_node_by_name(get_tree().root, "fpsCamera") as Camera3D
@@ -120,7 +118,7 @@ func _setup_camera_backdrop() -> void:
 	var mesh = QuadMesh.new()
 	mesh.size = Vector2(500, 350)
 
-	var img = Image.create(640, 480, false, Image.FORMAT_RGB8)
+	var img = Image.create(960, 540, false, Image.FORMAT_RGB8)
 	img.fill(Color(0.15, 0.15, 0.25))
 	camera_texture = ImageTexture.create_from_image(img)
 
@@ -137,7 +135,74 @@ func _setup_camera_backdrop() -> void:
 	backdrop_mesh.position = Vector3(0, 0, -90)
 
 
-# -- Hide world (only killPlane + CameraPivot) --
+func _setup_gate_overlay() -> void:
+	var cam = _find_node_by_name(get_tree().root, "fpsCamera") as Camera3D
+	if cam == null: return
+
+	gate_banner = Label3D.new()
+	gate_banner.text = "MARIO KART AR"
+	gate_banner.font_size = 72
+	gate_banner.modulate = Color(1, 0.2, 0.2)
+	gate_banner.outline_modulate = Color(1, 0.85, 0)
+	gate_banner.outline_size = 12
+	gate_banner.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+	gate_banner.no_depth_test = true
+	gate_banner.visible = false
+	gate_banner.pixel_size = 0.25
+	gate_banner.name = "GateBanner"
+	cam.add_child(gate_banner)
+
+	gate_sub_label = Label3D.new()
+	gate_sub_label.text = ""
+	gate_sub_label.font_size = 48
+	gate_sub_label.modulate = Color(1, 0.85, 0)
+	gate_sub_label.outline_modulate = Color(0.6, 0, 0)
+	gate_sub_label.outline_size = 8
+	gate_sub_label.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+	gate_sub_label.no_depth_test = true
+	gate_sub_label.visible = false
+	gate_sub_label.pixel_size = 0.2
+	gate_sub_label.name = "GateSubLabel"
+	cam.add_child(gate_sub_label)
+
+
+func _pixel_to_backdrop(px: float, py: float) -> Vector3:
+	var x = (px / 960.0 - 0.5) * 500.0
+	var y = (0.5 - py / 540.0) * 350.0
+	return Vector3(x, y, -89.5)
+
+
+func _show_gate(center: Array, corners: Array, gate_name: String) -> void:
+	if gate_banner == null: return
+
+	var cx = float(center[0])
+	var cy = float(center[1])
+	var pos = _pixel_to_backdrop(cx, cy)
+
+	var tag_h_px := 0.0
+	if corners.size() == 4:
+		var top_y = min(float(corners[0][1]), float(corners[1][1]))
+		var bot_y = max(float(corners[2][1]), float(corners[3][1]))
+		tag_h_px = bot_y - top_y
+
+	var banner_offset = (tag_h_px / 540.0) * 350.0 * 0.6 + 8.0
+
+	gate_banner.position = Vector3(pos.x, pos.y + banner_offset, pos.z)
+	gate_banner.visible = true
+
+	gate_sub_label.text = gate_name
+	gate_sub_label.position = Vector3(pos.x, pos.y - banner_offset * 0.7, pos.z)
+	gate_sub_label.visible = true
+
+	gate_visible = true
+	gate_fade_timer = 0.25
+
+
+func _hide_gate() -> void:
+	if gate_banner: gate_banner.visible = false
+	if gate_sub_label: gate_sub_label.visible = false
+	gate_visible = false
+
 
 func _hide_world() -> void:
 	var root = get_tree().root
@@ -157,8 +222,6 @@ func _hide_visual_children(node: Node) -> void:
 		_hide_visual_children(child)
 
 
-# -- Networking --
-
 func _connect_tcp() -> void:
 	tcp_client.connect_to_host("127.0.0.1", 6003)
 
@@ -169,6 +232,11 @@ func _process(delta: float) -> void:
 	process_count += 1
 	if gate_cooldown > 0: gate_cooldown -= delta
 	if not player_found: _find_player()
+
+	if gate_visible:
+		gate_fade_timer -= delta
+		if gate_fade_timer <= 0:
+			_hide_gate()
 
 	tcp_client.poll()
 	var status = tcp_client.get_status()
@@ -197,7 +265,7 @@ func _receive_tcp_frames() -> void:
 
 	while tcp_buffer.size() >= 4:
 		var size = (tcp_buffer[0] << 24) | (tcp_buffer[1] << 16) | (tcp_buffer[2] << 8) | tcp_buffer[3]
-		if size <= 0 or size > 500000:
+		if size <= 0 or size > 2000000:
 			tcp_buffer.clear()
 			break
 		if tcp_buffer.size() < 4 + size: break
@@ -216,7 +284,13 @@ func _receive_tags() -> void:
 		var data = JSON.parse_string(udp_tags.get_packet().get_string_from_utf8())
 		if data == null or data.get("type", "") != "ar_tags": continue
 		for tag in data.get("tags", []):
-			_trigger_gate(tag.get("event", ""), tag.get("name", ""))
+			var center = tag.get("center", [0, 0])
+			var corners = tag.get("corners", [])
+			var gate_name = tag.get("name", "")
+			var event = tag.get("event", "")
+
+			_show_gate(center, corners, gate_name)
+			_trigger_gate(event, gate_name)
 
 
 func _trigger_gate(event: String, name: String) -> void:
@@ -228,8 +302,6 @@ func _trigger_gate(event: String, name: String) -> void:
 		"mystery_box":   player_node.StoreItem(randi() % 3); print("[AR] ITEM BOX!")
 		"banana_trap":   player_node.Current = 1; player_node.StartTimer(player_node); print("[AR] HAZARD!")
 
-
-# -- Utility --
 
 func _find_player() -> void:
 	player_node = get_node_or_null("../CarManager/Player")
