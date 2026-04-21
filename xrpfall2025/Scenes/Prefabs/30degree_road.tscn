@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://drhckipbmuqft"]
+[gd_scene load_steps=7 format=3 uid="uid://drhckipbmuqft"]
 
 [ext_resource type="Script" uid="uid://bkj7k1i45vvp0" path="res://Scripts/track builder piece.gd" id="1_1qmnm"]
 [ext_resource type="ArrayMesh" uid="uid://e5sf0nht8lp1" path="res://Assets/3dmodels/Roady_30L.tres" id="2_1qmnm"]
@@ -12,7 +12,15 @@ radius = 0.15
 [sub_resource type="SphereShape3D" id="SphereShape3D_231pb"]
 radius = 0.15
 
+[sub_resource type="Curve3D" id="Curve3D_1qmnm"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.0903977, 0, -0.412882, 0, 0, 0, 0, 0, 0, -0.423795, 0, -0.736734),
+"tilts": PackedFloat32Array(0, 0, 0)
+}
+point_count = 3
+
 [node name="30deg Road" type="Node3D"]
+transform = Transform3D(1.236, 0, 0, 0, 1.236, 0, 0, 0, 1.236, 0, 0, 0)
 script = ExtResource("1_1qmnm")
 
 [node name="30deg Road Model" type="MeshInstance3D" parent="."]
@@ -36,8 +44,12 @@ shape = SubResource("SphereShape3D_ft2qa")
 
 [node name="Snap Point 2" type="StaticBody3D" parent="."]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+visible = false
 collision_layer = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Snap Point 2"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 shape = SubResource("SphereShape3D_231pb")
+
+[node name="Path3D" type="Path3D" parent="."]
+curve = SubResource("Curve3D_1qmnm")

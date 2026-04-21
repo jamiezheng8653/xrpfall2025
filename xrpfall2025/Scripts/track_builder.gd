@@ -9,6 +9,7 @@ var dragging = false
 var drag_object : Node3D = null
 
 var currently_snapped = false
+var snapped_to : Node3D = null
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
@@ -16,9 +17,10 @@ func _input(event: InputEvent) -> void:
 			drag_object.rotation.z += PI # flip over
 			# did try and use scale * -1 but it interacted weirdly with rotations
 		elif event.keycode == KEY_D and event.pressed and dragging:
-			drag_object.queue_free()
-			drag_object = null
-			dragging = false
+			if drag_object != %RootPart:
+				drag_object.queue_free()
+				drag_object = null
+				dragging = false
 		elif event.keycode == KEY_S and event.pressed:
 			save_track()
 	elif event is InputEventMouseButton:
@@ -48,7 +50,7 @@ func _input(event: InputEvent) -> void:
 			elif event.pressed == true and dragging == true:
 				pass
 			elif event.pressed == false and dragging == true:
-				print("just released button")
+				# released button
 				dragging = false
 				drag_object.enable_points()
 			else:
@@ -64,13 +66,22 @@ func _input(event: InputEvent) -> void:
 			camera.position.z -= diff.y
 		elif dragging:
 			var result = mouse_raycast_on_layer(4) # bitmasks baybee
-			if result != {} and !currently_snapped: # hovering over a snap point
+			if result != {} and snapped_to == null: # hovering over a snap point
 				#print(result["collider"])
 				drag_object.global_position = result["collider"].global_position
 				drag_object.global_rotation.y = result["collider"].global_rotation.y# + drag_object.rotation
-				currently_snapped = true
-			elif result == {} and currently_snapped: # just dragged off a point
-				currently_snapped = false
+				#currently_snapped = true
+				snapped_to = result["collider"].get_parent()
+				
+				snapped_to.next_piece = drag_object
+				drag_object.previous_piece = snapped_to
+			elif result == {} and snapped_to != null: # just dragged off a point
+				drag_object.previous_piece = null
+				if snapped_to.next_piece == drag_object:
+					snapped_to.next_piece = null
+				
+				#currently_snapped = false
+				snapped_to = null
 			elif result == {}:
 				#currently_snapped = false
 				drag_object.position = mouse_raycast_on_layer(2).get("position", Vector3.ZERO)
@@ -97,7 +108,7 @@ func spawn_part(part : PackedScene) -> void:
 	dragging = true
 	spawned.disable_points()
 
-func save_track():
+func save_track(): # save track and also compute full path
 	var saveScene = PackedScene.new()
 	var track = $Track
 	track.owner = track
@@ -114,3 +125,13 @@ func save_track():
 		path += ".tscn"
 	
 	var err = ResourceSaver.save(saveScene, path)
+
+func generate_path():
+	var path = Curve3D.new()
+	var piece = %RootPart
+	while piece != null:
+		var cur_path : Curve3D = piece.get_child(-1).curve # path3D is at the end for now, might need to be smarter
+		for i in cur_path.point_count:
+			var cur_point = cur_path.get_point_position(i)
+			path.add_point(cur_point)
+	$"Final Path".curve = path

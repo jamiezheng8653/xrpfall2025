@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://by4tp8ngpb2ux"]
+[gd_scene load_steps=12 format=3 uid="uid://by4tp8ngpb2ux"]
 
 [ext_resource type="Script" uid="uid://bo5v8cr2ptpos" path="res://Scripts/track_builder.gd" id="1_qc0ov"]
 [ext_resource type="PackedScene" uid="uid://dmtk2kn15ygii" path="res://Scenes/Prefabs/straight_road.tscn" id="2_dthog"]
@@ -13,6 +13,11 @@ font_size = 41
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_2u0tw"]
 size = Vector3(32.1033, 0.1, 31.8472)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i2bqm"]
+albedo_color = Color(0.729412, 0, 0, 1)
+
+[sub_resource type="Curve3D" id="Curve3D_i2bqm"]
 
 [node name="BuilderRoot" type="Node3D" node_paths=PackedStringArray("camera")]
 script = ExtResource("1_qc0ov")
@@ -80,14 +85,15 @@ spawned_piece = ExtResource("7_sqw8x")
 
 [node name="Label" type="Label" parent="Control"]
 layout_mode = 0
-offset_top = 783.0
-offset_right = 442.0
+offset_top = 723.0
+offset_right = 825.0
 offset_bottom = 1080.0
 text = "Left click to drag piece
 Right click to pan
 F to flip piece
 D to delete piece
-S to save"
+S to save
+Red piece is \"Root\" and cannot be deleted"
 label_settings = SubResource("LabelSettings_i2bqm")
 
 [node name="Backdrop" type="StaticBody3D" parent="."]
@@ -113,14 +119,26 @@ filters = PackedStringArray(".tscn")
 
 [node name="Track" type="Node3D" parent="."]
 
-[node name="StraightRoad" parent="Track" instance=ExtResource("2_dthog")]
+[node name="RootPart" parent="Track" instance=ExtResource("2_dthog")]
+unique_name_in_owner = true
 placed = true
 
-[node name="Straight Road" parent="Track" instance=ExtResource("2_dthog")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0971611, 0.0545238, -1.46099)
+[node name="Straight Road Model" parent="Track/RootPart" index="0"]
+material_override = SubResource("StandardMaterial3D_i2bqm")
+
+[node name="Snap Point 2" parent="Track/RootPart" index="3"]
+process_mode = 4
+
+[node name="CollisionShape3D" parent="Track/RootPart/Snap Point 2" index="0"]
+shape = null
+
+[node name="Final Path" type="Path3D" parent="."]
+curve = SubResource("Curve3D_i2bqm")
 
 [connection signal="button_down" from="Control/Straight Button" to="Control/Straight Button" method="_on_button_down"]
 [connection signal="button_down" from="Control/15 Button" to="Control/15 Button" method="_on_button_down"]
 [connection signal="button_down" from="Control/30 Button" to="Control/30 Button" method="_on_button_down"]
 [connection signal="button_down" from="Control/45 Button" to="Control/45 Button" method="_on_button_down"]
 [connection signal="button_down" from="Control/60 Button" to="Control/60 Button" method="_on_button_down"]
+
+[editable path="Track/RootPart"]

@@ -4,6 +4,9 @@ extends Node3D
 #@export var snap_point : Node3D
 @export var base_rotation : Vector3
 
+@export var next_piece : Node = null
+@export var previous_piece : Node = null
+
 func _ready() -> void:
 	if !placed:
 		pass
