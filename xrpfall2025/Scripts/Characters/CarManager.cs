@@ -5,11 +5,14 @@ public partial class CarManager : Node
 {
 	private PackedScene playerPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/player.tscn");
 	private PackedScene enemyPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/enemy_ai.tscn");
-
+	
 	private List<Car> cars = new List<Car>();
 	private int numberOfEnemies = 0;
-	private const int TOTALCARS = 2;
+	private const int TOTALCARS = 3;
 	private int numberOfPlayers = 1;
+	//keep track of the only player. will need to rewrite 
+	// cooresponding logic if multiplayer is implemented
+	private Player player; 
 
 	/// <summary>
 	/// Get a reference to the list of cars in the game
@@ -38,6 +41,53 @@ public partial class CarManager : Node
 		{
 			cars[i].PlacementChanged(i + 1);
 		}
+
+		//figure out which car is rubber banding to the player
+		if (player.Place == 1) //first place
+		{
+			foreach (Car c in Cars)
+			{
+				if (c.Place == 2 && c.IsClass("EnemyAi"))
+				{
+					EnemyAi e = (EnemyAi)c;
+					e.IsRubberbanding = true;
+					e.IsRubberbandingTo(player);
+					return;
+				}
+			}
+		}
+		else if (player.Place == Cars.Count) //last place
+		{
+			//have all cars rubber to the player for now
+			foreach (Car c in Cars)
+			{
+				if (c.IsClass("EnemyAi"))
+				{
+					EnemyAi e = (EnemyAi)c;
+					e.IsRubberbanding = true;
+					e.IsRubberbandingTo(player);
+				}
+			}
+		}
+		else //middle of the pack
+		{
+			int i = 0;
+			//grab a car in front and behind the player
+			foreach (Car c in Cars)
+			{
+				if (
+					(c.Place == player.Place + 1 || c.Place == player.Place - 1) 
+					&& c.IsClass("EnemyAi")
+				)
+				{
+					EnemyAi e = (EnemyAi)c;
+					e.IsRubberbanding = true;
+					e.IsRubberbandingTo(player);
+					i++;
+				}
+				if (i >= 2) return;
+			}
+		}
 	}
 
 	/// <summary>
@@ -64,6 +114,7 @@ public partial class CarManager : Node
 			cars.Add((Car)playerPrefab.Instantiate());
 			AddChild(cars[^1]);
 			cars[^1].Init(startingPosition += spawnDisplacement, track, totalCheckpoints);
+			player = (Player)cars[^1];
 		}
 
 	}

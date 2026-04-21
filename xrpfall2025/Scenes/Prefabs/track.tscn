@@ -14,12 +14,10 @@ albedo_color = Color(0.0117647, 0.447059, 0.698039, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5eegi"]
 albedo_color = Color(0.137921, 0.612636, 0.464006, 1)
 
-[node name="Track" type="Node" node_paths=PackedStringArray("innerPath", "innerFollow", "outerPath", "outerFollow")]
+[node name="Track" type="Node" node_paths=PackedStringArray("innerPath", "outerPath")]
 script = ExtResource("1_mutsl")
 innerPath = NodePath("innerPath3D")
-innerFollow = NodePath("innerPath3D/PathFollow3D")
 outerPath = NodePath("outerPath3D")
-outerFollow = NodePath("outerPath3D/PathFollow3D")
 scale = 15
 numOfPts = 15
 

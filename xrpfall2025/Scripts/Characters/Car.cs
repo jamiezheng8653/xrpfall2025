@@ -35,6 +35,9 @@ public partial class Car : Node
 	protected int place = 1;
 	protected int lap = 1;
 	protected bool finishedRace = false;
+	//flip to true once race countdown ends
+	//TODO: Hook up all cars to the hud's "countdown_finished" signal upon initialization
+	protected bool raceStarted = true; 
 	protected Path3D track;
 
 	//checkpoints passed for the onFinishline Collision check --> lap increment
@@ -270,7 +273,8 @@ public partial class Car : Node
 				break;
 		}
 		//stop moving if you've completed all three laps
-		if (finishedRace) speed *= 0;
+		//or ignore all movement while the race has not started 
+		if (finishedRace || !raceStarted) speed *= 0;
 		//GD.Print("speed: " + speed);
 		return speed;
 	}
@@ -516,5 +520,14 @@ public partial class Car : Node
 	}
 
 	#endregion
+
+	/// <summary>
+	/// Flips internal boolean that the race has started, enabling cars the ability to move. 
+	/// Call for all cars in car manager when the countdown has reached 0
+	/// </summary>
+	public void RaceStarted()
+	{
+		raceStarted = true;
+	}
 
 }
