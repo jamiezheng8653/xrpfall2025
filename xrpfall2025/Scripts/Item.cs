@@ -23,13 +23,18 @@ public partial class Item : Node
 	private List<Car> cars;
 
 	//references necessary for collision bounds
-	[Export] private CsgMesh3D cylinder = null;
+	
+	//[Export] private CsgMesh3D cylinder = null;
+	[Export] private VisualInstance3D cylinder = null;
 	[Export] private Area3D area3d = null;
 
 	private Stopwatch timer = null;
 
 	//for gizmos debugging
 	private Color color;
+
+	// Store which car hit this item for burst direction
+	private Vector3 lastHitDirection = Vector3.Forward;
 
 	private Vector3 Position
 	{
@@ -67,7 +72,30 @@ public partial class Item : Node
 	public override void _Process(double delta)
 	{
 		//spin
-		cylinder.RotateObjectLocal(new Vector3(0, 1, 0), (float)Mathf.DegToRad(2));
+		//cylinder.RotateObjectLocal(new Vector3(0, 1, 0), (float)Mathf.DegToRad(1));
+		// Face closest car + swing + bob + sway
+		float t = (float)(Time.GetTicksMsec() * 0.004);
+		float swingY = (float)Mathf.Sin(t) * Mathf.DegToRad(45);
+		float sway = (float)Mathf.Sin(t * 0.7) * Mathf.DegToRad(20);
+		float bob = (float)Mathf.Sin(t * 1.5) * 0.3f;
+
+		float faceY = 0;
+		if (cars != null && cars.Count > 0)
+		{
+			Car closest = cars[0];
+			float minDist = float.MaxValue;
+			foreach (Car c in cars)
+			{
+				float d = area3d.GlobalPosition.DistanceTo(c.AABB.GetCenter());
+				if (d < minDist) { minDist = d; closest = c; }
+			}
+			Vector3 dir = closest.AABB.GetCenter() - area3d.GlobalPosition;
+			faceY = Mathf.Atan2(dir.X, dir.Z);
+		}
+
+		cylinder.Rotation = new Vector3(sway, faceY + swingY, cylinder.Rotation.Z);
+		cylinder.Position = new Vector3(cylinder.Position.X, bob + 0.5f, cylinder.Position.Z);
+		
 		//if a timer is going, then reset the item and the timer
 		if (timer.ElapsedMilliseconds > 10000)
 		{
@@ -85,6 +113,14 @@ public partial class Item : Node
 					//GD.Print("I'm Colliding!");
 					//invoke event
 					//if (OnItemCollision != null) OnItemCollision();
+
+					// Get car's forward direction from its CharacterBody3D
+					var body = c.GetNode<CharacterBody3D>("Node3D/Player") ?? c.GetNode<CharacterBody3D>("Node3D/CharacterBody3D");
+					if (body != null)
+						lastHitDirection = -body.GlobalTransform.Basis.Z.Normalized();
+					else
+						lastHitDirection = (c.AABB.GetCenter() - area3d.GlobalPosition).Normalized();
+
 					OnItemCollision?.Invoke(c); //shorthand for above
 				
 					StartTimer(c);
@@ -160,13 +196,97 @@ public partial class Item : Node
 	}
 
 	/// <summary>
-	/// Hides the item box from the scene temporarily
+	/// Hides the item box and spawns burst particles
 	/// </summary>
-	/// <param name="c">Associated event requires reference 
-	/// to the car that passed the item box</param>
 	private void HideModel(Car c)
 	{
+		SpawnBurst();
 		cylinder.Hide();
+	}
+
+	/// <summary>
+	/// Crisp pop with pieces flying forward along car direction,
+	/// bouncing off floor, then fading out
+	/// </summary>
+	private void SpawnBurst()
+	{
+		var rng = new Random();
+		Vector3 forward = lastHitDirection;
+		forward.Y = 0;
+		if (forward.LengthSquared() > 0.01f)
+			forward = forward.Normalized();
+		else
+			forward = Vector3.Forward;
+
+		Vector3 side = new Vector3(-forward.Z, 0, forward.X);
+
+		for (int i = 0; i < 50; i++)
+		{
+			var piece = new CsgBox3D();
+			piece.Size = new Vector3(0.4f, 0.4f, 0.4f);
+
+			// Bright rainbow colors like MK item box shards
+			var mat = new StandardMaterial3D();
+			Color[] colors = {
+				new Color(1, 0.2f, 0.2f),    // red
+				new Color(0.2f, 0.5f, 1),     // blue
+				new Color(1, 0.9f, 0.1f),     // yellow
+				new Color(0.2f, 1, 0.4f),     // green
+				new Color(1, 0.4f, 0.8f),     // pink
+				new Color(0.6f, 0.3f, 1),     // purple
+			};
+			mat.AlbedoColor = colors[rng.Next(colors.Length)];
+			piece.Material = mat;
+
+			area3d.GetParent().AddChild(piece);
+			piece.GlobalPosition = area3d.GlobalPosition + new Vector3(0, 0.5f, 0);
+
+			// Spread: forward bias + some sideways + upward
+			float fwd = (float)(rng.NextDouble() * 12 + 2);            // 2-8 forward
+			float sideAmt = (float)(rng.NextDouble() * 2 - 1) * 4;    // ±4 sideways
+			float peakY = (float)(rng.NextDouble() * 2.5 + 1);        // 1-3.5 up
+
+			Vector3 scatter = forward * fwd + side * sideAmt;
+
+			var peakPos = piece.GlobalPosition + new Vector3(scatter.X, peakY, scatter.Z);
+			var floorPos = new Vector3(peakPos.X, 0.1f, peakPos.Z);
+			var bouncePos = new Vector3(floorPos.X, peakY * 0.2f, floorPos.Z);
+			var restPos = new Vector3(bouncePos.X, 0.1f, bouncePos.Z);
+
+			// Random spin while flying
+			var spinAxis = new Vector3(
+				(float)(rng.NextDouble() * 2 - 1),
+				(float)(rng.NextDouble() * 2 - 1),
+				(float)(rng.NextDouble() * 2 - 1)
+			).Normalized();
+			float spinAmount = (float)(rng.NextDouble() * 10 + 5);
+
+			var tween = piece.CreateTween();
+
+			// Phase 1: pop upward and forward (fast, crisp)
+			tween.SetParallel(true);
+			tween.TweenProperty(piece, "global_position", peakPos, 0.3f)
+				.SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
+			tween.TweenProperty(piece, "rotation", spinAxis * spinAmount, 0.3f);
+			tween.SetParallel(false);
+
+			// Phase 2: fall to floor
+			tween.TweenProperty(piece, "global_position", floorPos, 0.4f)
+				.SetEase(Tween.EaseType.In).SetTrans(Tween.TransitionType.Quad);
+
+			// Phase 3: small bounce
+			tween.TweenProperty(piece, "global_position", bouncePos, 0.2f)
+				.SetEase(Tween.EaseType.Out);
+
+			// Phase 4: settle
+			tween.TweenProperty(piece, "global_position", restPos, 0.2f)
+				.SetEase(Tween.EaseType.In);
+
+			// Phase 5: fade out (shrink)
+			tween.TweenProperty(piece, "scale", Vector3.Zero, 0.3f)
+				.SetEase(Tween.EaseType.In);
+			tween.TweenCallback(Callable.From(() => piece.QueueFree()));
+		}
 	}
 
 	/// <summary>
