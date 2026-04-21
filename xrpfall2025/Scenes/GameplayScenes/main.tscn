@@ -8,7 +8,8 @@
 [ext_resource type="PackedScene" uid="uid://dry5xxoksd4yr" path="res://Scenes/Prefabs/kill_plane.tscn" id="3_33oou"]
 [ext_resource type="PackedScene" uid="uid://dqemkqrkjrxoy" path="res://Scenes/Prefabs/checkpoint_manager.tscn" id="5_hbpqu"]
 [ext_resource type="PackedScene" uid="uid://b0pyubict3ifh" path="res://Scenes/Prefabs/finishline.tscn" id="5_t5l7q"]
-[ext_resource type="Script" uid="uid://lovac61hs2us" path="res://Scripts/ar_manager.gd" id="9_t5l7q"]
+[ext_resource type="Script" uid="uid://lovac61hs2us" path="res://Scripts/ar_manager.gd" id="8_t5l7q"]
+[ext_resource type="Script" uid="uid://cwl05w7v58gy5" path="res://Scenes/GameplayScenes/camera_feed.gd" id="9_t5l7q"]
 
 [node name="Node" type="Node"]
 
@@ -77,4 +78,15 @@ transform = Transform3D(-4.37114e-08, -1, -4.37114e-08, 0, -4.37114e-08, 1, -1, 
 cull_mask = 1047554
 
 [node name="ARManager" type="Node" parent="."]
+script = ExtResource("8_t5l7q")
+
+[node name="CameraFeedLayer" type="CanvasLayer" parent="."]
 script = ExtResource("9_t5l7q")
+
+[node name="VideoRect" type="TextureRect" parent="CameraFeedLayer"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+expand_mode = 1
+stretch_mode = 4
