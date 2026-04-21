@@ -30,8 +30,7 @@ public partial class CarManager : Node
     public override void _Process(double delta)
 	{
 		//sort the cars into their proper placements and save this new list
-		List<Car> temp = MergeSort(cars);
-		if (temp != null) cars = temp;
+		cars = MergeSort(Cars);
 
 		//adjust the placements of each car
 		for (int i = 0; i < cars.Count; i++)
