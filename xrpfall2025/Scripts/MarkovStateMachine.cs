@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Numerics;
 
 /// <summary>
 /// Will be used to handle decision making for the enemy ai.

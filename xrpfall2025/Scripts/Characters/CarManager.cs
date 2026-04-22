@@ -5,11 +5,14 @@ public partial class CarManager : Node
 {
 	private PackedScene playerPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/player.tscn");
 	private PackedScene enemyPrefab = ResourceLoader.Load<PackedScene>("res://Scenes/Prefabs/enemy_ai.tscn");
-
+	
 	private List<Car> cars = new List<Car>();
 	private int numberOfEnemies = 0;
-	private const int TOTALCARS = 2;
+	private const int TOTALCARS = 3;
 	private int numberOfPlayers = 1;
+	//keep track of the only player. will need to rewrite 
+	// cooresponding logic if multiplayer is implemented
+	private Player player; 
 
 	/// <summary>
 	/// Get a reference to the list of cars in the game
@@ -27,7 +30,7 @@ public partial class CarManager : Node
 		get {return numberOfPlayers;}
 	}
 
-    public override void _Process(double delta)
+	public override void _Process(double delta)
 	{
 		//sort the cars into their proper placements and save this new list
 		cars = MergeSort(Cars);
@@ -37,8 +40,54 @@ public partial class CarManager : Node
 		{
 			cars[i].PlacementChanged(i + 1);
 		}
-		//PlacementTracker();
-    }
+
+		//figure out which car is rubber banding to the player
+		if (player.Place == 1) //first place
+		{
+			foreach (Car c in Cars)
+			{
+				if (c.Place == 2 && c.IsClass("EnemyAi"))
+				{
+					EnemyAi e = (EnemyAi)c;
+					e.IsRubberbanding = true;
+					e.IsRubberbandingTo(player);
+					return;
+				}
+			}
+		}
+		else if (player.Place == Cars.Count) //last place
+		{
+			//have all cars rubber to the player for now
+			foreach (Car c in Cars)
+			{
+				if (c.IsClass("EnemyAi"))
+				{
+					EnemyAi e = (EnemyAi)c;
+					e.IsRubberbanding = true;
+					e.IsRubberbandingTo(player);
+				}
+			}
+		}
+		else //middle of the pack
+		{
+			int i = 0;
+			//grab a car in front and behind the player
+			foreach (Car c in Cars)
+			{
+				if (
+					(c.Place == player.Place + 1 || c.Place == player.Place - 1) 
+					&& c.IsClass("EnemyAi")
+				)
+				{
+					EnemyAi e = (EnemyAi)c;
+					e.IsRubberbanding = true;
+					e.IsRubberbandingTo(player);
+					i++;
+				}
+				if (i >= 2) return;
+			}
+		}
+	}
 
 	/// <summary>
 	/// Initializes all cars for the new track
@@ -64,6 +113,7 @@ public partial class CarManager : Node
 			cars.Add((Car)playerPrefab.Instantiate());
 			AddChild(cars[^1]);
 			cars[^1].Init(startingPosition += spawnDisplacement, track, totalCheckpoints);
+			player = (Player)cars[^1];
 		}
 
 	}
@@ -179,61 +229,4 @@ public partial class CarManager : Node
 		
 	}
 
-    /// <summary>
-	/// Calculates and sorts the placement of all cars
-	/// Admitted the current implementation can be optimized significantly.
-	/// But for now its performance is good enough for our intents and purposes.
-	/// 
-	/// </summary>
-	private void PlacementTracker()
-	{
-		// LinkedList<Car> ordered = new LinkedList<Car>();
-		// ordered.AddFirst(cars[0]);
-		// LinkedListNode<Car> current = ordered.First;
-		// //order the cars in terms of placement
-		// for(int i = 0; i < TOTALCARS; i++)
-		// {
-		// 	for (int j = i + 1; j < TOTALCARS; j++)
-		// 	{
-		// 		//first check if two cars are on different laps
-		// 		if (current.Value.Lap < cars[j].Lap)
-		// 		{
-		// 			current.
-		// 			ordered.AddFirst(cars[j]);
-		// 			current = cars[j];
-		// 			continue;
-		// 		}
-		// 		//if two cars are on the same lap, check who has more checkpoints
-		// 		else if (current.NumPassedCheckpoints < cars[i].Lap)
-		// 		{
-		// 			ordered.AddFirst(cars[j]);
-		// 			current = cars[j];
-		// 			continue;
-		// 		}
-		// 		//if two cars have the same amount of checkpoints, calculate who is farther from the last checkpoint passed
-		// 		else if(current.DistanceFromLastCheckpoint() < cars[i].DistanceFromLastCheckpoint())
-		// 		{
-		// 			ordered.AddFirst(cars[j]);
-		// 			current = cars[j];
-		// 			continue;
-		// 		}
-		// 		else
-		// 		{
-		// 			ordered.
-		// 		}
-		// 	}
-
-
-		// }
-
-
-		// //modify placement values for each car
-		// for(int i = 1; i <= TOTALCARS; i++)
-		// {
-		// 	now.Value.PlacementChanged(i);
-		// 	if(i + 1 > TOTALCARS) return;
-		// 	now = now.Next;
-		// }
-
-	}
 }
