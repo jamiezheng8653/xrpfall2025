@@ -20,3 +20,6 @@ mono_crash.*.json
 .envrc
 venv/
 .DS_Store
+
+road_models.blend
+xrpfall2025/export/

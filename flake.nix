@@ -22,8 +22,6 @@
           enablePython = true;
         })
         (pkgs.python313.withPackages (python-pkgs: with python-pkgs; [
-          #opencv4.overrideAttrs(final: prev: {enablePython = true; enableGtk3 = true;})
-          #opencv4
         ]))
       ];
       buildInputs = with pkgs; [

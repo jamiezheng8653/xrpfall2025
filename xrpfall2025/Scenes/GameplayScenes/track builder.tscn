@@ -18,6 +18,7 @@ size = Vector3(32.1033, 0.1, 31.8472)
 albedo_color = Color(0.729412, 0, 0, 1)
 
 [sub_resource type="Curve3D" id="Curve3D_i2bqm"]
+closed = true
 
 [node name="BuilderRoot" type="Node3D" node_paths=PackedStringArray("camera")]
 script = ExtResource("1_qc0ov")
@@ -132,7 +133,7 @@ process_mode = 4
 [node name="CollisionShape3D" parent="Track/RootPart/Snap Point 2" index="0"]
 shape = null
 
-[node name="Final Path" type="Path3D" parent="."]
+[node name="Final Path" type="Path3D" parent="Track"]
 curve = SubResource("Curve3D_i2bqm")
 
 [connection signal="button_down" from="Control/Straight Button" to="Control/Straight Button" method="_on_button_down"]

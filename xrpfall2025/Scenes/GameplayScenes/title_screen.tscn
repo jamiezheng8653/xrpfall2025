@@ -107,5 +107,24 @@ clip_text = true
 icon_alignment = 1
 expand_icon = true
 
+[node name="Track Editor" type="Button" parent="."]
+process_mode = 3
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -111.0
+offset_top = 617.0
+offset_right = 111.0
+offset_bottom = 716.0
+grow_horizontal = 2
+theme_override_styles/normal = ExtResource("3_t0dsj")
+text = "Track Editor"
+icon = ExtResource("3_1cpuo")
+clip_text = true
+icon_alignment = 1
+expand_icon = true
+
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="Quickstart" to="." method="_on_quickstart_pressed"]
+[connection signal="pressed" from="Track Editor" to="." method="_on_track_editor_pressed"]

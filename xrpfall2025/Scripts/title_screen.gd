@@ -20,3 +20,7 @@ func bounce_background():
 	tween.set_loops() # loops forever
 	tween.tween_property(background, "position:y", background.position.y - 20, 5.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(background, "position:y", background.position.y + 20, 5.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+
+func _on_track_editor_pressed() -> void:
+	get_tree().change_scene_to_file("res://Scenes/GameplayScenes/track builder.tscn")

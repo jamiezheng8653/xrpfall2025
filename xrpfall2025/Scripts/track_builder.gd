@@ -11,6 +11,8 @@ var drag_object : Node3D = null
 var currently_snapped = false
 var snapped_to : Node3D = null
 
+var currently_saving = false
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		if event.keycode == KEY_F and event.pressed and dragging:
@@ -21,8 +23,12 @@ func _input(event: InputEvent) -> void:
 				drag_object.queue_free()
 				drag_object = null
 				dragging = false
-		elif event.keycode == KEY_S and event.pressed:
+		elif event.keycode == KEY_S and event.pressed and !currently_saving:
+			currently_saving = true
 			save_track()
+			currently_saving = false
+		elif event.keycode == KEY_G and event.pressed:
+			generate_path()
 	elif event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			#print(event)
@@ -53,6 +59,7 @@ func _input(event: InputEvent) -> void:
 				# released button
 				dragging = false
 				drag_object.enable_points()
+				generate_path()
 			else:
 				pass
 				#dragging = false
@@ -66,15 +73,16 @@ func _input(event: InputEvent) -> void:
 			camera.position.z -= diff.y
 		elif dragging:
 			var result = mouse_raycast_on_layer(4) # bitmasks baybee
-			if result != {} and snapped_to == null: # hovering over a snap point
+			if result != {} and snapped_to == null: # just went over a snap point
 				#print(result["collider"])
 				drag_object.global_position = result["collider"].global_position
 				drag_object.global_rotation.y = result["collider"].global_rotation.y# + drag_object.rotation
 				#currently_snapped = true
 				snapped_to = result["collider"].get_parent()
 				
-				snapped_to.next_piece = drag_object
-				drag_object.previous_piece = snapped_to
+				if snapped_to.next_piece == null: # don't replace a piece that is in place
+					snapped_to.next_piece = drag_object
+					drag_object.previous_piece = snapped_to
 			elif result == {} and snapped_to != null: # just dragged off a point
 				drag_object.previous_piece = null
 				if snapped_to.next_piece == drag_object:
@@ -82,7 +90,7 @@ func _input(event: InputEvent) -> void:
 				
 				#currently_snapped = false
 				snapped_to = null
-			elif result == {}:
+			elif result == {}: # not over a snap point, was not on one
 				#currently_snapped = false
 				drag_object.position = mouse_raycast_on_layer(2).get("position", Vector3.ZERO)
 				#drag_object.rotation = Vector3.ZERO
@@ -109,6 +117,7 @@ func spawn_part(part : PackedScene) -> void:
 	spawned.disable_points()
 
 func save_track(): # save track and also compute full path
+	generate_path()
 	var saveScene = PackedScene.new()
 	var track = $Track
 	track.owner = track
@@ -121,17 +130,26 @@ func save_track(): # save track and also compute full path
 	
 	var path = await fileDialog.file_selected
 	
-	if !path.ends_with(".tscn"):
-		path += ".tscn"
+	#if !path.ends_with(".tscn"):
+	#	path += ".tscn"
 	
 	var err = ResourceSaver.save(saveScene, path)
 
 func generate_path():
 	var path = Curve3D.new()
+	path.closed = true # makes end connect to start
 	var piece = %RootPart
 	while piece != null:
 		var cur_path : Curve3D = piece.get_child(-1).curve # path3D is at the end for now, might need to be smarter
 		for i in cur_path.point_count:
 			var cur_point = cur_path.get_point_position(i)
-			path.add_point(cur_point)
-	$"Final Path".curve = path
+			var pos_global = piece.to_global(cur_point)
+			if path.point_count != 0: # always add points from root
+				# skip any points that are too close (usually overlapping start/end of pieces)
+				var dis_from_prev = (pos_global - path.get_point_position(path.point_count-1)).length()
+				if dis_from_prev > 0.1:
+					path.add_point(pos_global)
+			else:
+				path.add_point(pos_global)
+		piece = piece.next_piece
+	$"Track/Final Path".curve = path
