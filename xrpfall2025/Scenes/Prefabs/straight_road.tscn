@@ -1,0 +1,54 @@
+[gd_scene load_steps=7 format=3 uid="uid://dmtk2kn15ygii"]
+
+[ext_resource type="Script" uid="uid://bkj7k1i45vvp0" path="res://Scripts/track builder piece.gd" id="1_231pb"]
+[ext_resource type="ArrayMesh" uid="uid://cfsfnd28rcmjw" path="res://Assets/3dmodels/Roady_straight.tres" id="1_ft2qa"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dthog"]
+size = Vector3(0.817627, 0.034729, 2.25568)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ft2qa"]
+radius = 0.15
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_231pb"]
+radius = 0.15
+
+[sub_resource type="Curve3D" id="Curve3D_231pb"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.897124),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[node name="Straight Road" type="Node3D"]
+transform = Transform3D(1.236, 0, 0, 0, 1.236, 0, 0, 0, 1.236, 0, 0, 0)
+script = ExtResource("1_231pb")
+
+[node name="Straight Road Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.45)
+mesh = ExtResource("1_ft2qa")
+skeleton = NodePath("../Drag Box")
+
+[node name="Drag Box" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, -0.45)
+
+[node name="Drag shape" type="CollisionShape3D" parent="Drag Box"]
+transform = Transform3D(0.395228, 0, 0, 0, -1.7276e-08, -0.395228, 0, 0.395228, -1.7276e-08, 0.000820175, 0.000354302, -0.0045238)
+shape = SubResource("BoxShape3D_dthog")
+
+[node name="Snap Point 1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.9)
+collision_layer = 4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Snap Point 1"]
+shape = SubResource("SphereShape3D_ft2qa")
+
+[node name="Snap Point 2" type="StaticBody3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+collision_layer = 4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Snap Point 2"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+shape = SubResource("SphereShape3D_231pb")
+
+[node name="Path3D" type="Path3D" parent="."]
+curve = SubResource("Curve3D_231pb")

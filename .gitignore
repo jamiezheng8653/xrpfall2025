@@ -14,3 +14,12 @@ export_credentials.cfg
 .mono/
 data_*/
 mono_crash.*.json
+
+# virtual environment ignores
+.direnv
+.envrc
+venv/
+.DS_Store
+
+road_models.blend
+xrpfall2025/export/

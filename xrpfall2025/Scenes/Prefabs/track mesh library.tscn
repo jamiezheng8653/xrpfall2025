@@ -1,0 +1,50 @@
+[gd_scene load_steps=10 format=3 uid="uid://ox7j21fm7vhr"]
+
+[ext_resource type="ArrayMesh" uid="uid://cfsfnd28rcmjw" path="res://Assets/3dmodels/Roady_straight.tres" id="1_hbs11"]
+[ext_resource type="ArrayMesh" uid="uid://bam07gwnduf55" path="res://Assets/3dmodels/Roady_15L.tres" id="2_5c6qu"]
+[ext_resource type="ArrayMesh" uid="uid://e5sf0nht8lp1" path="res://Assets/3dmodels/Roady_30L.tres" id="3_6ybh1"]
+[ext_resource type="ArrayMesh" uid="uid://dgtih8proc1xg" path="res://Assets/3dmodels/Roady_45L.tres" id="4_2hwkj"]
+[ext_resource type="ArrayMesh" uid="uid://dted6wvjw0dyw" path="res://Assets/3dmodels/Roady_60L.tres" id="5_gjf1g"]
+[ext_resource type="ArrayMesh" uid="uid://bcutbnk30tn6c" path="res://Assets/3dmodels/Roady_15R.tres" id="6_0tbtg"]
+[ext_resource type="ArrayMesh" uid="uid://cn3iq28stfyo3" path="res://Assets/3dmodels/Roady_30R.tres" id="7_5sckn"]
+[ext_resource type="ArrayMesh" uid="uid://bgu8ba3vdem06" path="res://Assets/3dmodels/Roady_45R.tres" id="8_nff8w"]
+[ext_resource type="ArrayMesh" uid="uid://ctw0yfpqrafad" path="res://Assets/3dmodels/Roady_60R.tres" id="9_lgpht"]
+
+[node name="Root" type="Node3D"]
+
+[node name="Straight" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_hbs11")
+
+[node name="15 Left" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
+mesh = ExtResource("2_5c6qu")
+
+[node name="30 Left" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+mesh = ExtResource("3_6ybh1")
+skeleton = NodePath("../15 Left")
+
+[node name="45 Left" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 0)
+mesh = ExtResource("4_2hwkj")
+
+[node name="60 Left" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+mesh = ExtResource("5_gjf1g")
+
+[node name="15 Right" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
+mesh = ExtResource("6_0tbtg")
+
+[node name="30 Right" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
+mesh = ExtResource("7_5sckn")
+
+[node name="45 Right" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0)
+mesh = ExtResource("8_nff8w")
+
+[node name="60 Right" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+mesh = ExtResource("9_lgpht")
+skeleton = NodePath("../45 Right")
