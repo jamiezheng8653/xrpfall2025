@@ -43,7 +43,7 @@ func _input(event: InputEvent) -> void:
 				pan = false
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed == true and dragging == false:
-				var result = mouse_raycast_on_layer(1)
+				var result = mouse_raycast_on_layer(8)
 				if result == null:
 					pass
 				var collider = result.get("collider",null)
@@ -130,10 +130,11 @@ func save_track(): # save track and also compute full path
 	
 	var path = await fileDialog.file_selected
 	
-	#if !path.ends_with(".tscn"):
-	#	path += ".tscn"
+	if !path.ends_with(".tscn"):
+		path += ".tscn"
 	
-	var err = ResourceSaver.save(saveScene, path)
+	var err = await ResourceSaver.save(saveScene, path)
+	print("finished saving")
 
 func generate_path():
 	var path = Curve3D.new()
