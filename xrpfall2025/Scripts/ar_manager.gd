@@ -1,6 +1,7 @@
 # ar_manager.gd - AR Manager
 # On start: popup "Enable AR Camera?" -> Yes: auto-launch Python, show camera backdrop
 # Hides: killPlane ground | Keeps: track edges, finishline, items, HUD, minimap
+# Ports: UDP 6000 (tags), TCP 6001 (frames) - aligned with team convention
 
 extends Node
 
@@ -80,7 +81,7 @@ func _on_camera_yes() -> void:
 	if dl: dl.queue_free()
 
 	_launch_python()
-	udp_tags.bind(6002, "0.0.0.0")
+	udp_tags.bind(6000, "0.0.0.0")
 	_connect_tcp()
 	_setup_camera_backdrop()
 	_setup_gate_overlay()
@@ -142,26 +143,26 @@ func _setup_gate_overlay() -> void:
 	gate_banner = Label3D.new()
 	gate_banner.text = "MARIO KART AR"
 	gate_banner.font_size = 72
+	gate_banner.pixel_size = 0.25
 	gate_banner.modulate = Color(1, 0.2, 0.2)
 	gate_banner.outline_modulate = Color(1, 0.85, 0)
 	gate_banner.outline_size = 12
 	gate_banner.billboard = BaseMaterial3D.BILLBOARD_DISABLED
 	gate_banner.no_depth_test = true
 	gate_banner.visible = false
-	gate_banner.pixel_size = 0.25
 	gate_banner.name = "GateBanner"
 	cam.add_child(gate_banner)
 
 	gate_sub_label = Label3D.new()
 	gate_sub_label.text = ""
 	gate_sub_label.font_size = 48
+	gate_sub_label.pixel_size = 0.2
 	gate_sub_label.modulate = Color(1, 0.85, 0)
 	gate_sub_label.outline_modulate = Color(0.6, 0, 0)
 	gate_sub_label.outline_size = 8
 	gate_sub_label.billboard = BaseMaterial3D.BILLBOARD_DISABLED
 	gate_sub_label.no_depth_test = true
 	gate_sub_label.visible = false
-	gate_sub_label.pixel_size = 0.2
 	gate_sub_label.name = "GateSubLabel"
 	cam.add_child(gate_sub_label)
 
@@ -187,15 +188,21 @@ func _show_gate(center: Array, corners: Array, gate_name: String) -> void:
 
 	var banner_offset = (tag_h_px / 540.0) * 350.0 * 0.6 + 8.0
 
+	# Scale based on tag size in frame (closer = bigger, farther = smaller)
+	var scale_factor = tag_h_px / 100.0
+	scale_factor = clamp(scale_factor, 0.3, 3.0)
+
 	gate_banner.position = Vector3(pos.x, pos.y + banner_offset, pos.z)
+	gate_banner.scale = Vector3(scale_factor, scale_factor, scale_factor)
 	gate_banner.visible = true
 
 	gate_sub_label.text = gate_name
 	gate_sub_label.position = Vector3(pos.x, pos.y - banner_offset * 0.7, pos.z)
+	gate_sub_label.scale = Vector3(scale_factor, scale_factor, scale_factor)
 	gate_sub_label.visible = true
 
 	gate_visible = true
-	gate_fade_timer = 0.25
+	gate_fade_timer = 0.15
 
 
 func _hide_gate() -> void:
@@ -223,7 +230,7 @@ func _hide_visual_children(node: Node) -> void:
 
 
 func _connect_tcp() -> void:
-	tcp_client.connect_to_host("127.0.0.1", 6003)
+	tcp_client.connect_to_host("127.0.0.1", 6001)
 
 
 func _process(delta: float) -> void:
